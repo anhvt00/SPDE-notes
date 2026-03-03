@@ -1,0 +1,748 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\tr}{tr}
+\newcommand{\dual}[2]{{}_{V'}\langle #1, #2 \rangle_{V}}
+
+\title{Lecture 8: Gelfand Triples and Abstract Parabolic Equations}
+\date{04.12.2025}
+\author{Tien Anh Vu}
+\begin{document}
+\maketitle
+
+\section*{Chapter 3: Variational approach to SPDEs (continued)}
+
+\subsection*{Gelfand triples}
+
+Let $V$ and $H$ be separable Hilbert spaces with a dense and continuous embedding
+\[
+V \hookrightarrow H.
+\]
+Concretely, ``continuous embedding'' means that there is a constant $C>0$ such that
+\[
+\|u\|_H \le C\|u\|_V,
+\qquad
+u\in V,
+\]
+so the $V$-norm is stronger than the $H$-norm (more regularity in $V$ implies control in $H$).
+Without loss of generality, we may assume that
+\[
+\|u\|_H \le \|u\|_V,
+\qquad
+u\in V.
+\]
+This normalization is harmless: if originally $\|u\|_H\le C\|u\|_V$, one can replace the norm on $V$
+by the equivalent norm $\|u\|_{V,\mathrm{new}}:=C\|u\|_V$.
+Equivalently, one may extend the $V$-norm to all of $H$ by setting $\|u\|_V:=\infty$ for
+$u\in H\setminus V$; then the inequality above holds for every $u\in H$.
+By identifying $H$ with its dual $H'$ via the Riesz isomorphism, we obtain the \emph{Gelfand triple}
+\[
+V \hookrightarrow H \cong H' \hookrightarrow V'.
+\]
+The meaning of the last embedding $H'\hookrightarrow V'$ is that every functional on $H$ restricts
+to a functional on $V$; this restriction is continuous because $V\hookrightarrow H$ is continuous.
+We write $\dual{\cdot}{\cdot}$ for the duality pairing between $V'$ and $V$; it extends the inner product on $H$ in the sense that
+\[
+\dual{h}{v} = \langle h,v\rangle_H,
+\qquad
+h\in H,\ v\in V.
+\]
+
+\begin{remark}[Typical example]
+For a bounded domain $D\subset\mathbb{R}^d$,
+\[
+V = H_0^1(D),
+\qquad
+H = L^2(D),
+\qquad
+V' = H^{-1}(D).
+\]
+In this example, $V$ is the energy space, $H$ is the pivot space with the $L^2$ inner product,
+and $V'$ is the corresponding dual space; concretely, $H_0^1(D)$ is the Sobolev space of
+$L^2$-functions with weak first derivatives in $L^2$ and zero boundary values, while
+$H^{-1}(D)$ is its dual, the negative Sobolev space.
+\end{remark}
+
+\begin{remark}[Why one says ``space regularity'']
+In PDE applications, the space $V$ usually describes regularity in the spatial variable. For
+instance, if $V=H_0^1(D)$, then $u(t)\in V$ means that for each fixed time $t$ the function
+$x\mapsto u(t,x)$ has one weak spatial derivative in $L^2(D)$, so membership in
+$L^2([0,T];V)$ expresses spatial regularity integrated over time.
+\end{remark}
+
+\subsection*{Operators $A:V\to V'$}
+
+Let $A:V\to V'$ be a (typically linear) operator. Common assumptions in the variational theory are:
+\begin{itemize}
+  \item \textbf{Boundedness:} $A\in \mathcal{L}(V,V')$, i.e.\ there exists $C>0$ such that
+  \[
+  \|Au\|_{V'}\le C\|u\|_V,
+  \qquad
+  u\in V.
+  \]
+  A lot of the time, the operators arising in PDEs are unbounded when viewed as operators on $H$.
+  In the variational framework, the relevant condition is that $A$ is bounded as a map from $V$
+  into $V'$.
+  Intuitively, boundedness means that $A$ does not amplify the size of $u$ in an uncontrolled
+  way: if $u$ is small in $V$, then $Au$ is small in $V'$.
+  \item \textbf{Coercivity (bounded from below):} there exist $\alpha>0$ and $\lambda\in\mathbb{R}$ such that
+  \[
+  \dual{Au}{u}\ge \alpha\|u\|_V^2-\lambda\|u\|_H^2,
+  \qquad
+  u\in V.
+  \]
+  Intuitively, coercivity says that $A$ controls the stronger $V$-norm of $u$ up to a lower-order
+  correction involving the weaker $H$-norm; this is the key estimate behind energy bounds.
+  Depending on the sign convention in the evolution equation, one often also encounters the equivalent
+  ``dissipative'' form
+  \[
+  \dual{Au}{u}\le -\alpha\|u\|_V^2+\lambda\|u\|_H^2,
+  \]
+  which is obtained by replacing $A$ with $-A$ (e.g.\ writing the heat equation as $u_t-\Delta u=f$ rather than $u_t=\Delta u+f$).
+  \item \textbf{Monotonicity:} for all $u,v\in V$,
+  \[
+  \dual{Au-Av}{u-v}\ge 0.
+  \]
+  Intuitively, monotonicity means that $A$ does not push two states farther apart in a harmful
+  direction; it is a nonlinear analogue of positivity and is central for uniqueness and stability.
+\end{itemize}
+
+\subsection*{Example: the Laplacian}
+
+Take $V=H_0^1(D)$ and define $A:V\to V'$ by
+\[
+\dual{Au}{v}
+:=
+\int_D \nabla u\cdot \nabla v\,dx,
+\qquad
+u,v\in H_0^1(D).
+\]
+Formally, this corresponds to $Au=-\Delta u$ with homogeneous Dirichlet boundary conditions, since for smooth $u,v$,
+\[
+\int_D \nabla u\cdot \nabla v\,dx
+=
+-\int_D (\Delta u)\,v\,dx.
+\]
+Moreover, this definition shows directly that $A$ is bounded from $V$ to $V'$: for $u\in V$,
+\[
+\|Au\|_{V'}
+=
+\sup_{\|v\|_V\le 1}\dual{Au}{v}
+=
+\sup_{\|v\|_V\le 1}\int_D \nabla u\cdot \nabla v\,dx
+\le
+\sup_{\|v\|_V\le 1}\|\nabla u\|_{L^2(D)}\|\nabla v\|_{L^2(D)}
+\le
+\|u\|_V.
+\]
+Here we used Cauchy--Schwarz and the fact that $\|v\|_V$ controls $\|\nabla v\|_{L^2(D)}$ for $v\in H_0^1(D)$.
+
+\subsection*{Abstract parabolic Cauchy problem}
+
+\begin{theorem}[Existence and uniqueness in a Gelfand triple]
+Let $A\in\mathcal{L}(V,V')$ be coercive, let $u_0\in H$, and let $f\in L^2([0,T];V')$. Then the evolution problem
+\[
+\begin{cases}
+u'(t)=Au(t)+f(t), & t\in(0,T),\\
+u(0)=u_0,
+\end{cases}
+\]
+has a unique solution
+\[
+u\in C([0,T];H)\cap L^2([0,T];V),
+\qquad
+u'\in L^2([0,T];V').
+\]
+In words, $u$ has space-time regularity: it is continuous in time with values in $H$ and
+square-integrable in time with values in the more regular space $V$, while its time derivative is
+square-integrable with values in the dual space $V'$.
+\end{theorem}
+
+\begin{remark}[Heat equation]
+With $V=H_0^1(D)$, $H=L^2(D)$, and $A=-\Delta$, the abstract problem reads
+\[
+u'(t)=\Delta u(t)+f(t),
+\qquad
+u(0)=u_0,
+\]
+and the solution satisfies $u(t)\in H_0^1(D)$ for a.e.\ $t$ and $u\in C([0,T];L^2(D))$.
+This means that for almost every fixed time $t$, the spatial function $x\mapsto u(t,x)$ belongs to
+$H_0^1(D)$, i.e.\ it has weak first derivatives in $L^2(D)$ and zero boundary values.
+\end{remark}
+
+\begin{remark}[Why this is called parabolic]
+If $A=-\Delta$, then the abstract equation is the heat equation
+\[
+u_t-\Delta u=f.
+\]
+In one space dimension this becomes $u_t-u_{xx}=f$, whose second-order part has discriminant
+$A=-1$, $B=0$, $C=0$, hence $B^2-AC=0$, so it is parabolic in the classical classification.
+In higher dimensions one says it is parabolic because it is first order in time and its spatial
+second-order part $-\Delta$ is elliptic.
+\end{remark}
+
+\subsection*{Uniqueness: energy estimate}
+
+To prove uniqueness, let $u$ and $v$ be two solutions in the class
+\[
+C([0,T];H)\cap L^2([0,T];V),
+\qquad
+u',v'\in L^2([0,T];V'),
+\]
+with the same initial condition $u(0)=v(0)$. Set $w:=u-v$. Then $w$ solves the corresponding homogeneous
+parabolic equation
+\[
+\begin{cases}
+w'(t)=Aw(t), & t\in(0,T),\\
+w(0)=0.
+\end{cases}
+\]
+The key identity is the following.
+
+\begin{lemma}[Derivative of the $H$-norm]
+If $w\in L^2([0,T];V)$ and $w'\in L^2([0,T];V')$, then the map $t\mapsto \|w(t)\|_H^2$ is absolutely continuous and for a.e.\ $t\in(0,T)$,
+\[
+\frac{d}{dt}\|w(t)\|_H^2
+=
+2\dual{w'(t)}{w(t)}.
+\]
+\end{lemma}
+
+Applying this with $w'=Aw$ yields, for a.e.\ $t$,
+\[
+\frac{d}{dt}\|w(t)\|_H^2
+=
+2\dual{Aw(t)}{w(t)}.
+\]
+If, for example, $A$ satisfies the dissipative estimate
+\[
+\dual{Aw(t)}{w(t)}\le \lambda \|w(t)\|_H^2,
+\]
+Here $\lambda\in\mathbb{R}$ is a constant measuring how much growth is still allowed in the
+$H$-energy. Intuitively, this one-sided estimate says that $A$ does not increase the size of $w$
+too fast in $H$. This is different from coercivity, which gives a lower bound on
+$\dual{Au}{u}$ and controls the stronger $V$-norm of $u$.
+then
+\[
+\frac{d}{dt}\|w(t)\|_H^2 \le 2\lambda \|w(t)\|_H^2.
+\]
+Equivalently,
+\[
+\frac{d}{dt}\Bigl(e^{-2\lambda t}\|w(t)\|_H^2\Bigr)\le 0.
+\]
+Hence the map $t\mapsto e^{-2\lambda t}\|w(t)\|_H^2$ is nonincreasing. Since $w(0)=0$, we obtain
+\[
+\|w(t)\|_H^2 = 0
+\qquad \text{for all } t\in[0,T].
+\]
+Hence $w\equiv 0$, and therefore $u=v$.
+
+\subsection*{Existence via approximation (Galerkin method)}
+
+Let $(e_k)_{k\ge 1}$ be a complete orthonormal system (CONS: $C$ means
+$\overline{\mathrm{span}\{e_1,e_2,\dots\}}=H$, $O$ means
+$\langle e_i,e_j\rangle_H=\delta_{ij}$, and $S$ means that $(e_k)_{k\ge 1}$ is a family
+of elements of $H$) of $H$ such that $e_k\in V$ for all $k$.
+For $n\in\mathbb{N}$ define the finite-dimensional subspace
+\[
+V_n := \mathrm{span}\{e_1,\dots,e_n\}\subset V.
+\]
+We project the equation onto $V_n$ and look for an approximate solution $u_n\in C([0,T];V_n)$ of
+the form
+\[
+u_n(t)=\sum_{k=1}^n g_k^{(n)}(t)\,e_k,
+\]
+where the scalar functions $g_k^{(n)}$ are the \emph{Fourier coefficients} of $u_n$ in the basis $(e_k)$.
+Then $u_n$ is the unique solution in $C([0,T];V_n)$ of an $n$-dimensional linear ordinary
+differential equation. More precisely, testing the evolution equation against $e_k$,
+$k=1,\dots,n$, yields the finite-dimensional system
+\[
+\begin{cases}
+\dfrac{d}{dt}\langle u_n(t),e_k\rangle_H = \dual{Au_n(t)}{e_k} + \dual{f(t)}{e_k}, & t\in(0,T),\\[6pt]
+\langle u_n(0),e_k\rangle_H = \langle u_0,e_k\rangle_H, &
+\end{cases}
+\qquad k=1,\dots,n.
+\]
+This is an $n$-dimensional Cauchy problem for the coefficient vector
+\[
+\bigl(g_1^{(n)},\dots,g_n^{(n)}\bigr),
+\]
+so by the standard existence and uniqueness theory for linear ODEs it has a unique solution.
+
+\begin{remark}[On choosing the basis $(e_k)$]
+Since $V$ is dense in $H$, one can choose a CONS $(e_k)$ with $e_k\in V$ (e.g.\ by applying Gram--Schmidt to a dense sequence in $V$).
+In PDE examples it is common to take $(e_k)$ as eigenfunctions of an elliptic operator (such as the Dirichlet Laplacian), which makes the Galerkin system coincide with a truncated Fourier expansion.
+\end{remark}
+
+\begin{remark}[What elliptic means here]
+For a second-order linear operator
+\[
+Lu=-\sum_{i,j=1}^d a_{ij}(x)\,\partial_{ij}u+\text{lower-order terms},
+\]
+elliptic means that the coefficient matrix $A(x)=(a_{ij}(x))$ is positive definite, i.e.
+\[
+\sum_{i,j=1}^d a_{ij}(x)\xi_i\xi_j>0
+\qquad\text{for every }\xi\in\mathbb{R}^d\setminus\{0\}.
+\]
+For the Laplacian, $a_{ij}(x)=\delta_{ij}$, so $-\Delta$ is elliptic.
+\end{remark}
+
+\subsection*{Uniform energy estimate (a priori bound)}
+
+It is called an \emph{a priori} estimate because the bound is derived from the equation and the
+data alone, before knowing the solution explicitly.
+
+The next step is to pass to the limit $n\to\infty$. The essential ingredient for this is an a
+priori estimate that is uniform in $n$.
+Testing the Galerkin equation with $u_n(t)\in V_n$ and using coercivity yields an energy inequality of the form
+\[
+\sup_{n\ge 1}\left(\sup_{t\in[0,T]}\|u_n(t)\|_H^2 \;+\; \int_0^T \|u_n(t)\|_V^2\,dt\right) < \infty,
+\]
+In words, all approximate solutions $u_n$ satisfy the same bound: their $H$-norms stay bounded
+for all times $t\in[0,T]$, and their $V$-norms are square-integrable in time. The constant in
+this estimate depends only on $\|u_0\|_H$, $\|f\|_{L^2([0,T];V')}$, and the constants in the
+assumptions on $A$, but not on $n$.
+
+\begin{remark}[Heat equation: why Sobolev spaces appear]
+For the heat equation on a domain $D\subset\mathbb{R}^d$ with $V=H_0^1(D)$ and $H=L^2(D)$, the $V$-norm is (up to equivalence) the $L^2$-norm of the gradient:
+\[
+\|u\|_V^2 \simeq \|\nabla u\|_{L^2(D)}^2.
+\]
+Here $\simeq$ means that the two quantities are comparable up to multiplicative constants: each
+one bounds the other. This follows from Poincar\'e's inequality on $H_0^1(D)$.
+
+\begin{remark}[Why this follows from Poincar\'e's inequality]
+If we take
+\[
+\|u\|_V^2=\|u\|_{H_0^1(D)}^2:=\|u\|_{L^2(D)}^2+\|\nabla u\|_{L^2(D)}^2,
+\]
+then Poincar\'e's inequality gives
+\[
+\|u\|_{L^2(D)} \le C_P\|\nabla u\|_{L^2(D)},
+\qquad u\in H_0^1(D).
+\]
+Therefore
+\[
+\|u\|_V^2
+=
+\|u\|_{L^2(D)}^2+\|\nabla u\|_{L^2(D)}^2
+\le
+(C_P^2+1)\|\nabla u\|_{L^2(D)}^2.
+\]
+Conversely,
+\[
+\|\nabla u\|_{L^2(D)}^2 \le \|u\|_V^2.
+\]
+This is immediate from the definition of $\|\cdot\|_V$, since $\|u\|_V^2$ is the sum of
+$\|u\|_{L^2(D)}^2$ and $\|\nabla u\|_{L^2(D)}^2$.
+Hence
+\[
+\|\nabla u\|_{L^2(D)}^2 \le \|u\|_V^2 \le (C_P^2+1)\|\nabla u\|_{L^2(D)}^2,
+\]
+which is exactly the meaning of
+\[
+\|u\|_V^2 \simeq \|\nabla u\|_{L^2(D)}^2.
+\]
+\end{remark}
+
+For the heat equation, this gives a concrete example of the uniform a priori estimate: for the
+Galerkin sequence $(u_n)$,
+\[
+\sup_{n\ge 1}\left(\sup_{t\in[0,T]}\|u_n(t)\|_{L^2(D)}^2+\int_0^T\|\nabla u_n(t)\|_{L^2(D)}^2\,dt\right)<\infty.
+\]
+This is why one works in Sobolev spaces: for $u\in H_0^1(D)$, the gradient $\nabla u$ is defined
+in the weak sense, and the estimate gives control of these weak derivatives.
+\end{remark}
+
+\subsubsection*{Energy estimate: derivation}
+
+We now prove the uniform a priori estimate for the Galerkin approximations $(u_n)$.
+
+Starting from the Galerkin system, one computes (formally; justified since $u_n$ is finite-dimensional and smooth in time)
+Since $(e_1,\dots,e_n)$ is an orthonormal basis of $V_n$ and $u_n(t)\in V_n$, Parseval's identity gives
+\[
+\|u_n(t)\|_H^2=\sum_{k=1}^n \langle u_n(t),e_k\rangle_H^2.
+\]
+Therefore
+\[
+\frac12\frac{d}{dt}\|u_n(t)\|_H^2
+=
+\frac12\frac{d}{dt}\sum_{k=1}^n \langle u_n(t),e_k\rangle_H^2
+=
+\sum_{k=1}^n \langle u_n'(t),e_k\rangle_H\,\langle u_n(t),e_k\rangle_H.
+\]
+Using $u_n'(t)=Au_n(t)+f(t)$ and the defining property of the Galerkin approximation,
+\[
+\sum_{k=1}^n \langle u_n'(t),e_k\rangle_H\,\langle u_n(t),e_k\rangle_H
+=
+\sum_{k=1}^n \dual{Au_n(t)+f(t)}{e_k}\,\langle u_n(t),e_k\rangle_H
+\]
+Since
+\[
+u_n(t)=\sum_{k=1}^n \langle u_n(t),e_k\rangle_H\,e_k,
+\]
+linearity of the duality pairing in the second argument gives
+\[
+\sum_{k=1}^n \dual{Au_n(t)+f(t)}{e_k}\,\langle u_n(t),e_k\rangle_H
+=
+\dual{Au_n(t)+f(t)}{\sum_{k=1}^n \langle u_n(t),e_k\rangle_H\,e_k}
+=
+\dual{Au_n(t)+f(t)}{u_n(t)}.
+\]
+Hence
+\[
+\frac12\frac{d}{dt}\|u_n(t)\|_H^2
+=
+\dual{Au_n(t)}{u_n(t)}
+\;+\;
+\dual{f(t)}{u_n(t)}.
+\]
+Assuming the simplified coercivity $\dual{Au}{u}\le -\alpha\|u\|_V^2$ (or after rewriting $A$ by shifting a lower-order term), and applying Cauchy--Schwarz in $(V',V)$ followed by Young's inequality,
+\[
+\dual{f(t)}{u_n(t)}
+\le
+\|f(t)\|_{V'}\|u_n(t)\|_V
+\le
+\frac{1}{2\alpha}\|f(t)\|_{V'}^2+\frac{\alpha}{2}\|u_n(t)\|_V^2,
+\]
+where we used Young's inequality in the general form
+\[
+ab\le \frac{a^p}{p}+\frac{b^q}{q},
+\qquad a,b\ge 0,\quad \frac1p+\frac1q=1,
+\]
+or, in the weighted quadratic case relevant here,
+\[
+ab\le \frac{1}{2\varepsilon}a^2+\frac{\varepsilon}{2}b^2.
+\]
+Here we take $p=q=2$, $a=\|f(t)\|_{V'}$, $b=\|u_n(t)\|_V$, and $\varepsilon=\alpha$; equivalently,
+one may view this as the weighted AM--GM inequality.
+Therefore
+\[
+\frac12\frac{d}{dt}\|u_n(t)\|_H^2
+\le
+-\alpha\|u_n(t)\|_V^2
+\;+\;
+\frac{1}{2\alpha}\|f(t)\|_{V'}^2
+\;+
+\frac{\alpha}{2}\|u_n(t)\|_V^2
+=
+-\frac{\alpha}{2}\|u_n(t)\|_V^2
+\;+\;
+\frac{1}{2\alpha}\|f(t)\|_{V'}^2.
+\]
+Integrating from $0$ to $t$ gives
+\[
+\frac12\|u_n(t)\|_H^2-\frac12\|u_n(0)\|_H^2
+\le
+-\frac{\alpha}{2}\int_0^t\|u_n(s)\|_V^2\,ds
+\;+\;
+\frac{1}{2\alpha}\int_0^t\|f(s)\|_{V'}^2\,ds.
+\]
+Equivalently,
+\[
+\|u_n(t)\|_H^2
+\;+\;
+\alpha\int_0^t\|u_n(s)\|_V^2\,ds
+\le
+\|u_n(0)\|_H^2
+\;+\;
+\frac{1}{\alpha}\int_0^t\|f(s)\|_{V'}^2\,ds.
+\]
+Replacing $t$ by the supremum over $[0,T]$ and weakening the constants, we obtain the a priori estimate
+\[
+\sup_{t\in[0,T]}\|u_n(t)\|_H^2
+\;+\;
+\frac{\alpha}{2}\int_0^T\|u_n(t)\|_V^2\,dt
+\le
+\|u_n(0)\|_H^2 + \frac{1}{2\alpha}\int_0^T\|f(t)\|_{V'}^2\,dt.
+\]
+Since $u_n(0)$ is the $H$-orthogonal projection of $u_0$ onto $V_n$, $\|u_n(0)\|_H\le \|u_0\|_H$, and the right-hand side is independent of $n$.
+Using this uniform bound and weak compactness, we may extract a subsequence, again denoted by
+$(u_n)$, such that
+\[
+u_n\rightharpoonup u \quad \text{in } L^2([0,T];V).
+\]
+If $A\in\mathcal{L}(V,V')$ is linear, then also
+\[
+A u_n \rightharpoonup A u \quad \text{in } L^2([0,T];V').
+\]
+Indeed, let $A^*:V\to V'$ denote the adjoint operator, characterized by
+\[
+\dual{Aw}{v}=\dual{A^*v}{w}
+\qquad\text{for all }w,v\in V.
+\]
+Then for any $v\in L^2([0,T];V)$,
+\[
+\int_0^T \dual{Au_n(t)}{v(t)}\,dt
+=
+\int_0^T \dual{A^*v(t)}{u_n(t)}\,dt.
+\]
+Since $A^*\in\mathcal{L}(V,V')$, we have $A^*v\in L^2([0,T];V')$, and by weak convergence of
+$u_n$ in $L^2([0,T];V)$,
+\[
+\int_0^T \dual{A^*v(t)}{u_n(t)}\,dt
+\longrightarrow
+\int_0^T \dual{A^*v(t)}{u(t)}\,dt
+\qquad\text{for all }v\in L^2([0,T];V).
+\]
+Applying the adjoint identity once more, this limit equals
+\[
+\int_0^T \dual{Au(t)}{v(t)}\,dt.
+\]
+This allows one to pass to the limit in the variational formulation and obtain a solution of the
+abstract parabolic problem.
+
+\subsection*{Generalization to nonlinear operators}
+
+Assume now that $A:V\to V'$ is still bounded and coercive but \emph{not necessarily linear}.
+The same a priori estimate remains true, so after extracting a subsequence we may assume
+\[
+u_n \rightharpoonup u \quad \text{in } L^2([0,T];V).
+\]
+Moreover, the growth bound on $A$ implies that $(A(u_n))$ is bounded in $L^2([0,T];V')$, so,
+after passing to a further subsequence if necessary,
+\[
+A(u_n) \rightharpoonup g \quad \text{in } L^2([0,T];V')
+\]
+for some (a priori unknown) $g$.
+In contrast to the linear case, weak convergence $u_n\rightharpoonup u$ does \emph{not} directly imply
+$A(u_n)\rightharpoonup A(u)$, so we need an additional argument to identify $g$.
+
+\subsection*{Monotonicity (dissipativity)}
+
+Assume the following one-sided Lipschitz/monotonicity condition: there exists
+$\lambda\in\mathbb{R}$ such that for all $u,v\in V$,
+\[
+\dual{A(u)-A(v)}{u-v}
+\le
+\lambda\|u-v\|_H^2.
+\]
+Together with this, assume the growth bound
+\[
+\|A(u)\|_{V'}\le M(1+\|u\|_V),
+\qquad u\in V,
+\]
+and the hemicontinuity condition: for all $u,v,w\in V$, the map
+$\theta\mapsto \dual{A(u+\theta v)}{w}$ is continuous on $\mathbb{R}$.
+
+For any $v\in L^2([0,T];V)$, the one-sided Lipschitz/monotonicity condition gives, after
+integrating in time,
+\[
+\int_0^T \dual{A(u_n(t))-A(v(t))}{u_n(t)-v(t)}\,dt
+\le
+\lambda\int_0^T \|u_n(t)-v(t)\|_H^2\,dt.
+\]
+Expanding this inequality gives
+\[
+\begin{aligned}
+&\int_0^T \dual{A(u_n(t))}{u_n(t)}\,dt
+\;-\;
+\int_0^T \dual{A(u_n(t))}{v(t)}\,dt\\
+&\quad
+\;-\;
+\int_0^T \dual{A(v(t))}{u_n(t)}\,dt
+\;+\;
+\int_0^T \dual{A(v(t))}{v(t)}\,dt\\
+&\le \lambda\int_0^T \|u_n(t)-v(t)\|_H^2\,dt.
+\end{aligned}
+\]
+From the energy estimate, one obtains the $\limsup$ bound
+\[
+\limsup_{n\to\infty}\int_0^T \dual{A(u_n(t))}{u_n(t)}\,dt
+\le
+\int_0^T \dual{g(t)}{u(t)}\,dt.
+\]
+Also,
+\[
+\int_0^T \dual{A(u_n(t))}{v(t)}\,dt
+\longrightarrow
+\int_0^T \dual{g(t)}{v(t)}\,dt
+\]
+by weak convergence of $A(u_n)$ in $L^2([0,T];V')$, and
+\[
+\int_0^T \dual{A(v(t))}{u_n(t)}\,dt
+\longrightarrow
+\int_0^T \dual{A(v(t))}{u(t)}\,dt
+\]
+because $A(v)\in L^2([0,T];V')$ and $u_n\rightharpoonup u$ in $L^2([0,T];V)$. Passing to the
+limit yields
+\[
+\int_0^T \dual{g(t)-A(v(t))}{u(t)-v(t)}\,dt
+\le
+\lambda\int_0^T \|u(t)-v(t)\|_H^2\,dt
+\qquad
+\forall\,v\in L^2([0,T];V).
+\]
+
+The remaining step is the classical \emph{Browder--Minty (Minty) trick}: we perturb $v$ around $u$
+and let the perturbation parameter tend to zero, using hemicontinuity to pass to the limit in the
+nonlinear term.
+
+Now choose
+\[
+v=u+\theta w,
+\qquad \theta>0,\quad w\in L^2([0,T];V).
+\]
+Then $u-v=-\theta w$ and therefore
+\[
+-\theta\int_0^T \dual{g(t)-A(u(t)+\theta w(t))}{w(t)}\,dt
+\le
+\lambda\theta^2\int_0^T \|w(t)\|_H^2\,dt.
+\]
+Dividing by $\theta>0$ and multiplying by $-1$ yields
+\[
+\int_0^T \dual{g(t)-A(u(t)+\theta w(t))}{w(t)}\,dt
+\ge
+-\lambda\theta\int_0^T \|w(t)\|_H^2\,dt.
+\]
+Letting $\theta\downarrow 0$ and using hemicontinuity gives
+\[
+\int_0^T \dual{g(t)-A(u(t))}{w(t)}\,dt \ge 0
+\qquad
+\forall\,w\in L^2([0,T];V).
+\]
+Replacing $w$ by $-w$ gives
+\[
+\int_0^T \dual{g(t)-A(u(t))}{-w(t)}\,dt \ge 0,
+\qquad \forall\,w\in L^2([0,T];V),
+\]
+equivalently,
+\[
+\int_0^T \dual{g(t)-A(u(t))}{w(t)}\,dt \le 0,
+\qquad \forall\,w\in L^2([0,T];V).
+\]
+Therefore,
+\[
+\int_0^T \dual{g(t)-A(u(t))}{w(t)}\,dt = 0
+\qquad
+\forall\,w\in L^2([0,T];V),
+\]
+hence $g=A(u)$ in $L^2([0,T];V')$.
+
+\medskip
+We now relate the quantity $\int_0^T \dual{A(u_n(t))}{u_n(t)}\,dt$ to the energy balance and use
+it to compare $\int_0^T \dual{g(t)}{u(t)}\,dt$ with $\liminf_{n\to\infty}\int_0^T \dual{A(u_n(t))}{u_n(t)}\,dt$.
+
+First, the Galerkin equation can be written as $u_n'(t)=A(u_n(t))+f(t)$ in $V_n$.
+Testing it by $u_n(t)$ and using $\frac12\frac{d}{dt}\|u_n(t)\|_H^2=\dual{u_n'(t)}{u_n(t)}$ gives
+\[
+\dual{A(u_n(t))}{u_n(t)}
+=
+\frac12\frac{d}{dt}\|u_n(t)\|_H^2
+\;-\;
+\dual{f(t)}{u_n(t)}.
+\]
+Integrating over $[0,T]$ yields
+\[
+\int_0^T \dual{A(u_n(t))}{u_n(t)}\,dt
+=
+\frac12\bigl(\|u_n(T)\|_H^2-\|u_n(0)\|_H^2\bigr)
+\;-\;
+\int_0^T \dual{f(t)}{u_n(t)}\,dt.
+\]
+\medskip
+Next, passing to the limit in the Galerkin formulation yields (in $V'$)
+\[
+u'(t)=g(t)+f(t),
+\]
+meaning that for a.e.\ $t\in[0,T]$ and all $\varphi\in V$,
+\[
+\dual{u'(t)}{\varphi}=\dual{g(t)}{\varphi}+\dual{f(t)}{\varphi}.
+\]
+Choosing $\varphi=u(t)$, integrating over $[0,T]$, and using
+$\frac12\frac{d}{dt}\|u(t)\|_H^2=\dual{u'(t)}{u(t)}$, we obtain
+\[
+\int_0^T \dual{g(t)}{u(t)}\,dt
+=
+\frac12\bigl(\|u(T)\|_H^2-\|u(0)\|_H^2\bigr)
+\;-\;
+\int_0^T \dual{f(t)}{u(t)}\,dt.
+\]
+\medskip
+Finally, extract a subsequence such that $u_n(T)\rightharpoonup u(T)$ in $H$.
+Since $u_n\rightharpoonup u$ in $L^2([0,T];V)$, we have
+\[
+\int_0^T \dual{f(t)}{u_n(t)}\,dt \longrightarrow \int_0^T \dual{f(t)}{u(t)}\,dt,
+\]
+and since $u_n(0)\to u(0)$ in $H$ (Galerkin projection of the common initial datum) together with
+weak lower semicontinuity of the norm in $H$, we infer
+\[
+\begin{aligned}
+\int_0^T \dual{g(t)}{u(t)}\,dt
+&\le
+\liminf_{n\to\infty}\Biggl[
+\frac12\bigl(\|u_n(T)\|_H^2-\|u_n(0)\|_H^2\bigr)
+\;-\;
+\int_0^T \dual{f(t)}{u_n(t)}\,dt
+\Biggr]\\
+&=
+\liminf_{n\to\infty}\int_0^T \dual{A(u_n(t))}{u_n(t)}\,dt\\
+&\le
+\limsup_{n\to\infty}\int_0^T \dual{A(u_n(t))}{u_n(t)}\,dt.
+\end{aligned}
+\]
+Thus we have linked the limit quantity $\int_0^T\dual{g(t)}{u(t)}\,dt$ to the $\liminf/\limsup$ of
+$\int_0^T \dual{A(u_n(t))}{u_n(t)}\,dt$.
+Combining this with the monotonicity inequality and passing to the limit in $n$ yields, for every
+$v\in L^2([0,T];V)$,
+\[
+\int_0^T \dual{g(t)-A(u(t))}{u(t)-v(t)}\,dt
+\le
+\limsup_{n\to\infty}\int_0^T \dual{A(u_n(t))-A(v(t))}{u(t)-v(t)}\,dt
+\le
+0.
+\]
+This variational inequality is the key output of the Browder--Minty/Minty trick and is the step
+that leads to the identification $g=A(u)$.
+
+\subsection*{Compactness}
+
+The monotonicity method above is not the only way to identify nonlinear terms in a limit.
+Another important approach is to use \emph{compactness} to upgrade weak convergence to strong convergence in an intermediate space.
+
+Suppose that $(u_n)$ is bounded in
+\[
+L^2([0,T];V).
+\]
+In practice one also needs a bound that prevents fast oscillations in time. A common formulation is a fractional time-regularity estimate such as
+\[
+u_n \text{ bounded in } L^2([0,T];V)\cap H^{1/2}([0,T];V'),
+\]
+or, in many PDE/SPDE settings, a bound on the time derivative $u_n'$ in a negative space (e.g.\ $u_n'$ bounded in $L^2([0,T];V')$).
+If the embedding $V\hookrightarrow H$ is compact, then (under additional time-regularity bounds, e.g.\ on $(u_n')$ in a negative space) one can often extract a subsequence that converges \emph{strongly} in
+\[
+L^2([0,T];H).
+\]
+Statements of this type are instances of the Aubin--Lions/Simon compactness lemma: compactness in space plus some regularity in time yields compactness in space--time.
+Recall that the embedding $V\hookrightarrow H$ is called \emph{compact} if the inclusion map
+$i:V\to H$, $i(v)=v$, is a compact linear operator, i.e.\ it maps bounded sets in $V$ to
+\emph{relatively compact} sets in $H$.
+Here ``relatively compact in $H$'' means that every sequence in the set admits a subsequence that
+converges in $H$ (equivalently, the closure of the set is compact in $H$).
+
+\begin{remark}[PDE example: Rellich--Kondrachov]
+For a bounded domain $D\subset\mathbb{R}^d$,
+\[
+H_0^1(D)\hookrightarrow L^2(D)
+\]
+is a compact embedding (Rellich--Kondrachov theorem): any sequence bounded in $H_0^1(D)$ admits a
+subsequence converging strongly in $L^2(D)$.
+This is a prototypical source of compactness in variational PDE/SPDE theory.
+\end{remark}
+
+\begin{remark}[Why compactness helps]
+Strong convergence in $L^2([0,T];H)$ is especially useful when the equation contains nonlinearities that are not monotone (e.g.\ convection terms in fluid dynamics such as Navier--Stokes).
+In such cases, weak convergence may be insufficient to pass to the limit in products, while strong convergence can restore convergence of nonlinear terms.
+\end{remark}
+
+\end{document}

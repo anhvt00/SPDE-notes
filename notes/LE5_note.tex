@@ -1,0 +1,727 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\tr}{tr}
+
+\title{Lecture 5: Mild Solutions for SPDEs}
+\date{13.11.2025}
+\author{Tien Anh Vu}
+\begin{document}
+\maketitle
+
+%% =============================
+%% §5 Mild solutions for SPDEs
+%% =============================
+\section*{\S 5 Mild solutions for SPDEs}
+
+We consider (semi-linear) stochastic evolution equations on a (real separable) Hilbert space $H$:
+\begin{equation}\label{eq:spde-abstract}
+    dX_t
+    \;=\;
+    \bigl(AX_t + B(X_t)\bigr)\,dt
+    \;+\;
+    C(X_t)\,dW_t,
+    \qquad t \in [0,T],
+    \qquad X_0 = \xi.
+\end{equation}
+Here $A \colon D(A) \subset H \to H$ is typically an \emph{unbounded} (linear) operator, $B \colon H \to H$ is the drift nonlinearity,
+and $C \colon H \to L_2(U,H)$ is the diffusion coefficient (for a $U$-valued $Q$-Wiener process $W$).
+
+\begin{remark}[What ``semi-linear'' means]
+The equation \eqref{eq:spde-abstract} is called \emph{semi-linear} because the (typically unbounded) operator $A$ enters \emph{linearly} in the highest-order part $AX_t$,
+while the remaining terms $B(X_t)$ and $C(X_t)$ are nonlinear maps of the state.
+In PDE language, $A$ contains the highest-order derivatives and the nonlinearities are ``lower-order'' (they do not change the principal part).
+This contrasts with \emph{quasi-linear} problems, where the leading operator itself depends on $X$ (e.g.\ $A(X_t)X_t$).
+\end{remark}
+
+\begin{remark}
+If one formally integrates \eqref{eq:spde-abstract}, one obtains
+\[
+    X_t
+    \stackrel{?}{=}
+    \xi
+    + \int_0^t (AX_s + B(X_s))\,ds
+    + \int_0^t C(X_s)\,dW_s.
+\]
+This is \emph{not} a good starting point in infinite dimensions because $AX_s$ may be ill-defined unless $X_s \in D(A)$ a.s.
+The \emph{mild formulation} avoids applying $A$ directly to $X$.
+\end{remark}
+
+%% =============================
+%% Semigroup and mild formulation
+%% =============================
+\subsection*{Semigroup and mild formulation}
+
+Assume that $A$ generates a strongly continuous semigroup $(T_t)_{t\ge 0}$ on $H$, i.e.
+\[
+    T_t = e^{tA}, \qquad t \ge 0,
+    \qquad
+    T_0 = I,
+    \qquad
+    T_{t+s} = T_t T_s.
+\]
+
+\begin{definition}[Mild solution]
+An adapted process $(X_t)_{t\in[0,T]}$ is called a \emph{mild solution} of \eqref{eq:spde-abstract} on $[0,T]$ if, for all $t\in[0,T]$,
+\begin{equation}\label{eq:mild}
+    X_t
+    \;=\;
+    T_t \xi
+    + \int_0^t T_{t-s} B(X_s)\,ds
+    + \int_0^t T_{t-s} C(X_s)\,dW_s,
+\end{equation}
+where the integrals are well-defined (Bochner integral for the drift term and It\^o integral for the stochastic term).
+\end{definition}
+
+\begin{remark}
+The stochastic term
+\[
+    \int_0^t T_{t-s} C(X_s)\,dW_s
+\]
+is often called a \emph{stochastic convolution}. Under standard integrability assumptions, it is an $H$-valued continuous square-integrable martingale.
+\end{remark}
+
+%% =============================
+%% Deterministic motivation: variation of constants
+%% =============================
+\subsection*{Deterministic motivation: variation of constants}
+
+Consider the (linear) deterministic evolution equation with inhomogeneous forcing
+\begin{equation}\label{eq:det}
+    \frac{d}{dt}x(t) = Ax(t) + f(t),
+    \qquad t>0,
+    \qquad x(0) = x,
+\end{equation}
+where $f\colon [0,T]\to H$ is a given function (independent of $x$).
+If $A$ generates $(T_t)_{t\ge 0}$, then the corresponding variation-of-constants (Duhamel) formula is
+\begin{equation}\label{eq:det-mild}
+    x(t)
+    \;=\;
+    T_t x
+    + \int_0^t T_{t-s} f(s)\,ds.
+\end{equation}
+
+\paragraph{Derivation (integration factor).}
+Formally, set $y(t) := T_{-t}x(t)$ (i.e.\ $y(t)=e^{-tA}x(t)$ when this makes sense). Then
+\[
+    y'(t)
+    \;=\;
+    \frac{d}{dt}\bigl(T_{-t}x(t)\bigr)
+    \;=\;
+    -T_{-t}Ax(t) + T_{-t}x'(t)
+    \;=\;
+    T_{-t} f(t).
+\]
+Integrating from $0$ to $t$ gives
+\[
+    T_{-t}x(t) = x + \int_0^t T_{-s} f(s)\,ds.
+\]
+Multiplying by $T_t$ and using $T_t T_{-s} = T_{t-s}$ yields \eqref{eq:det-mild}.
+
+\paragraph{Homogeneous case.}
+If $f \equiv 0$, then \eqref{eq:det} reduces to $x'(t)=Ax(t)$ with solution $x(t)=T_t x = e^{tA}x$.
+
+\begin{remark}[Fundamental solution and convolution form]
+In the bounded-operator case, $T_t=e^{tA}=\sum_{k=0}^\infty \frac{t^k}{k!}A^k$ is the \emph{fundamental solution} of the homogeneous equation.
+The inhomogeneous term in \eqref{eq:det-mild} is a time-convolution of $f$ against the semigroup kernel $T_{t-s}$.
+\end{remark}
+
+\begin{remark}
+Formula \eqref{eq:mild} for the SPDE is the stochastic analogue of \eqref{eq:det-mild}:
+the drift is convolved with the semigroup (now with $f(s)$ replaced by $B(X_s)$), and the noise enters through the stochastic convolution
+$\int_0^t T_{t-s}C(X_s)\,dW_s$.
+\end{remark}
+
+%% =============================
+%% Additional remarks
+%% =============================
+\subsection*{Remarks}
+
+\begin{remark}[Why mild solutions are natural]
+In SPDEs, $A$ is often a differential operator (e.g. Laplacian) and $D(A)$ encodes spatial regularity.
+Even if $X_0=\xi \in H$, the process $X_t$ need not lie in $D(A)$ for all $t$.
+The mild formulation uses the smoothing effect of $T_t$ and is the standard notion for existence/uniqueness via fixed-point arguments.
+\end{remark}
+
+\begin{remark}[$C_0$ property]
+The semigroup generated by $A$ is assumed \emph{strongly continuous}:
+\[
+    \lim_{t \downarrow 0} \|T_t x - x\|_H = 0 \qquad \text{for all } x \in H.
+\]
+This is exactly what one needs for \eqref{eq:mild} to reduce to $X_0=\xi$ at $t=0$.
+\end{remark}
+
+\begin{remark}[Strong vs.\ mild]
+If a mild solution is sufficiently regular so that $X_t \in D(A)$ a.s.\ and the map $t\mapsto X_t$ is differentiable in a suitable sense,
+then \eqref{eq:mild} can be differentiated to recover the \emph{strong} (differential) form \eqref{eq:spde-abstract}.
+In general, mild solutions are weaker but typically easier to construct.
+\end{remark}
+
+%% =============================
+%% Appendix: strongly continuous semigroups
+%% =============================
+\subsection*{Appendix: Strongly continuous semigroups ($C_0$-semigroups)}
+
+\paragraph{Formal variation-of-constants (SPDE).}
+In the same spirit as the deterministic integration-factor argument, one \emph{formally} writes
+\[
+    X_t
+    =
+    e^{tA}\xi
+    + \int_0^t e^{(t-s)A} B(X_s)\,ds
+    + \int_0^t e^{(t-s)A} C(X_s)\,dW_s.
+\]
+This is exactly the mild formula \eqref{eq:mild} when we denote $T_t = e^{tA}$.
+
+\paragraph{Motivation from bounded operators.}
+If $A \in \mathcal{L}(E)$ is bounded on a Banach space $E$, then
+\[
+    e^{tA} := \sum_{k=0}^{\infty} \frac{t^k}{k!}A^k
+\]
+is well-defined for all $t\ge 0$, and it satisfies:
+\[
+    e^{0A} = I, \qquad
+    e^{(t+s)A} = e^{tA}e^{sA},
+\]
+and for each $u\in E$, the map $t\mapsto e^{tA}u$ is continuous on $[0,\infty)$.
+
+\begin{definition}[$C_0$-semigroup]
+Let $E$ be a Banach space. A family $(T_t)_{t\ge 0} \subset \mathcal{L}(E)$ is called a
+\emph{strongly continuous semigroup} (or \emph{$C_0$-semigroup}) on $E$ if:
+\begin{enumerate}
+    \item $T_0 = I_E$;
+    \item $T_{t+s} = T_t \circ T_s$ for all $s,t \ge 0$;
+    \item for every $u\in E$, the map $t\mapsto T_t u$ is continuous on $[0,\infty)$.
+\end{enumerate}
+\end{definition}
+
+\begin{definition}[Infinitesimal generator]
+Let $(T_t)_{t\ge 0}$ be a $C_0$-semigroup on $E$. Its \emph{infinitesimal generator} is the pair $(A,D(A))$ defined by
+\[
+    Au
+    :=
+    \lim_{h\downarrow 0}\frac{T_hu-u}{h},
+    \qquad \text{for } u \in D(A),
+\]
+where
+\[
+    D(A)
+    :=
+    \left\{
+        u\in E:\;
+        \lim_{h\downarrow 0}\frac{T_hu-u}{h}
+        \text{ exists in } E
+    \right\}.
+\]
+\end{definition}
+
+\begin{remark}
+The limit is \emph{one-sided} ($h\downarrow 0$) because the semigroup is only defined for times $t\ge 0$.
+\end{remark}
+
+\begin{remark}
+For bounded $A\in\mathcal{L}(E)$, the semigroup $T_t=e^{tA}$ is a $C_0$-semigroup and its generator is exactly $A$ with domain $D(A)=E$.
+In SPDEs, the important examples (Laplacian, elliptic operators, etc.) are typically unbounded, so one starts from the semigroup rather than from the exponential series.
+\end{remark}
+
+\begin{remark}
+For a $C_0$-semigroup, the generator domain $D(A)$ is dense in $E$ (in the standard semigroup setting).
+This density is one reason the generator captures the semigroup uniquely.
+\end{remark}
+
+\begin{remark}[Generator is closed]
+If $(A,D(A))$ is the generator of a $C_0$-semigroup on $E$, then $(A,D(A))$ is a \emph{closed} linear operator.
+Equivalently, its graph
+\[
+    \mathcal{G}(A)
+    :=
+    \{(u,Au):\; u\in D(A)\}
+    \subset E\times E
+\]
+is a closed subspace of $E\times E$.
+Thus, if $u_n\in D(A)$ with $u_n\to u$ in $E$ and $Au_n\to v$ in $E$, then $u\in D(A)$ and $Au=v$.
+
+Equivalently, $D(A)$ equipped with the \emph{graph norm}
+\[
+    \|u\|_{D(A)} := \|u\|_E + \|Au\|_E
+\]
+is complete. In concrete terms: if $(u_n)$ is a Cauchy sequence in $D(A)$ (for the graph norm), $u_n\to u$ in $E$, and $(Au_n)$ is Cauchy in $E$,
+then $u\in D(A)$ and $Au_n\to Au$ in $E$.
+\end{remark}
+
+%% =============================
+%% Example: heat semigroup and Laplacian
+%% =============================
+\subsection*{Example: Laplace operator on $E=L^2(\mathbb{R}^d)$}
+
+Let $(W_t)_{t\ge 0}$ be a standard $d$-dimensional Brownian motion in $\mathbb{R}^d$.
+For $f \in C_c^2(\mathbb{R}^d)$ and $x\in\mathbb{R}^d$, apply It\^o's formula to $s\mapsto f(x+W_s)$:
+\begin{equation}\label{eq:ito-heat-example}
+    f(x+W_t)
+    =
+    f(x)
+    + \int_0^t \nabla f(x+W_s)\,dW_s
+    + \frac12 \int_0^t \Delta f(x+W_s)\,ds.
+\end{equation}
+
+Define
+\[
+    T_t f(x) := E\bigl[f(x+W_t)\bigr],
+    \qquad t\ge 0.
+\]
+Taking expectations in \eqref{eq:ito-heat-example} (the stochastic integral has mean zero) yields
+\[
+    T_t f(x) - f(x)
+    =
+    \frac12 \int_0^t E\bigl[\Delta f(x+W_s)\bigr]\,ds
+    =
+    \frac12 \int_0^t T_s(\Delta f)(x)\,ds.
+\]
+Hence
+\begin{equation}\label{eq:heat-dq}
+    \frac{T_t f(x)-f(x)}{t}
+    =
+    \frac1t \int_0^t T_s\!\left(\frac12\Delta f\right)(x)\,ds
+    \xrightarrow[t\downarrow 0]{}
+    \frac12\Delta f(x).
+\end{equation}
+
+\begin{remark}
+The family $(T_t)_{t\ge 0}$ is the \emph{heat semigroup}. In convolution form,
+\[
+    T_t f = \Gamma_t * f,
+\]
+where $\Gamma_t$ is the heat kernel on $\mathbb{R}^d$.
+This immediately implies that $T_t$ is linear and bounded on $L^2(\mathbb{R}^d)$.
+\end{remark}
+
+\begin{remark}[Semigroup property]
+Using independent increments of Brownian motion (or the convolution identity for heat kernels),
+\[
+    T_t(T_s f)=T_{t+s}f,
+    \qquad s,t\ge 0.
+\]
+Moreover, $(T_t)_{t\ge 0}$ is a $C_0$-semigroup on $L^2(\mathbb{R}^d)$.
+\end{remark}
+
+\begin{remark}[Generator on a core]
+Let $(A,D(A))$ denote the infinitesimal generator of the heat semigroup on $L^2(\mathbb{R}^d)$.
+Then
+\[
+    C_c^2(\mathbb{R}^d) \subset D(A),
+    \qquad
+    Af = \frac12 \Delta f
+    \quad \text{for } f\in C_c^2(\mathbb{R}^d),
+\]
+by the difference-quotient limit \eqref{eq:heat-dq}.
+\end{remark}
+
+\begin{remark}[Full domain (Sobolev description)]
+The generator is the closure of $\frac12\Delta$ initially defined on $C_c^2(\mathbb{R}^d)$, and its full domain is
+\[
+    D(A)=H^{2,2}(\mathbb{R}^d)=W^{2,2}(\mathbb{R}^d),
+\]
+with $A=\frac12\Delta$ in the weak (distributional) sense.
+\end{remark}
+
+\begin{remark}[Weak derivatives (distributional formulation)]
+For $f \in L^2(\mathbb{R}^d)$, the weak derivative $\partial^\alpha f$ is characterized by
+\[
+    \langle \partial^\alpha f, g\rangle_{L^2(\mathbb{R}^d)}
+    =
+    (-1)^{|\alpha|}
+    \int_{\mathbb{R}^d} f(x)\,\partial^\alpha g(x)\,dx,
+    \qquad g\in C_c^\infty(\mathbb{R}^d),
+\]
+whenever the left-hand side is represented by an $L^2$-function.
+This is the sense in which the Sobolev-space identity above is understood.
+\end{remark}
+
+%% =============================
+%% Example: killed Brownian motion / Dirichlet Laplacian
+%% =============================
+\subsection*{Example: Laplace operator on $L^2(D)$ (Dirichlet boundary condition)}
+
+Let $D \subset \mathbb{R}^d$ be an open set, and let $(W_t)_{t\ge 0}$ be a standard Brownian motion in $\mathbb{R}^d$.
+For $x\in D$, define the first exit time
+\[
+    \tau_D
+    :=
+    \inf\{t\ge 0:\; x+W_t \notin D\}.
+\]
+
+Define, for $f \in L^2(D)$,
+\begin{equation}\label{eq:killed-semigroup}
+    T_t f(x)
+    :=
+    E\!\left[f(x+W_t)\,\mathbf{1}_{\{\tau_D>t\}}\right],
+    \qquad t\ge 0,\; x\in D.
+\end{equation}
+Equivalently, $(T_t)_{t\ge 0}$ is the semigroup of Brownian motion \emph{killed} when it exits $D$.
+
+\begin{remark}
+The indicator $\mathbf{1}_{\{\tau_D>t\}}$ enforces the Dirichlet boundary condition probabilistically:
+mass is removed once the trajectory reaches $\partial D$.
+This is why the associated generator is the \emph{Dirichlet Laplacian}, not the free Laplacian on $\mathbb{R}^d$.
+\end{remark}
+
+\begin{remark}[Semigroup and generator]
+Under standard assumptions, $(T_t)_{t\ge 0}$ defines a $C_0$-semigroup on $L^2(D)$.
+Its infinitesimal generator is the operator $A=\frac12\Delta$ with Dirichlet boundary condition.
+\end{remark}
+
+\begin{remark}[Domain (smooth bounded domains)]
+If $D$ is sufficiently regular (e.g.\ bounded with smooth boundary), then the generator domain can be identified as
+\[
+    D(A)=H^2(D)\cap H_0^1(D)\subset L^2(D),
+\]
+and
+\[
+    Au=\frac12\Delta u
+    \qquad \text{for } u\in D(A),
+\]
+where $\Delta u$ is understood in the weak sense.
+\end{remark}
+
+\begin{remark}[Meaning of $H_0^1(D)$]
+The space $H_0^1(D)$ is the closure of $C_c^\infty(D)$ in $H^1(D)$.
+Informally, it consists of $H^1$-functions with zero trace on $\partial D$ (Dirichlet condition).
+In one dimension, for $D=(a,b)$, this corresponds to vanishing boundary values at $a$ and $b$ in the trace sense.
+\end{remark}
+
+%% =============================
+%% Special case: D = (0,1) and spectral representation
+%% =============================
+\subsection*{Special case: $D=(0,1)$ (Dirichlet) and spectral representation}
+
+Let $D=(0,1)\subset \mathbb{R}$ and consider the Dirichlet Laplacian. The functions
+\[
+    e_k(x) := \sqrt{2}\,\sin(\pi k x),
+    \qquad k=1,2,\dots,
+\]
+form a complete orthonormal system of $L^2(0,1)$ and satisfy
+\[
+    \Delta e_k = \partial_{xx} e_k = -\pi^2 k^2\, e_k,
+    \qquad e_k(0)=e_k(1)=0.
+\]
+For the generator $A=\tfrac12\Delta$ we therefore have
+\[
+    A e_k = -\frac{\pi^2 k^2}{2}\,e_k.
+\]
+
+\paragraph{Spectral representation of the semigroup.}
+Let $(T_t)_{t\ge 0}$ be the $C_0$-semigroup generated by $A=\tfrac12\Delta$ on $L^2(0,1)$ with Dirichlet boundary condition.
+For $f\in L^2(0,1)$ with Fourier coefficients $\langle f,e_k\rangle_{L^2(0,1)}$, one has the $L^2$-expansion
+	\[
+	    f = \sum_{k=1}^{\infty} \langle f,e_k\rangle\,e_k
+	    \qquad \text{and} \qquad
+	    T_t f = \sum_{k=1}^{\infty} e^{-\frac{\pi^2 k^2}{2}t}\,\langle f,e_k\rangle\,e_k.
+	\]
+	Indeed, since $A e_k = -\frac{\pi^2 k^2}{2}e_k$, one has
+	\[
+	    T_t e_k = e^{tA}e_k = e^{-\frac{\pi^2 k^2}{2}t}\,e_k.
+	\]
+	Expanding $f=\sum_{k\ge 1}\langle f,e_k\rangle e_k$ and using linearity yields the displayed formula for $T_t f$.
+	In particular, $T_t f \to 0$ in $L^2(0,1)$ as $t\to\infty$.
+
+\begin{remark}[Generator via Fourier coefficients]
+Formally differentiating term-by-term gives
+\[
+    \frac{d}{dt}T_t f
+    =
+    -\frac{\pi^2}{2}\sum_{k=1}^{\infty} k^2\,e^{-\frac{\pi^2 k^2}{2}t}\,\langle f,e_k\rangle\,e_k.
+\]
+At $t=0$ this suggests
+\[
+    Af = -\frac{\pi^2}{2}\sum_{k=1}^{\infty} k^2\,\langle f,e_k\rangle\,e_k,
+\]
+	with domain characterized by
+	\[
+	    D(A)
+	    =
+	    \left\{
+	        f\in L^2(0,1):\;
+	        \sum_{k=1}^{\infty} k^4\,|\langle f,e_k\rangle|^2 < \infty
+	    \right\},
+	\]
+	which is equivalent to $D(A)=H^2(0,1)\cap H_0^1(0,1)$.
+
+	A useful sufficient condition (e.g.\ used in some references such as Stannat) is a decay assumption on the Fourier coefficients:
+	if for some $\varepsilon>0$,
+	\[
+	    |\langle f,e_k\rangle|
+	    =
+	    O\!\left(k^{-\left(\frac52+\varepsilon\right)}\right),
+	    \qquad k\to\infty,
+	\]
+	then
+	\[
+	    k^4\,|\langle f,e_k\rangle|^2
+	    =
+	    O\!\left(k^{-1-2\varepsilon}\right),
+	\]
+	so the defining series for $D(A)$ converges.
+	By contrast, a bound of the form $|\langle f,e_k\rangle|=O(k^{-5/2})$ is borderline and does \emph{not} imply $\sum_k k^4|\langle f,e_k\rangle|^2<\infty$.
+	\end{remark}
+
+\begin{remark}[One-dimensional Sobolev regularity]
+In dimension $d=1$, $H^1(0,1)$ embeds into $C([0,1])$, so every $H^1$-function has a (unique) continuous representative and admits well-defined boundary traces.
+In higher dimensions, the analogous embedding generally fails for $H^1(D)$; continuity requires Sobolev smoothness $s>\tfrac{d}{2}$ (in a suitable $H^s$ scale).
+\end{remark}
+
+\begin{remark}[Convention for the factor $\tfrac12$]
+Some references take the generator to be $\Delta$ (instead of $\tfrac12\Delta$); then the exponent becomes $e^{-\pi^2 k^2 t}$.
+Only the time scaling changes.
+\end{remark}
+
+%% =============================
+%% Resolvent, spectrum, and Hille--Yosida
+%% =============================
+\subsection*{Resolvent, spectrum, and the Hille--Yosida theorem}
+
+\begin{remark}[Contraction estimate in the eigenbasis]
+In the Dirichlet one-dimensional case, the spectral representation yields
+\[
+    \|T_t f\|_{L^2(0,1)}^2
+    =
+    \sum_{k=1}^{\infty}
+    e^{-\pi^2 k^2 t}\,|\langle f,e_k\rangle|^2
+    \le
+    \sum_{k=1}^{\infty} |\langle f,e_k\rangle|^2
+    =
+    \|f\|_{L^2(0,1)}^2,
+    \qquad t\ge 0,
+\]
+because $\{e_k\}_{k\ge 1}$ is an orthonormal basis of $L^2(0,1)$ and therefore, by Parseval,
+\[
+    \|T_t f\|_{L^2(0,1)}^2
+    =
+    \sum_{k=1}^{\infty}\left|e^{-\frac{\pi^2 k^2}{2}t}\,\langle f,e_k\rangle\right|^2
+    =
+    \sum_{k=1}^{\infty}e^{-\pi^2 k^2 t}\,|\langle f,e_k\rangle|^2.
+\]
+Hence $(T_t)_{t\ge 0}$ is a contraction semigroup on $L^2(0,1)$.
+\end{remark}
+
+\begin{definition}[Resolvent set and resolvent operator]
+Let $E$ be a Banach space and let $(A,D(A))$ be a (closed) linear operator on $E$.
+The \emph{resolvent set} of $A$ is
+\[
+    \rho(A)
+    :=
+    \left\{
+        \lambda\in\mathbb{C}:\;
+        \lambda I - A \colon D(A)\to E \text{ is bijective}
+    \right\}.
+\]
+For $\lambda\in\rho(A)$, the \emph{resolvent operator} is
+\[
+    R(\lambda,A) := (\lambda I - A)^{-1}.
+\]
+\end{definition}
+
+\begin{remark}[Boundedness of the resolvent]
+If $A$ is closed and $\lambda\in\rho(A)$, then $R(\lambda,A)\colon E\to D(A)$ is well-defined.
+Moreover, $R(\lambda,A)\in\mathcal{L}(E)$ when $D(A)$ is equipped with the graph norm, by the bounded inverse / closed graph theorem.
+\end{remark}
+
+\begin{theorem}[Closed graph theorem]
+Let $X,Y$ be Banach spaces and let $T\colon X\to Y$ be a linear operator with domain $\mathrm{Dom}(T)=X$.
+If the graph
+\[
+    \mathcal{G}(T):=\{(x,Tx)\in X\times Y:\;x\in X\}
+\]
+is closed in $X\times Y$, then $T$ is bounded (hence continuous), i.e.\ $T\in\mathcal{L}(X,Y)$.
+\end{theorem}
+
+\begin{remark}[Why it applies to the resolvent]
+If $A$ is closed, then $(\lambda I-A)^{-1}\colon E\to D(A)$ has closed graph when $D(A)$ is equipped with the graph norm.
+Since it is defined on all of $E$, the closed graph theorem implies it is bounded.
+\end{remark}
+
+\begin{definition}[Spectrum]
+The \emph{spectrum} of $A$ is
+\[
+    \sigma(A) := \mathbb{C}\setminus \rho(A).
+\]
+\end{definition}
+
+\begin{remark}[Types of spectrum (informal)]
+One distinguishes three disjoint parts of the spectrum $\sigma(A)$ (for a closed densely defined operator $(A,D(A))$ on a Banach space $E$):
+\begin{itemize}
+    \item \emph{Point spectrum} $\sigma_p(A)$: $\lambda\in\sigma_p(A)$ iff $\lambda I-A$ is not injective, i.e.\ there exists $0\neq f\in D(A)$ with
+    \[
+        Af=\lambda f.
+    \]
+    These are eigenvalues.
+    \item \emph{Continuous spectrum} $\sigma_c(A)$: $\lambda\in\sigma_c(A)$ iff $\lambda I-A$ is injective and has dense range, but $(\lambda I-A)^{-1}$ is not bounded as an operator defined on $\mathrm{Ran}(\lambda I-A)$ (equivalently, $\mathrm{Ran}(\lambda I-A)$ is not all of $E$).
+    Intuitively: there is no eigenvector, but there are ``approximate eigenvectors''.
+    \item \emph{Residual spectrum} $\sigma_r(A)$: $\lambda\in\sigma_r(A)$ iff $\lambda I-A$ is injective but its range is not dense in $E$:
+    \[
+        \overline{\mathrm{Ran}(\lambda I-A)}\neq E.
+    \]
+    Intuitively: solving $(\lambda I-A)u=f$ fails for ``many'' right-hand sides because of a genuine range defect.
+\end{itemize}
+For self-adjoint operators on Hilbert spaces, the residual spectrum is empty.
+For self-adjoint operators, the associated spectral measure can be decomposed into pure point, absolutely continuous, and singular continuous parts (Lebesgue decomposition).
+\smallskip
+
+\emph{Why $\sigma_r(A)=\varnothing$ for self-adjoint $A$.}
+For a densely defined closed operator $T$ on a Hilbert space one has
+\[
+    \overline{\mathrm{Ran}(T)} = (\ker T^*)^\perp.
+\]
+Taking $T=\lambda I-A$ and using $A=A^*$ (hence $(\lambda I-A)^*=\lambda I-A$ for $\lambda\in\mathbb{R}$), injectivity of $\lambda I-A$ implies $\ker(\lambda I-A)=\{0\}$ and therefore
+\[
+    \overline{\mathrm{Ran}(\lambda I-A)} = (\ker(\lambda I-A)^*)^\perp = H,
+\]
+so the range is automatically dense and $\lambda$ cannot lie in the residual spectrum.
+\smallskip
+
+\emph{Lebesgue decomposition of the spectral measure.}
+By the spectral theorem there is a projection-valued measure $E:\mathcal{B}(\mathbb{R})\to\mathcal{L}(H)$ (called the \emph{spectral measure} or \emph{spectral resolution} of $A$). For each Borel set $B\subset\mathbb{R}$, the operator $E(B)$ is the corresponding \emph{spectral projection} (an orthogonal projection onto the spectral subspace of $A$ associated with $B$). Thus
+\[
+    A=\int_{\mathbb{R}}\lambda\,dE(\lambda).
+\]
+	For each $u\in H$, the scalar measure $\mu_u(B):=\langle E(B)u,u\rangle$ (the \emph{scalar spectral measure} of $A$ associated with $u$) admits a unique decomposition
+	\[
+	    \mu_u = \mu_u^{pp}+\mu_u^{ac}+\mu_u^{sc},
+	\]
+	where, informally,
+	\begin{itemize}
+	    \item $\mu_u^{pp}$ is \emph{pure point}: it is a sum of atoms (Dirac masses),
+	    \[
+	        \mu_u^{pp}=\sum_{j} a_j\,\delta_{\lambda_j},
+	        \qquad a_j>0,
+	    \]
+	    corresponding to the eigenvalue part of the spectrum (spectral mass sitting at isolated points).
+	    \item $\mu_u^{ac}$ is \emph{absolutely continuous} w.r.t.\ Lebesgue measure: $\mu_u^{ac}\ll d\lambda$, hence $\mu_u^{ac}=w(\lambda)\,d\lambda$ for some density $w\in L^1(\mathbb{R})$.
+	    This corresponds to a ``continuum'' of spectral values (no atoms).
+	    \item $\mu_u^{sc}$ is \emph{singular continuous}: it has no atoms (so no point masses), but is singular w.r.t.\ Lebesgue measure,
+	    \[
+	        \mu_u^{sc}\perp d\lambda,
+	    \]
+	    meaning it is supported on a Lebesgue null set while still varying continuously (often with fractal-type support).
+	\end{itemize}
+\end{remark}
+
+\begin{remark}[Orthogonal projections and projection-valued measures]
+An \emph{orthogonal projection} on a Hilbert space $H$ is a bounded linear operator $P\in\mathcal{L}(H)$ satisfying
+\[
+    P^2=P,
+    \qquad
+    P^*=P.
+\]
+Equivalently, $P$ projects onto the closed subspace $M=\mathrm{Ran}(P)$ in the geometric sense that every $u\in H$ decomposes uniquely as
+\[
+    u = Pu + (u-Pu),
+\]
+where $Pu\in M$ and the ``error'' $u-Pu$ is orthogonal to $M$, i.e.\ $u-Pu\in M^\perp$ (so $\langle u-Pu, m\rangle=0$ for all $m\in M$).
+\smallskip
+
+A \emph{projection-valued measure} (PVM) is a map $E:\mathcal{B}(\mathbb{R})\to \mathcal{L}(H)$ such that $E(B)$ is an orthogonal projection for every Borel set $B$, $E(\emptyset)=0$, $E(\mathbb{R})=I$, and for pairwise disjoint sets $B_n$,
+\[
+    E\!\left(\bigcup_{n=1}^{\infty} B_n\right)u
+    =
+    \sum_{n=1}^{\infty} E(B_n)u,
+    \qquad u\in H,
+\]
+(countable additivity in the strong sense). One also has $E(B\cap C)=E(B)E(C)$.
+\end{remark}
+
+\begin{remark}[Intuition for the spectral theorem]
+In finite dimensions, a self-adjoint matrix admits an orthonormal eigenbasis and can be diagonalized as
+\[
+    A = U\,\mathrm{diag}(\lambda_1,\dots,\lambda_n)\,U^*,
+\]
+equivalently $A=\sum_{k=1}^n \lambda_k P_k$ with orthogonal projections $P_k$ onto the eigenspaces.
+The spectral theorem generalizes this: when the spectrum is not purely discrete, the sum over eigenvalues is replaced by an operator-valued integral, with the projection-valued measure $E(\cdot)$ playing the role of ``spectral projections'' onto the part of the space where the spectral values lie in a set $B$.
+\end{remark}
+
+\begin{theorem}[Spectral theorem (self-adjoint case)]
+Let $H$ be a Hilbert space and let $A$ be a self-adjoint operator on $H$.
+Then there exists a unique projection-valued measure $E(\cdot)$ on $\mathbb{R}$ such that
+\[
+    A = \int_{\mathbb{R}} \lambda\,dE(\lambda),
+\]
+and, more generally, for every bounded Borel function $f:\mathbb{R}\to\mathbb{C}$ one can define a bounded operator
+\[
+    f(A) := \int_{\mathbb{R}} f(\lambda)\,dE(\lambda).
+\]
+Moreover, for $u,v\in H$ the map $B\mapsto \langle E(B)u,v\rangle$ is a (complex) measure, and for $u\in H$ the scalar measure $\mu_u(B):=\langle E(B)u,u\rangle$ describes how $u$ decomposes across the spectrum of $A$.
+\end{theorem}
+
+\begin{theorem}[Hille--Yosida (one standard form)]
+Let $E$ be a Banach space and let $(A,D(A))$ be a linear operator.
+Fix constants $M\ge 1$ and $\omega\in\mathbb{R}$.
+Then the following are equivalent:
+\begin{enumerate}
+    \item $A$ generates a $C_0$-semigroup $(T_t)_{t\ge 0}$ on $E$ with growth bound
+    \[
+        \|T_t\|_{\mathcal{L}(E)} \le M e^{\omega t}, \qquad t\ge 0.
+    \]
+		    \item $A$ is closed and densely defined, and for every $\lambda>\omega$ one has $\lambda\in\rho(A)$ and for every $n\in\mathbb{N}$,
+		    \[
+		        \|R(\lambda,A)^n\|_{\mathcal{L}(E)}
+		        \le
+	        \frac{M}{(\lambda-\omega)^n}.
+	    \]
+	\end{enumerate}
+\end{theorem}
+
+\begin{remark}[Intuition for Hille--Yosida]
+The Hille--Yosida conditions say that ``$\lambda I-A$ can be inverted to the right of $\omega$'' and that these inverses have the same scaling as the resolvent of a generator.
+Heuristically, for $\lambda>\omega$ one expects the Laplace transform identity
+\[
+    R(\lambda,A) = \int_0^\infty e^{-\lambda t}T_t\,dt,
+\]
+which immediately gives the bound for $n=1$,
+\[
+    \|R(\lambda,A)\| \lesssim \frac{M}{\lambda-\omega},
+\]
+The same idea yields the higher-power estimates: for $n\ge 2$ one has the identity
+\[
+    R(\lambda,A)^n
+    =
+    \frac{1}{(n-1)!}\int_0^\infty t^{n-1}e^{-\lambda t}T_t\,dt,
+\]
+hence
+\[
+    \|R(\lambda,A)^n\| \lesssim \frac{M}{(\lambda-\omega)^n}.
+\]
+Conversely, Hille--Yosida says that these resolvent bounds are not only necessary but (together with closedness and density of $D(A)$) also sufficient to reconstruct a $C_0$-semigroup.
+\end{remark}
+
+\begin{remark}[Resolvent as Laplace transform of the semigroup]
+If $(T_t)_{t\ge 0}$ is a $C_0$-semigroup with $\|T_t\|\le M e^{\omega t}$ and $\lambda>\omega$, then
+\[
+    R(\lambda,A)f
+    =
+    \int_0^\infty e^{-\lambda t}\,T_t f\,dt,
+    \qquad f\in E,
+\]
+where the integral converges absolutely in $E$.
+This identity can be checked by differentiating $t\mapsto T_t f$ for $f\in D(A)$ (so that $T_t f\in D(A)$ and $\frac{d}{dt}T_t f = AT_t f$)
+and integrating by parts:
+\[
+    A\!\left(\int_0^\infty e^{-\lambda t}T_t f\,dt\right)
+    =
+    \int_0^\infty e^{-\lambda t}AT_t f\,dt
+    =
+    \int_0^\infty e^{-\lambda t}\frac{d}{dt}(T_t f)\,dt
+    =
+    -f + \lambda \int_0^\infty e^{-\lambda t}T_t f\,dt.
+\]
+Equivalently, $(\lambda I-A)R(\lambda,A)f=f$.
+\end{remark}
+
+\end{document}

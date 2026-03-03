@@ -1,0 +1,1084 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\tr}{tr}
+
+\title{Lecture 7: Variational Approach to SPDEs}
+\date{27.11.2025}
+\author{Tien Anh Vu}
+\begin{document}
+\maketitle
+
+\section*{Chapter 3: Variational approach to SPDEs}
+
+\subsection*{Variational calculus and Dirichlet energy}
+
+In ordinary calculus one minimizes a function $j:\mathbb{R}^n\to\mathbb{R}$. In the calculus of variations one minimizes a \emph{functional}
+\[
+J:X\to\mathbb{R},
+\qquad
+v\mapsto J(v),
+\]
+where $X$ is typically an infinite-dimensional function space.
+
+One considers a constrained minimization problem
+\[
+\min_{v\in \mathcal U\subset X} J(v),
+\]
+where the admissible set $\mathcal U$ encodes constraints such as boundary conditions (e.g.\ Dirichlet data $v|_{\partial\Omega}=\varphi$). Without such constraints, the Dirichlet-energy problem below has many trivial minimizers (constants).
+
+In the basic Dirichlet-energy example,
+\[
+f^\ast
+=
+\operatorname*{argmin}_{\text{[constraint unclear]}}
+J,
+\qquad
+J(v)
+:=
+\int_\Omega |\nabla v|^2\,dx,
+\qquad
+\Omega \subset \mathbb{R}^d.
+\]
+This energy penalizes spatial variation: if $v$ changes rapidly then $|\nabla v|$ is large and $J(v)$ is large; if $v$ is constant then $\nabla v=0$ and $J(v)=0$.
+
+To ensure $J(v)<\infty$ one typically takes $X=H^1(\Omega)$, the Sobolev space of $L^2$ functions with $L^2$ first (weak) derivatives. With Dirichlet boundary constraints, the minimizer $f^\ast$ is harmonic (in a weak sense).
+
+For an admissible direction $g$ and $0\le \varepsilon \le 1$,
+\[
+J(f^\ast)\le J(f^\ast+\varepsilon g).
+\]
+Here ``admissible'' means $f^\ast+\varepsilon g\in\mathcal U$ for small $\varepsilon$; for Dirichlet constraints this typically forces $g|_{\partial\Omega}=0$, i.e.\ $g\in H_0^1(\Omega)$.
+
+The difference quotient is expanded as
+\[
+\frac{J(f^\ast+\varepsilon g)-J(f^\ast)}{\varepsilon}
+=
+\frac{1}{\varepsilon}
+\int_\Omega
+\Bigl(
+|\nabla(f^\ast+\varepsilon g)|^2-|\nabla f^\ast|^2
+\Bigr)\,dx
+\]
+and then (next line)
+\[
+=
+\frac{1}{\varepsilon}
+\int_\Omega
+\left(
+2\varepsilon \langle \nabla f^\ast,\nabla g\rangle
++ \varepsilon^2 |\nabla g|^2
+\right)\,dx.
+\]
+
+\begin{remark}[Out-of-source explanation (more explicit algebra)]
+Using linearity of the gradient,
+\[
+\nabla(f^\ast+\varepsilon g)=\nabla f^\ast+\varepsilon\nabla g,
+\]
+and expanding the square,
+\[
+\begin{aligned}
+|\nabla(f^\ast+\varepsilon g)|^2
+&=|\nabla f^\ast+\varepsilon\nabla g|^2 \\
+&=|\nabla f^\ast|^2 + 2\varepsilon\langle \nabla f^\ast,\nabla g\rangle + \varepsilon^2|\nabla g|^2.
+\end{aligned}
+\]
+Substituting this into the difference quotient gives
+\[
+\begin{aligned}
+\frac{J(f^\ast+\varepsilon g)-J(f^\ast)}{\varepsilon}
+&=\frac{1}{\varepsilon}\int_\Omega\Bigl(2\varepsilon\langle \nabla f^\ast,\nabla g\rangle + \varepsilon^2|\nabla g|^2\Bigr)\,dx\\
+&=2\int_\Omega \langle \nabla f^\ast,\nabla g\rangle\,dx \;+\; \varepsilon\int_\Omega |\nabla g|^2\,dx.
+\end{aligned}
+\]
+Sending $\varepsilon\to 0$ yields
+\[
+\left.\frac{d}{d\varepsilon}J(f^\ast+\varepsilon g)\right|_{\varepsilon=0}
+=2\int_\Omega \langle \nabla f^\ast,\nabla g\rangle\,dx.
+\]
+\end{remark}
+
+After a scratched intermediate line, the page records the first-variation condition
+\[
+\int_\Omega \langle \nabla f^\ast,\nabla g\rangle\,dx = 0.
+\]
+This is the vanishing of the first variation: for $\Phi(\varepsilon):=J(f^\ast+\varepsilon g)$ one has $\Phi'(0)=0$ for all admissible $g$. The identity is already a weak (variational) Euler--Lagrange condition and only involves first derivatives.
+
+Then, by integration by parts (as written),
+\[
+-\int_\Omega \Delta f^\ast \, g\,dx = 0
+\qquad \Rightarrow \qquad
+\Delta f^\ast = 0,
+\]
+with the side note ``Harmonic function''.
+
+\begin{remark}[Out-of-source explanation (harmonic function)]
+A function $u$ is called \emph{harmonic} in $\Omega$ if it solves Laplace's equation $\Delta u=0$ in $\Omega$. Classically this means $u\in C^2(\Omega)$ and $\Delta u(x)=0$ pointwise. In the variational/weak sense (appropriate for $u\in H^1(\Omega)$), harmonicity means
+\[
+\int_\Omega \nabla u\cdot\nabla \varphi\,dx = 0
+\qquad \text{for all } \varphi\in C_c^\infty(\Omega)
+\ (\text{equivalently, for all } \varphi\in H_0^1(\Omega)).
+\]
+Under suitable regularity, the weak and classical notions coincide.
+\end{remark}
+
+Formally, $\int_\Omega \nabla f^\ast\cdot\nabla g\,dx=-\int_\Omega (\Delta f^\ast)\,g\,dx$ plus a boundary term. Under Dirichlet-type variations (where $g$ vanishes on $\partial\Omega$), the boundary term is $0$. Interpreted distributionally, this yields $\Delta f^\ast=0$ in $\Omega$.
+
+\begin{remark}[Out-of-source remark]
+This is the standard Euler--Lagrange derivation for the Dirichlet energy. With appropriate boundary conditions in the minimization constraint (the subscript is unclear), the minimizer is harmonic in weak form.
+\end{remark}
+
+\begin{remark}[Out-of-source remark (what changes in more general variational problems)]
+More generally, if one considers a functional of the form
+\[
+J(v)=\int_\Omega L(x,v(x),\nabla v(x))\,dx,
+\]
+then the same variational idea yields the Euler--Lagrange equation
+\[
+\frac{\partial L}{\partial v}
+-\nabla\cdot\left(\frac{\partial L}{\partial(\nabla v)}\right)
+=0,
+\]
+again first in weak form (via testing against admissible directions) and, when $v$ is sufficiently smooth, in strong PDE form. For the Dirichlet energy one has $L(x,v,\nabla v)=|\nabla v|^2$, so $\partial L/\partial v=0$ and $\partial L/\partial(\nabla v)=2\nabla v$, giving $-\nabla\cdot(2\nabla v)=0$, i.e.\ $\Delta v=0$.
+\end{remark}
+
+\section*{Hilbert-space setup}
+
+Let $H$ be a separable real Hilbert space, and let $V$ be another Hilbert space continuously and densely embedded into $H$:
+\[
+V\hookrightarrow H.
+\]
+
+\noindent
+The arrow $V\hookrightarrow H$ indicates an \emph{embedding} $i:V\to H$:
+\begin{itemize}
+\item An \emph{embedding} means that $i$ is \emph{injective}, so we can identify $V$ with its image $i(V)\subset H$ and treat $V$ as a subspace of $H$.
+\item In this setting $i$ is assumed \emph{linear} (so $i(\alpha u+\beta v)=\alpha i(u)+\beta i(v)$).
+\item \emph{Continuously embedded} means $i$ is continuous (bounded): there exists $C>0$ such that $\|i(u)\|_H\le C\|u\|_V$ for all $u\in V$.
+\item \emph{Densely embedded} means $i(V)$ is dense in $H$: every $h\in H$ can be approximated in $\|\cdot\|_H$ by a sequence from $i(V)$ (equivalently, from $V$ after identifying $V$ with its image).
+\item In many PDE examples one literally has $V\subset H$ as sets of functions and then $i(u)=u$ is just the identity; in the abstract setting one often identifies $V$ with its image $i(V)\subset H$.
+\end{itemize}
+
+Continuity of the embedding means that convergence in $V$ implies convergence in $H$; equivalently, there exists a constant $C>0$ such that
+\[
+\|u\|_H \le C\|u\|_V,
+\qquad \text{for all } u\in V.
+\]
+By rescaling the norm on $V$ (an equivalent norm), one may assume without loss of generality that $C=1$.
+
+Next identify $H$ with its dual. Denote
+\[
+H' := L(H,\mathbb{R}),
+\]
+the space of continuous linear functionals on $H$. By the Riesz representation theorem, each $h\in H$ defines a functional $\ell_h\in H'$ via
+\[
+h \longmapsto \ell_h,
+\qquad
+\ell_h(g):=\langle h,g\rangle_H,
+\qquad g\in H,
+\]
+and the map $h\mapsto \ell_h$ is an isometric isomorphism $H\cong H'$.
+
+\begin{remark}[Out-of-source explanation (Riesz identification $H\cong H'$)]
+The statement $H\cong H'$ is the \emph{Riesz representation theorem}: every continuous linear functional $\ell\in H'$ can be written uniquely in the form $\ell=\ell_h$ for some $h\in H$, where
+\[
+\ell_h(g)=\langle h,g\rangle_H \qquad \text{for all } g\in H.
+\]
+Thus $H$ and its dual $H'$ are canonically identified by the inner product on $H$.
+\end{remark}
+
+\begin{remark}[Out-of-source explanation (why the Riesz map is isometric)]
+Recall that the dual norm on $H'$ is
+\[
+\|\ell\|_{H'}:=\sup_{\|g\|_H\le 1} |\ell(g)|.
+\]
+For $\ell_h(g)=\langle h,g\rangle_H$, Cauchy--Schwarz yields
+\[
+|\ell_h(g)| = |\langle h,g\rangle_H|
+\le \|h\|_H\,\|g\|_H
+\le \|h\|_H
+\qquad (\|g\|_H\le 1),
+\]
+so $\|\ell_h\|_{H'}\le \|h\|_H$. For $h\neq 0$, choose
+\[
+g:=\frac{h}{\|h\|_H},
+\qquad\text{so that}\qquad
+\|g\|_H=1.
+\]
+Then
+\[
+|\ell_h(g)|
+=|\langle h,g\rangle_H|
+=\left\langle h,\frac{h}{\|h\|_H}\right\rangle_H
+=\|h\|_H,
+\]
+which shows $\|\ell_h\|_{H'}\ge \|h\|_H$. Together with the inequality above this yields equality, hence
+\[
+\|\ell_h\|_{H'}=\|h\|_H.
+\]
+In words: it is an \emph{isomorphism} because it is a linear bijection between $H$ and $H'$, and it is \emph{isometric} because it preserves the norm (hence the metric), i.e.\ $\|\ell_h\|_{H'}=\|h\|_H$.
+\end{remark}
+
+\begin{remark}[Out-of-source remark]
+This is the standard preliminary setup for the variational approach to SPDEs, where one typically builds the Gelfand triple
+\[
+V \hookrightarrow H \cong H' \hookrightarrow V'.
+\]
+The page appears to be introducing the $V\hookrightarrow H$ embedding and the Riesz identification $H\cong H'$.
+\end{remark}
+
+\begin{remark}[Out-of-source explanation (Gelfand triple)]
+A \emph{Gelfand triple} (also called a \emph{Hilbert triple}) is a chain of continuous and dense embeddings
+\[
+V \hookrightarrow H \hookrightarrow V',
+\]
+where $H$ is identified with its dual $H'$ via the Riesz map, so one often writes
+\[
+V \hookrightarrow H \cong H' \hookrightarrow V'.
+\]
+This framework is fundamental in the variational approach to PDEs/SPDEs: operators such as the Laplacian are naturally viewed as maps $A:V\to V'$, and solutions are tested against functions in $V$ using the dual pairing ${}_{V'}\langle \cdot,\cdot\rangle_V$.
+\end{remark}
+
+\section*{Embedding $H \cong H' \hookrightarrow V'$}
+
+First compute the norm of the Riesz functional:
+\[
+\|\ell_h\|_{H'}
+\;:=\;
+\sup_{\|g\|_H\le 1}\,|\ell_h(g)|
+\;=\;
+\|h\|_H.
+\]
+We already proved this above (by Cauchy--Schwarz and the choice $g=h/\|h\|_H$), hence the embedding $H\cong H'$ is an isometry.
+
+In particular,
+\[
+H \cong H' \hookrightarrow V'.
+\]
+
+The inclusion $H'\hookrightarrow V'$ is the restriction map:
+\begin{itemize}
+\item For $\ell_h\in H'$ (continuous map $H\to \mathbb{R}$), restrict it to $V\subset H$:
+\[
+\ell_h|_V:V\to \mathbb{R}.
+\]
+\item Let $(u_n)_n$ be a sequence in $V$. If $u_n\to u$ in $V$, then $u_n\to u$ in $H$, because the embedding $V\hookrightarrow H$ is continuous.
+\item Since $\ell_h\in H'$ means $\ell_h:H\to\mathbb{R}$ is continuous, it follows that if $u_n\to u$ in $H$, then $\ell_h(u_n)\to \ell_h(u)$ in $\mathbb{R}$. Hence the restriction $\ell_h|_V$ is continuous on $V$.
+\item Therefore $\ell_h\in V'$.
+\end{itemize}
+
+\begin{remark}[Out-of-source remark]
+The map $H' \to V'$ here is the restriction map: every continuous linear functional on $H$ becomes a continuous linear functional on $V$ by restriction, because the embedding $V\hookrightarrow H$ is continuous.
+\end{remark}
+
+\begin{remark}[Out-of-source explanation (why it is called the restriction map)]
+If $\ell\in H'$ is a functional $\ell:H\to\mathbb{R}$, then its \emph{restriction to $V$} is the functional $\ell|_V:V\to\mathbb{R}$ defined by
+\[
+(\ell|_V)(v):=\ell(v),
+\qquad v\in V.
+\]
+This is well-defined because $V\subset H$ (after identifying $V$ with its image under the embedding). Moreover,
+\[
+|(\ell|_V)(v)|
+=|\ell(v)|
+\le \|\ell\|_{H'}\,\|v\|_H
+\le C\,\|\ell\|_{H'}\,\|v\|_V,
+\]
+For fixed $\ell\in H'$, the constant $C\,\|\ell\|_{H'}$ is independent of $v$, so one may write
+\[
+|(\ell|_V)(v)| \le C_\ell\,\|v\|_V,
+\qquad C_\ell:=C\,\|\ell\|_{H'},
+\]
+which is exactly the boundedness/continuity of $\ell|_V$ on $V$, i.e.\ $\ell|_V\in V'$. The map $\ell\mapsto \ell|_V$ is therefore literally ``restriction of the domain from $H$ to $V$''.
+\end{remark}
+
+\subsection*{In summary}
+
+\[
+V \hookrightarrow H \cong H' \hookrightarrow V'.
+\]
+
+The page writes the induced embedding (via the $H$-inner product) as
+\[
+v \longmapsto \ell_v : g \longmapsto \bigl(\langle v,g\rangle_H\bigr)\big|_V.
+\]
+\noindent
+\emph{Domain:} $H$. \emph{Codomain:} $V'$ (each $v\in H$ first defines a functional on $H$ via $h\mapsto \langle v,h\rangle_H$ for $h\in H$, and then we restrict it to $V$ to view it as an element of $V'$, i.e.\ $g\mapsto \langle v,g\rangle_H$ for $g\in V$).
+
+Then a warning/contrast is written:
+\[
+\text{different from } \quad
+v \longmapsto \bigl(g \longmapsto \langle v,g\rangle_V\bigr).
+\]
+\noindent
+\emph{Domain:} $V$. \emph{Codomain:} $V'$ (Riesz map on $V$ induced by $\langle\cdot,\cdot\rangle_V$, sending $v\in V$ to the continuous linear functional on $V$ given by $g\mapsto \langle v,g\rangle_V$).
+
+Next, for the functional $\ell_v$ on $V$, the page writes
+\[
+\|\ell_v\|_{V'}
+\;=\;
+\max_{\|g\|_V\le 1}\,\ell_v(g).
+\]
+That is, the operator norm in $V'$ is defined by
+\[
+\|\ell_v\|_{V'}=\sup_{g\in V,\,\|g\|_V\le 1}|\ell_v(g)|.
+\]
+The goal is to show that $\ell_v\in V'$ and to obtain a bound of the form $\|\ell_v\|_{V'}\le C\,\|v\|_H$, i.e.\ continuity of the canonical embedding $H\hookrightarrow V'$.
+To estimate this quantity, apply Cauchy--Schwarz in $H$ and then use the continuous embedding $V\hookrightarrow H$:
+\[
+\bigl|\langle v,g\rangle_H\bigr|
+\le
+\|v\|_H\,\|g\|_H
+\le
+\;C\,\|v\|_H\,\|g\|_V
+\le
+\;C\,\|v\|_H,
+\qquad (\|g\|_V\le 1).
+\]
+Taking the supremum over $\|g\|_V\le 1$ yields $\|\ell_v\|_{V'}\le C\,\|v\|_H$, so $\ell_v\in V'$ and the embedding $H\hookrightarrow V'$ is continuous.
+
+Hence:
+\[
+\text{continuity of the embedding } H \hookrightarrow V'.
+\]
+
+\begin{remark}[Out-of-source remark]
+This is the standard canonical embedding $H \hookrightarrow V'$ associated with the Gelfand triple. The functional assigned to $v\in H$ is $g\mapsto \langle v,g\rangle_H$ for $g\in V$, which is \emph{not} the same construction as the Riesz map on $V$ using $\langle \cdot,\cdot\rangle_V$.
+\end{remark}
+
+\begin{remark}[Out-of-source explanation (what ``canonical embedding'' means)]
+In general, a map is called \emph{canonical} if it is determined uniquely by the given structures and does not require extra choices (basis, coordinates, etc.). A \emph{canonical embedding} is a canonical injective map.
+
+Examples:
+\begin{itemize}
+\item (Riesz map) For a Hilbert space $H$, the map $H\to H'$ given by $h\mapsto \ell_h$ with $\ell_h(g)=\langle h,g\rangle_H$ is canonical.
+\item (Double dual) For a normed space $X$, the evaluation map $J:X\to X''$, $(Jx)(\ell)=\ell(x)$ for $\ell\in X'$, is the canonical embedding into the double dual.
+\end{itemize}
+
+In this note, the map $H\to V'$ given by $v\mapsto \ell_v$ with $\ell_v(g)=\langle v,g\rangle_H$ is canonical because it is determined uniquely by the $H$-inner product and the inclusion $V\hookrightarrow H$. It is an embedding because it is linear and injective, and the estimate $\|\ell_v\|_{V'}\le C\|v\|_H$ shows it is continuous.
+\end{remark}
+
+\section*{Bounded operators $A:V\to V'$ and coercivity}
+
+Let
+\[
+A \in L(V,V')
+\]
+be a bounded linear operator $A:V\to V'$.
+
+We will assume that $A$ satisfies a \emph{coercivity condition} with parameters $\lambda\in\mathbb{R}$ and $\alpha>0$ (see below for a common form of this assumption).
+
+We denote the duality pairing (dualization) between $V'$ and $V$ by ${}_{V'}\langle\cdot,\cdot\rangle_V$. For $g\in V'$ and $u\in V$,
+\[
+{}_{V'}\langle g,u\rangle_V := g(u).
+\]
+In particular, if $Au\in V'$ and $u\in V$, then ${}_{V'}\langle Au,u\rangle_V$ is well-defined.
+
+\begin{remark}[Out-of-source remark]
+In many SPDE/variational texts, the coercivity assumption for $A\in L(V,V')$ is written in a form such as
+\[
+{}_{V'}\langle Au,u\rangle_V + \lambda \|u\|_H^2 \ge \alpha \|u\|_V^2,
+\]
+for all $u\in V$. The page appears to be setting up this notation before stating the full inequality.
+
+Intuitively, coercivity means that the ``leading part'' of $A$ controls the $V$-norm: the pairing ${}_{V'}\langle Au,u\rangle_V$ grows at least like $\|u\|_V^2$ up to a lower-order correction in the weaker norm $\|u\|_H$.
+\begin{itemize}
+\item \emph{Ellipticity (variational analogue):} the operator is ``positive'' in the sense that pairing with $u$ produces control of the strong norm: roughly, ${}_{V'}\langle Au,u\rangle_V\gtrsim \|u\|_V^2$ (up to lower-order terms).
+\item \emph{Dissipation (energy analogue):} in an evolution equation $u'=Au+\cdots$, the same positivity leads to an \emph{energy estimate}: $\|u(t)\|_H^2$ cannot grow too fast and typically satisfies $\frac12\frac{d}{dt}\|u(t)\|_H^2 \lesssim -\|u(t)\|_V^2+\cdots$.
+\end{itemize}
+This is the key estimate behind energy bounds and well-posedness.
+\end{remark}
+
+\section*{Coercivity and Sobolev example}
+
+The top line continues the dual-pairing example (from the previous page). If $h\in H$, then $\ell_h\in H'$ is defined by $\ell_h(x)=\langle h,x\rangle_H$ for $x\in H$. Restricting $\ell_h$ to $V$ yields an element of $V'$, and the duality pairing agrees with the $H$-inner product:
+\[
+{}_{V'}\langle g,u\rangle_V
+\;=\;
+\langle h,u\rangle_H,
+\qquad g=\ell_h.
+\]
+In other words, ${}_{V'}\langle g,u\rangle_V=g(u)$ extends the notion of an inner product to the situation where the first argument is a dual element $g\in V'$ (which need not lie in $H$). When $g$ happens to come from some $h\in H$ via the Riesz map, the pairing reduces to $\langle h,u\rangle_H$.
+
+Then the coercivity condition is written explicitly:
+\[
+\langle Au,u\rangle
+\ge
+\alpha \|u\|_V^2 - \lambda \|u\|_H^2,
+\qquad \forall u\in V.
+\]
+Here $\langle Au,u\rangle$ denotes the dual pairing ${}_{V'}\langle Au,u\rangle_V$.
+
+Next, a coercive-growth intuition is sketched:
+\[
+J(u)=-\langle Au,u\rangle \longrightarrow \infty
+\qquad \text{as }\|u\|_V\to +\infty.
+\]
+This expresses coercive growth (often discussed in convex-analysis terms: a coercive, strongly convex functional has a global minimizer). Note that this statement depends on the sign convention for $A$: if coercivity holds with $\lambda=0$ as ${}_{V'}\langle Au,u\rangle_V \ge \alpha \|u\|_V^2$, then $-{}_{V'}\langle Au,u\rangle_V \le -\alpha\|u\|_V^2\to -\infty$ as $\|u\|_V\to\infty$. For example, if $A=\Delta$ (rather than $A=-\Delta$), then ${}_{V'}\langle \Delta u,u\rangle_V=-\|\nabla u\|_{L^2}^2$ and hence $-\langle \Delta u,u\rangle=\|\nabla u\|_{L^2}^2\to+\infty$.
+
+\begin{remark}[Out-of-source remark]
+The sketch is illustrating coercive growth: if an energy functional satisfies $J(u)\to +\infty$ as $\|u\|_V\to\infty$, then a minimizing sequence $(u_n)$ with $J(u_n)\downarrow \inf_{u\in V}J(u)$ cannot satisfy $\|u_n\|_V\to\infty$ (otherwise $J(u_n)\to\infty$), so minimizing sequences stay bounded in $V$. The handwriting informally links this to convex-analysis intuition.
+\end{remark}
+
+\subsection*{Example: Sobolev space setup}
+
+The page then gives the standard PDE example:
+\[
+D \subset \mathbb{R}^d \text{ be an open subset},
+\qquad
+H=L^2(D).
+\]
+Here $H=L^2(D)$ is a Hilbert space with the usual inner product.
+
+\[
+V := H^1(D) := W^{1,2}(D),
+\qquad \text{where}
+\]
+\[
+H^1(D)
+=
+\left\{
+u\in L^2(D)
+:
+\partial_{x_i}u \in L^2(D),\ i=1,\ldots,d
+\right\}.
+\]
+In words: $H^1(D)$ consists of functions whose weak first derivatives exist and are square-integrable.
+
+\subsection*{Remark (weak derivative)}
+
+The page states a weak-derivative criterion of the form:
+\[
+\exists\,\partial_{x_i}u \in L^2(D)
+\quad\text{such that}\quad
+\int_D u\,\partial_{x_i}\varphi\,dx
+=
+-\int_D \partial_{x_i}u\,\varphi\,dx
+\quad \text{for all } \varphi \in C_c^\infty(D).
+\]
+Here $C_c^\infty(D)$ denotes smooth test functions with compact support in $D$, meaning that $\operatorname{supp}(\varphi):=\overline{\{x\in D:\varphi(x)\neq 0\}}$ is a compact subset of $D$ (equivalently, $\varphi$ vanishes near $\partial D$).
+
+\begin{remark}[Out-of-source explanation (definition)]
+We say that $u$ is \emph{weakly differentiable} in the $x_i$ direction if there exists a function $w\in L^1_{\mathrm{loc}}(D)$ (in this note, $w\in L^2(D)$) such that
+\[
+\int_D u\,\partial_{x_i}\varphi\,dx = -\int_D w\,\varphi\,dx
+\qquad \text{for all }\varphi\in C_c^\infty(D).
+\]
+In that case we define $w:=\partial_{x_i}u$ and call it the \emph{weak derivative} of $u$.
+\end{remark}
+
+\begin{remark}[Out-of-source remark]
+This is the standard distributional (weak) derivative definition. The identity is an integration-by-parts formula with no boundary term because the test function has compact support in $D$.
+\end{remark}
+
+The page ends this visible portion with an ``advantage'' note:
+\[
+\Rightarrow \text{ Advantage: generalize differentiability.}
+\]
+and an example (in one dimension):
+\[
+u(x)=|x|+1 \text{ is weakly differentiable},
+\qquad
+u'(x)=\operatorname{sgn}(x).
+\]
+Here the derivative is understood in the weak sense.
+
+\subsection*{Continuation of the example $u(x)=|x|+1$}
+
+One can visualize the sign function together with the note:
+\begin{quote}
+Doesn't have to specify at zero; for zero measure set isn't relevant for $L^2$.
+\end{quote}
+This refers to the value of $\operatorname{sgn}(0)$ being irrelevant as an $L^2$-equivalence-class representative.
+
+Then the weak-derivative check is written for a test function
+\[
+\varphi \in L_c^1((-1,1)).
+\]
+For the integration-by-parts computation below we additionally assume $\varphi\in C_c^1((-1,1))$ (so that $\varphi'$ exists and $\varphi$ vanishes near $\pm 1$).
+
+The page computes
+\[
+\int_{-1}^1 (1+|x|)\,\varphi'(x)\,dx
+=
+\int_{-1}^0 (1-x)\,\varphi'(x)\,dx
++
+\int_0^1 (1+x)\,\varphi'(x)\,dx.
+\]
+
+After integration by parts on each interval (as written across several lines),
+\[
+\begin{aligned}
+\int_{-1}^1 (1+|x|)\,\varphi'(x)\,dx
+&=
+\Bigl[(1-x)\varphi(x)\Bigr]_{-1}^{0}
++ \int_{-1}^{0}\varphi(x)\,dx \\
+&\quad
++ \Bigl[(1+x)\varphi(x)\Bigr]_{0}^{1}
+- \int_{0}^{1}\varphi(x)\,dx.
+\end{aligned}
+\]
+The boundary terms at $\pm 1$ vanish because $\varphi$ has compact support, and the two boundary terms at $0$ cancel.
+
+Hence the result is
+\[
+\int_{-1}^1 (1+|x|)\,\varphi'(x)\,dx
+=
+\int_{-1}^{0}\varphi(x)\,dx - \int_{0}^{1}\varphi(x)\,dx
+=
+-\int_{-1}^{1}\operatorname{sgn}(x)\,\varphi(x)\,dx.
+\]
+This matches the weak-derivative convention stated above.
+
+\begin{remark}[Out-of-source remark]
+This verifies that the weak derivative of $u(x)=|x|+1$ is $\operatorname{sgn}(x)$ on $(-1,1)$, with the value at $x=0$ arbitrary (irrelevant in $L^2$).
+\end{remark}
+
+\subsection*{Illustration in one dimension: $H^1(0,1)$}
+
+In one dimension, a useful classical fact is the following:
+\[
+\text{Illustration }(d=1),\quad D:=(0,1),\quad u\in H^1(D)
+\]
+implies that $u$ has an absolutely continuous representative (with respect to Lebesgue measure). Concretely, although $u$ is only defined as an $L^2$-equivalence class, there exists a representative $\tilde u:[0,1]\to\mathbb{R}$ which is absolutely continuous and agrees with $u$ a.e. Moreover, there exists a \emph{density} $u'\in L^2(0,1)$, i.e.\ the Radon--Nikodym derivative (which coincides a.e.\ with the weak derivative of $u$), such that for all $x,y\in(0,1)$,
+\[
+\tilde u(x)-\tilde u(y)=\int_y^x u'(s)\,ds,
+\]
+
+Then:
+\begin{remark}[Out-of-source remark]
+In particular, $u$ has a continuous version $\tilde u$, which is unique up to equality a.e.\ (as an $L^2$ equivalence class). Indeed, if $\tilde u_1$ and $\tilde u_2$ are continuous representatives with $\tilde u_1=\tilde u_2$ a.e., then $w:=\tilde u_1-\tilde u_2$ is continuous and $w=0$ a.e., hence $w\equiv 0$ (otherwise continuity would force $w$ to be nonzero on a set of positive measure).
+\end{remark}
+
+An example representative is indicated:
+\[
+\tilde u(x)=\int_0^x u'(s)\,ds
+\]
+which fixes a particular representative by choosing $\tilde u(0)=0$.
+
+\subsection*{Boundary condition characterization of $H_0^1$ (1D)}
+
+In one dimension, one has the characterization
+\[
+u\in H_0^1(D)
+\quad\text{iff}\quad
+u\in H^1(D)
+\ \text{and}\ 
+\tilde u(0)=\tilde u(1)=0.
+\]
+\begin{remark}[Out-of-source remark]
+This is the 1D Dirichlet boundary condition: the (continuous) representative vanishes at the boundary.
+\end{remark}
+
+\section*{$H^1(D)$ as a Hilbert space}
+
+Recall that
+\[
+H^1(D)=H^{1,2}(D)
+\]
+is a Hilbert space with inner product
+\[
+\langle u,v\rangle_{H^1(D)}
+=
+\int_D u\,v\,dx
++ \sum_{i=1}^{d}\int_D \partial_{x_i}u\,\partial_{x_i}v\,dx.
+\]
+
+\subsection*{Norm comparison and Gelfand triple}
+
+Equivalently, in vector notation,
+\[
+\langle u,v\rangle_{H^1(D)}
+=
+\int_D u\,v\,dx
++ \int_D \langle \nabla u,\nabla v\rangle_{\mathbb{R}^d}\,dx.
+\]
+
+In particular,
+\[
+\|u\|_{H^1(D)}^2
+=\langle u,u\rangle_{H^1(D)}
+=\int_D |u|^2\,dx + \int_D \langle \nabla u,\nabla u\rangle_{\mathbb{R}^d}\,dx
+=\int_D |u|^2\,dx + \int_D |\nabla u|^2\,dx.
+\]
+Since $|\nabla u|^2\ge 0$ pointwise, we have $\int_D |\nabla u|^2\,dx\ge 0$, hence
+\[
+\|u\|_{H^1(D)}^2 \ge \int_D |u|^2\,dx = \|u\|_{L^2(D)}^2,
+\]
+and taking square roots gives
+\[
+\|u\|_{H^1(D)} \ge \|u\|_{L^2(D)}.
+\]
+
+This yields the Gelfand triple
+\[
+H^1(D)\hookrightarrow L^2(D)=L^2(D)' \hookrightarrow H^1(D)'.
+\]
+
+\begin{remark}[Out-of-source remark]
+This is the standard choice for variational PDEs/SPDEs. Depending on boundary conditions, many texts use $V=H_0^1(D)$ instead of $H^1(D)$, leading to $V'=H^{-1}(D)$.
+\end{remark}
+
+\begin{remark}[Out-of-source remark (Sobolev embedding theorem; one example)]
+On a bounded Lipschitz domain $\Omega\subset\mathbb{R}^d$, the Sobolev embedding theorem says that if $1\le p<d$ and
+\[
+p^\ast:=\frac{dp}{d-p},
+\]
+then
+\[
+W^{1,p}(\Omega)\hookrightarrow L^{p^\ast}(\Omega),
+\qquad
+\|u\|_{L^{p^\ast}(\Omega)}\le C\|u\|_{W^{1,p}(\Omega)}.
+\]
+For example, in $d=3$ and $p=2$ one has $H^1(\Omega)=W^{1,2}(\Omega)\hookrightarrow L^6(\Omega)$.
+\end{remark}
+
+\section*{Weak Laplace operator (variational definition)}
+
+Recall the Laplace operator
+\[
+\Delta = \sum_{i=1}^{d}\partial_{x_i}^2.
+\]
+
+In the variational setting, we define it as a continuous linear operator
+\[
+\Delta: H^1(D)\to H^1(D)'
+\]
+
+Given $u\in H^1(D)$, define $\Delta u\in H^1(D)'$ by
+\[
+v \longmapsto {}_{H^1(D)'}\langle \Delta u,v\rangle_{H^1(D)}
+:=
+-\sum_{i=1}^{d}\int_D \partial_{x_i}u\,\partial_{x_i}v\,dx,
+\qquad v\in H^1(D).
+\]
+
+This is a consistent extension of the classical Laplacian on smooth functions: if $u$ is smooth enough and $v$ is a smooth test function with compact support in $D$, then integration by parts yields
+\[
+-\sum_{i=1}^{d}\int_D \partial_{x_i}u\,\partial_{x_i}v\,dx
+=
+\int_D (\Delta u)\,v\,dx.
+\]
+
+\begin{remark}[Out-of-source remark]
+This is the weak/distributional realization of the Laplacian associated with the bilinear form
+\[
+a(u,v)=\int_D \nabla u\cdot \nabla v\,dx.
+\]
+It is the formulation used in finite elements and the variational theory.
+\end{remark}
+
+A side comment mentions applications/advantages, e.g.:
+\begin{quote}
+good for finite element method \quad [and a note about Hilbert-space geometry being easy]
+\end{quote}
+
+\section*{Initial value problem (start of deterministic variational theory)}
+
+Consider the abstract evolution equation
+\[
+(*)\quad
+\left\{
+\begin{aligned}
+\frac{d}{dt}u(t) &= Au(t)+f(t), \qquad t>0,\\
+u(0) &= u_0.
+\end{aligned}
+\right.
+\]
+This includes, for example, the inhomogeneous heat equation when $A=\Delta$.
+
+\subsection*{Theorem 3.2 (Lions variational well-posedness)}
+
+\begin{theorem}[Standard variational well-posedness]
+Assume $A\in L(V,V')$ is coercive. Let $u_0\in H$ and $f\in L^2([0,T];V')$. Then there exists a unique solution $u$ such that
+\[
+u\in L^2([0,T];V)\cap C([0,T];H),
+\qquad
+u'\in L^2([0,T];V'),
+\]
+and $u$ satisfies $u'(t)=Au(t)+f(t)$ in $V'$ for a.e.\ $t\in(0,T)$ with $u(0)=u_0$.
+\end{theorem}
+
+\begin{remark}[Out-of-source remark]
+This is the standard Lions variational well-posedness theorem for deterministic evolution equations in a Gelfand triple. A common full statement concludes
+\[
+u' \in L^2([0,T];V'),\qquad
+u\in L^2([0,T];V)\cap C([0,T];H).
+\]
+\end{remark}
+
+\begin{remark}[Out-of-source explanation (why these spaces appear)]
+The condition $u\in L^2([0,T];V)$ ensures that $u(t)\in V$ for a.e.\ $t$, so $Au(t)$ is well-defined as an element of $V'$ and the natural ``energy'' $\int_0^T\|u(t)\|_V^2\,dt$ is finite. The condition $u'\in L^2([0,T];V')$ means the time derivative exists in the weak sense with values in $V'$, so the equation $u'(t)=Au(t)+f(t)$ is meaningful in $V'$. Finally, $u\in C([0,T];H)$ allows one to interpret the initial condition $u(0)=u_0\in H$ and to evaluate $\|u(t)\|_H$ pointwise in time; in fact, $u\in C([0,T];H)$ typically follows from $u\in L^2([0,T];V)$ and $u'\in L^2([0,T];V')$ via the energy identity below.
+\end{remark}
+
+\section*{Auxiliary lemma: energy identity in the Gelfand triple}
+
+\begin{lemma}[Energy identity]
+Let $u\in L^2([0,T];V)$ with $u'\in L^2([0,T];V')$. Then $u\in C([0,T];H)$ and
+\[
+\frac12\frac{d}{dt}\|u(t)\|_H^2
+=
+{}_{V'}\left\langle u'(t),u(t)\right\rangle_{V}
+\quad \text{for a.e.\ }t\in(0,T).
+\]
+\end{lemma}
+
+\subsection*{Proof (as written: Step 1)}
+
+Choose $u_m\in C^1([0,T];V)$ such that
+\[
+\lim_{m\to\infty}
+\Bigl(
+\|u_m-u\|_{L^2([0,T];V)}^2
++
+\|\dot u_m-\dot u\|_{L^2([0,T];V')}^2
+\Bigr)=0.
+\]
+\noindent
+In particular, this assumption means that $u_m\to u$ \emph{strongly} in $L^2([0,T];V)$ and $\dot u_m\to \dot u$ \emph{strongly} in $L^2([0,T];V')$.
+
+Then
+\[
+\frac{d}{dt}\|u_m(t)\|_H^2
+=
+2\left\langle \frac{du_m}{dt}(t),u_m(t)\right\rangle_H
+=
+2\,{}_{V'}\left\langle \frac{du_m}{dt}(t),u_m(t)\right\rangle_{V}.
+\]
+\noindent
+The first equality is the usual chain rule in a real Hilbert space: since $\|u_m(t)\|_H^2=\langle u_m(t),u_m(t)\rangle_H$ and $u_m$ is $C^1$ in time,
+\[
+\frac{d}{dt}\langle u_m(t),u_m(t)\rangle_H
+=
+\left\langle \dot u_m(t),u_m(t)\right\rangle_H
++
+\left\langle u_m(t),\dot u_m(t)\right\rangle_H
+=
+2\left\langle \dot u_m(t),u_m(t)\right\rangle_H.
+\]
+The second equality uses the Gelfand triple: $u_m(t)\in V$ and $\dot u_m(t)\in V\subset H\hookrightarrow V'$, and for elements of $H$ the duality pairing agrees with the $H$-inner product, i.e.\ ${}_{V'}\langle \dot u_m(t),u_m(t)\rangle_V=\langle \dot u_m(t),u_m(t)\rangle_H$.
+\noindent
+Note that $u_m(t)\in V$ (and $\dot u_m(t)\in V$) holds for every $t\in[0,T]$ because $u_m\in C^1([0,T];V)$ by construction.
+
+Passing $m\to\infty$, the page records
+\[
+2\,{}_{V'}\left\langle \frac{du_m}{dt}(t),u_m(t)\right\rangle_{V}
+\longrightarrow
+2\,{}_{V'}\left\langle \frac{du}{dt}(t),u(t)\right\rangle_{V}
+\quad\text{in }L^1([0,T]),
+\]
+which follows from Cauchy--Schwarz/H\"older ($p=q=2$) and the strong convergence in $L^2([0,T];V)$ and $L^2([0,T];V')$. In particular, the $L^1$ convergence can be checked by estimating the $L^1$-norm of the difference (see below); equivalently, after extracting a subsequence with a.e.\ convergence, one may justify passing $m\to\infty$ under the time integral using Lebesgue's convergence theorem (dominated convergence).
+\noindent
+Indeed, write
+\[
+{}_{V'}\left\langle \dot u_m,u_m\right\rangle_V
+-
+{}_{V'}\left\langle \dot u,u\right\rangle_V
+=
+{}_{V'}\left\langle \dot u_m-\dot u,\,u_m\right\rangle_V
++
+{}_{V'}\left\langle \dot u,\,u_m-u\right\rangle_V.
+\]
+\noindent
+For each $t\in[0,T]$, apply the duality estimate
+$|{}_{V'}\langle a,b\rangle_V|\le \|a\|_{V'}\|b\|_V$ to both terms:
+\[
+\left|{}_{V'}\left\langle \dot u_m(t)-\dot u(t),\,u_m(t)\right\rangle_V\right|
+\le
+\|\dot u_m(t)-\dot u(t)\|_{V'}\,\|u_m(t)\|_{V},
+\]
+\[
+\left|{}_{V'}\left\langle \dot u(t),\,u_m(t)-u(t)\right\rangle_V\right|
+\le
+\|\dot u(t)\|_{V'}\,\|u_m(t)-u(t)\|_{V}.
+\]
+\noindent
+Now integrate over $t\in[0,T]$ and use Cauchy--Schwarz in time:
+\[
+\left\|{}_{V'}\langle \dot u_m,u_m\rangle_V-{}_{V'}\langle \dot u,u\rangle_V\right\|_{L^1([0,T])}
+=
+\int_0^T
+\left|
+{}_{V'}\langle \dot u_m(t),u_m(t)\rangle_V-{}_{V'}\langle \dot u(t),u(t)\rangle_V
+\right|\,dt
+\]
+\[
+\;=\;
+\int_0^T
+\left|
+{}_{V'}\langle \dot u_m(t)-\dot u(t),u_m(t)\rangle_V
++
+{}_{V'}\langle \dot u(t),u_m(t)-u(t)\rangle_V
+\right|\,dt
+\]
+\[
+\le
+\int_0^T
+\left|
+{}_{V'}\langle \dot u_m(t)-\dot u(t),u_m(t)\rangle_V
+\right|\,dt
++
+\int_0^T
+\left|
+{}_{V'}\langle \dot u(t),u_m(t)-u(t)\rangle_V
+\right|\,dt
+\]
+\[
+\le
+\int_0^T
+\|\dot u_m(t)-\dot u(t)\|_{V'}\,\|u_m(t)\|_{V}\,dt
++
+\int_0^T
+\|\dot u(t)\|_{V'}\,\|u_m(t)-u(t)\|_{V}\,dt.
+\]
+Finally, apply Cauchy--Schwarz to each integral (H\"older's inequality with $p=q=2$):
+\begin{align*}
+\int_0^T
+\|\dot u_m(t)-\dot u(t)\|_{V'}\,\|u_m(t)\|_{V}\,dt
+&\le
+\left(\int_0^T \|\dot u_m(t)-\dot u(t)\|_{V'}^2\,dt\right)^{1/2}
+\left(\int_0^T \|u_m(t)\|_{V}^2\,dt\right)^{1/2} \\
+&=
+\|\dot u_m-\dot u\|_{L^2([0,T];V')}\,\|u_m\|_{L^2([0,T];V)},
+\\[0.5em]
+\int_0^T
+\|\dot u(t)\|_{V'}\,\|u_m(t)-u(t)\|_{V}\,dt
+&\le
+\left(\int_0^T \|\dot u(t)\|_{V'}^2\,dt\right)^{1/2}
+\left(\int_0^T \|u_m(t)-u(t)\|_{V}^2\,dt\right)^{1/2} \\
+&=
+\|\dot u\|_{L^2([0,T];V')}\,\|u_m-u\|_{L^2([0,T];V)}.
+\end{align*}
+Combining these inequalities gives
+\[
+\left\|{}_{V'}\langle \dot u_m,u_m\rangle_V-{}_{V'}\langle \dot u,u\rangle_V\right\|_{L^1([0,T])}
+\le
+\|\dot u_m-\dot u\|_{L^2([0,T];V')}\,\|u_m\|_{L^2([0,T];V)}
++
+\|\dot u\|_{L^2([0,T];V')}\,\|u_m-u\|_{L^2([0,T];V)}.
+\]
+Since $\|u_m\|_{L^2([0,T];V)}\le \|u_m-u\|_{L^2([0,T];V)}+\|u\|_{L^2([0,T];V)}$, the right-hand side tends to $0$ by the assumed strong convergences.
+\noindent
+Therefore we have proved
+\[
+2\,{}_{V'}\left\langle \frac{du_m}{dt}(t),u_m(t)\right\rangle_{V}
+\longrightarrow
+2\,{}_{V'}\left\langle \frac{du}{dt}(t),u(t)\right\rangle_{V}
+\quad\text{in }L^1([0,T]).
+\]
+
+Also,
+\[
+\lim_{m\to\infty}\|u_m(t)\|_H^2=\|u(t)\|_H^2
+\quad\text{in }L^1([0,T]).
+\]
+
+Hence it follows that
+\[
+t\mapsto \|u(t)\|_H^2
+\]
+is absolutely continuous with derivative
+\[
+2\,{}_{V'}\left\langle \frac{du}{dt}(t),u(t)\right\rangle_{V}.
+\]
+\noindent
+Here ``absolutely continuous'' is meant in the standard real-variable sense: a function $f:[0,T]\to\mathbb{R}$ is absolutely continuous if it satisfies either (equivalently both) of the following.
+\begin{itemize}
+\item ($\varepsilon$--$\delta$ definition) For every $\varepsilon>0$ there exists $\delta>0$ such that for any finite family of pairwise disjoint intervals $(a_k,b_k)\subset[0,T]$,
+\[
+\sum_k (b_k-a_k)<\delta
+\quad\Longrightarrow\quad
+\sum_k |f(b_k)-f(a_k)|<\varepsilon.
+\]
+\item (Integral/derivative characterization) There exists $g\in L^1([0,T])$ such that
+\[
+f(t)=f(0)+\int_0^t g(s)\,ds\qquad\text{for all }t\in[0,T].
+\]
+In that case $f$ is differentiable for a.e.\ $t$ and $f'(t)=g(t)$ a.e.
+\end{itemize}
+
+\begin{remark}[Out-of-source remark]
+This is the standard Hilbert-space chain rule for $u\in L^2([0,T];V)$ with $u'\in L^2([0,T];V')$. In many texts this is first proved for smooth approximations and then passed to the limit exactly as sketched here.
+\end{remark}
+
+\subsection*{Proof (as written: Step 2)}
+
+Define the time-average:
+\[
+\langle v\rangle
+:=
+\frac{1}{T}\int_0^T v(t)\,dt,
+\qquad
+v\in L^2([0,T];H).
+\]
+
+Then for $v\in C^1([0,T];V)$,
+\[
+\|v(t)\|_H^2
+=
+\|v(t)-\langle v\rangle+\langle v\rangle\|_H^2
+\le
+2\|v(t)-\langle v\rangle\|_H^2
++2\|\langle v\rangle\|_H^2.
+\]
+\noindent
+Here we used the elementary inequality $\|a+b\|_H^2\le 2\|a\|_H^2+2\|b\|_H^2$ (take $a=v(t)-\langle v\rangle$ and $b=\langle v\rangle$). The time average $\langle v\rangle=\frac1T\int_0^T v(s)\,ds$ is well-defined in $H$ since $v\in L^2([0,T];H)$ implies $v\in L^1([0,T];H)$ on a finite interval.
+
+Using
+\[
+v(t)-\langle v\rangle
+=
+\frac{1}{T}\int_0^T\bigl(v(t)-v(r)\bigr)\,dr,
+\]
+\noindent
+We estimate $\|v(t)-\langle v\rangle\|_H^2$ by Jensen's inequality. Recall: if $\Phi:\mathbb{R}\to\mathbb{R}$ is convex and $\mu$ is a probability measure, then
+\[
+\Phi\!\left(\int f\,d\mu\right)\le \int \Phi(f)\,d\mu.
+\]
+\noindent
+Here $f$ is an integrable function on the underlying measure space (i.e.\ $f\in L^1(\mu)$).
+Here we apply this with the probability measure $\mu=\frac{1}{T}\,dr$ on $[0,T]$ and the convex function $\Phi(x)=\|x\|_H^2$ (convex on the Hilbert space $H$).
+\noindent
+In this application, $f$ is the $H$-valued function $f(r):=v(t)-v(r)$ (with $t$ fixed).
+\[
+\left\| \frac{1}{T}\int_0^T \bigl(v(t)-v(r)\bigr)\,dr \right\|_H^2
+\le
+\frac{1}{T}\int_0^T \|v(t)-v(r)\|_H^2\,dr.
+\]
+Similarly, for the average term one has (again by Jensen)
+\[
+\|\langle v\rangle\|_H^2
+=
+\left\|\frac{1}{T}\int_0^T v(r)\,dr\right\|_H^2
+\le
+\frac{1}{T}\int_0^T \|v(r)\|_H^2\,dr.
+\]
+Combining these bounds gives
+\[
+\|v(t)\|_H^2
+\le
+\frac{2}{T}\int_0^T \|v(t)-v(r)\|_H^2\,dr
++
+\frac{2}{T}\int_0^T \|v(r)\|_H^2\,dr.
+\]
+
+For the first term, assume $t\ge r$:
+\[
+\|v(t)-v(r)\|_H^2
+=
+\int_r^t \frac{d}{ds}\|v(s)-v(r)\|_H^2\,ds
+\]
+\noindent
+This is just the fundamental theorem of calculus applied to the real-valued function $F(s):=\|v(s)-v(r)\|_H^2$ on $[r,t]$, using $F(r)=0$.
+\[
+=
+2\int_r^t
+{}_{V'}\left\langle \frac{dv}{ds}(s),\,v(s)-v(r)\right\rangle_{V} ds
+\]
+\[
+\le
+2\int_r^t
+\left\|\frac{dv}{ds}(s)\right\|_{V'}
+\|v(s)-v(r)\|_V\,ds
+\]
+\[
+\le
+\int_r^t
+\left\|\frac{dv}{ds}(s)\right\|_{V'}^2\,ds
++
+\int_r^t
+\|v(s)-v(r)\|_V^2\,ds.
+\]
+
+Substituting this estimate into the previous inequality gives a bound of the form
+\[
+\|v(t)\|_H^2
+\le
+\frac{2}{T}\int_0^T\left\|\frac{dv}{ds}(s)\right\|_{V'}^2\,ds
++
+\frac{2}{T}\int_0^T\!\!\int_0^T \|v(s)-v(r)\|_V^2\,ds\,dr
++
+\frac{2}{T}\int_0^T \|v(r)\|_H^2\,dr.
+\]
+\noindent
+More explicitly: starting from
+\[
+\|v(t)\|_H^2
+\le
+\frac{2}{T}\int_0^T \|v(t)-v(r)\|_H^2\,dr
++
+\frac{2}{T}\int_0^T \|v(r)\|_H^2\,dr,
+\]
+and using for each $r\in[0,T]$ the estimate (valid e.g.\ when $t\ge r$)
+\[
+\|v(t)-v(r)\|_H^2
+\le
+\int_r^t \left\|\frac{dv}{ds}(s)\right\|_{V'}^2\,ds
++
+\int_r^t \|v(s)-v(r)\|_V^2\,ds,
+\]
+we obtain
+\[
+\frac{2}{T}\int_0^T \|v(t)-v(r)\|_H^2\,dr
+\le
+\frac{2}{T}\int_0^T\int_r^t \left\|\frac{dv}{ds}(s)\right\|_{V'}^2\,ds\,dr
++
+\frac{2}{T}\int_0^T\int_r^t \|v(s)-v(r)\|_V^2\,ds\,dr.
+\]
+By enlarging the integration domains (so that $\int_r^t \le \int_0^T$) one can bound
+\[
+\int_0^T\int_r^t \left\|\frac{dv}{ds}(s)\right\|_{V'}^2\,ds\,dr
+\le
+\int_0^T\int_0^T \left\|\frac{dv}{ds}(s)\right\|_{V'}^2\,ds\,dr
+=
+T\int_0^T \left\|\frac{dv}{ds}(s)\right\|_{V'}^2\,ds,
+\]
+and similarly
+\[
+\int_0^T\int_r^t \|v(s)-v(r)\|_V^2\,ds\,dr
+\le
+\int_0^T\int_0^T \|v(s)-v(r)\|_V^2\,ds\,dr.
+\]
+Substituting these bounds yields the displayed estimate.
+\noindent
+The purpose of this calculation is to obtain a pointwise-in-time bound on $\|v(t)\|_H^2$ in terms of time-integrated quantities. In particular, one obtains an estimate of the form
+\[
+\sup_{t\in[0,T]}\|v(t)\|_H^2
+\;\le\;
+C\left(
+\left\|\frac{dv}{dt}\right\|_{L^2([0,T];V')}^2
++
+\|v\|_{L^2([0,T];V)}^2
++
+\|v\|_{L^2([0,T];H)}^2
+\right),
+\]
+for a constant $C$ depending only on $T$ (and the embedding constants). This is the ``desired form'' used below.
+Substituting $v=u_n-u_m$ then shows that if $(u_n)$ is Cauchy in $L^2([0,T];V)$ and $(\dot u_n)$ is Cauchy in $L^2([0,T];V')$, it is also Cauchy in $C([0,T];H)$.
+\noindent
+Since $H$ is complete, $C([0,T];H)$ is complete under the supremum norm $\|w\|_{C([0,T];H)}:=\sup_{t\in[0,T]}\|w(t)\|_H$. Hence $(u_n)$ converges to some $u\in C([0,T];H)$.
+\subsection*{Continuation / closing lines}
+
+Then a short ``Final remark'' is written:
+\[
+u\in H^1([0,T]),
+\qquad
+u(y)-u(x)=\int_x^y u'(s)\,ds.
+\]
+
+\begin{remark}[Out-of-source remark]
+This final line is the 1D Sobolev/absolute-continuity identity in time, matching the idea that $H^1$ functions have absolutely continuous representatives.
+\end{remark}
+
+\end{document}

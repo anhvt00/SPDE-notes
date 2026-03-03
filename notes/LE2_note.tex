@@ -1,0 +1,594 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\tr}{tr}
+
+\title{Lecture 2: Gaussian Measures on Hilbert Spaces}
+\author{Tien Anh Vu}
+\date{23.10.2025}
+
+\begin{document}
+\maketitle
+
+Let $(H, \langle \cdot, \cdot \rangle)$ be a real separable Hilbert space.
+
+%% =============================
+%% Definition of Gaussian measure
+%% =============================
+\begin{definition}[Gaussian measure]
+A probability measure $\mu$ on $(H, \mathcal{B}(H))$ is \emph{Gaussian} if and only if
+for all $t \in \mathbb{R}$ and $h \in H$:
+\[
+    \mathbb{E}[e^{it l_h}] = \int_H e^{it\langle h, u \rangle} \, \mu(du)
+    = e^{it \, m(h) \;-\; \frac{1}{2}\,t^2\sigma^2(h)}.
+\]
+Here, the left-hand side is the \textbf{characteristic function} of the linear functional $l_h \colon H \to \mathbb{R}$ defined by $l_h(u) = \langle h, u \rangle$.
+The right-hand side expresses the mean $m(h)$ and variance $\sigma^2(h)$ of the Gaussian measure.
+\end{definition}
+
+\begin{remark}
+The definition says that $\mu$ is Gaussian if and only if every one-dimensional projection $\langle h, \cdot \rangle$ produces a (real) Gaussian distribution.  In finite dimensions this is equivalent to saying that every linear functional of the random vector is normally distributed.  Passing to infinite dimensions, the characteristic function formulation is the natural replacement for a density, which may not exist on an infinite-dimensional space.
+\end{remark}
+
+%% =============================
+%% Theorem 1.6: characterisation
+%% =============================
+\begin{theorem}[Theorem 1.6 --- Characterisation of Gaussian measures]
+$\mu$ is a Gaussian measure on $H$ if and only if
+\[
+    \int_H e^{i\langle h, u \rangle} \, \mu(du)
+    = e^{\, i\langle m, h \rangle \;-\; \frac{1}{2}\,\langle Q h,\, h \rangle},
+\]
+where
+\begin{itemize}
+    \item \textbf{Mean:} \; $h \mapsto m(h) = \langle m, h \rangle$, \quad $m \in H$,
+
+    \item \textbf{Covariance:} \; $h \mapsto \sigma^2(h) = \langle Qh, h \rangle$, \quad
+          $Q \in L(H)$, \; $Q$ is symmetric, positive, semidefinite,
+
+    \item \textbf{Finite trace:}
+          \[
+              \tr(Q) = \sum_{j=1}^{\infty} \langle Q e_j, e_j \rangle < \infty
+          \]
+          for any one (hence all) complete orthonormal system (CONS) $(e_j)$ of $H$.
+\end{itemize}
+We write $\mu = \mathcal{N}(m, Q)$ to denote a Gaussian measure with mean $m$ and covariance operator $Q$.
+\textit{Explanation:} The operator $Q$ is the covariance operator, which must be symmetric, positive, and of trace class (i.e., $\tr(Q) < \infty$). The mean $m$ is an element of $H$. The condition on the trace ensures the measure is well-defined on infinite-dimensional spaces.
+
+\begin{remark}
+In finite dimensions, the characteristic function of $\mathcal{N}(m, \Sigma)$ on $\mathbb{R}^d$ takes the form $\exp(im^T a - \frac{1}{2} a^T \Sigma a)$.  Theorem~1.6 is the infinite-dimensional generalisation: the covariance \emph{matrix} $\Sigma$ is replaced by a covariance \emph{operator}~$Q$, and the finite-dimensional inner product $m^T a$ becomes $\langle m, a \rangle_H$.  The trace-class condition $\tr(Q) < \infty$ has no analogue in finite dimensions (every matrix has finite trace), but is essential in infinite dimensions to ensure the Gaussian measure is concentrated on~$H$.
+\end{remark}
+
+\end{theorem}
+
+%% =============================
+%% Example: Brownian bridge
+%% =============================
+\subsection*{Example: Brownian Bridge}
+
+\textbf{A Brownian bridge} is a continuous Gaussian process on $[0,T]$ pinned at both endpoints: $B(0) = B(T) = 0$. Its covariance operator is the inverse of the Dirichlet Laplacian on $L^2([0,T])$:
+\[
+    (-\Delta_D)^{-1} g(t)
+    = \int_0^{T} G(s,t)\, g(s)\,ds,
+\]
+where $G(s,t) = s \wedge t - \dfrac{st}{T}$ is the Green's function for $-\Delta_D$ on $[0,T]$ with homogeneous Dirichlet boundary conditions.
+
+\begin{remark}
+The Brownian bridge can be constructed from a standard Brownian motion $B$ via $B^{\mathrm{br}}_t = B_t - \frac{t}{T}\,B_T$.  Its covariance $\operatorname{Cov}(B^{\mathrm{br}}_s, B^{\mathrm{br}}_t) = s \wedge t - st/T$ coincides with the Green's function $G(s,t)$.  This is a prototypical example of a Gaussian measure whose covariance operator is the inverse of a differential operator.
+\end{remark}
+
+%% =============================
+%% Sketch of the proof of Theorem 1.6
+%% =============================
+\subsection*{Sketch of the proof of Theorem 1.6}
+
+\paragraph{Direction ``$\Leftarrow$''.}
+This direction is straightforward from the definition: if the characteristic function has the required form, then $\mu$ is Gaussian by definition.
+
+\begin{remark}
+More precisely, for any fixed $h \in H$ and $t \in \mathbb{R}$, setting $a = th$ in the assumed identity gives
+$\int_H e^{it\langle h, u\rangle}\,\mu(du) = e^{it\langle m, h\rangle - \frac{t^2}{2}\langle Qh, h\rangle}$,
+which is exactly the characteristic function of a real Gaussian with mean $\langle m, h\rangle$ and variance $\langle Qh, h\rangle$.  So every one-dimensional projection is Gaussian, matching the definition.
+\end{remark}
+
+\paragraph{Direction ``$\Rightarrow$''.}
+Goal: represent the mean functional using the Riesz representation theorem. The idea is to show that the mean map $h \mapsto m(h)$ is linear and continuous, so it can be represented as an inner product with some $m \in H$.
+
+\begin{remark}
+The reverse direction is the deeper part of the proof.  The strategy has three steps:
+(1)~show that the mean functional $h \mapsto m(h)$ is \textbf{continuous}, which by the Riesz representation theorem yields a vector $m \in H$;
+(2)~similarly construct the covariance operator $Q$ from the covariance bilinear form;
+(3)~establish the \textbf{trace-class} property $\tr(Q) < \infty$.
+Step~(1) is the most delicate: in infinite dimensions, a linear functional defined by integration need not be bounded automatically (unlike in $\mathbb{R}^d$, where all linear functionals are continuous), and the continuity must be deduced from a non-trivial argument --- here, using the \textbf{Baire category theorem} applied to the sets $H_n$.
+\end{remark}
+
+Define $\ell_h(u) := \langle h, u \rangle$.  We want to show that the map
+\[
+    h \;\longmapsto\; m(h) = E(\ell_h)
+\]
+is \textbf{linear and continuous}.
+
+To establish continuity it suffices to show the operator norm is finite:
+\[
+    \sup_{\|h\|_H \le 1} |m(h)| < \infty.
+\]
+
+To this end, define for each $n \ge 1$:
+\[
+    H_n := \left\{\, h \in H \;:\; \int_H |\ell_h(u)|\, \mu(du) \le n \,\right\}
+    \;\subset\; H,
+\]
+which is a \textbf{closed subset} of $H$.  Since every $h \in H$ yields
+a finite integral for some $n$, we have
+\[
+    H = \bigcup_{n \ge 1} H_n.
+\]
+By the \textbf{Baire category theorem}, at least one $H_n$ has non-empty interior, from which the boundedness of $m$ follows. This is a standard argument to deduce continuity from the closed graph property in infinite-dimensional spaces.
+
+%% =============================
+%% Detailed argument: closedness of H_n
+%% =============================
+\paragraph{Closedness of $H_n$.}
+Suppose $h_m \to h$ in $H$ with $h_m \in H_n$ for all $m$.  Then
+\[
+    |\ell_{h_m}(u)| \;\longrightarrow\; |\ell_h(u)| \quad \text{pointwise}.
+\]
+By \textbf{Fatou's lemma},
+\[
+    \int_H |\ell_h(u)|\,\mu(du)
+    \;\le\; \liminf_{m \to \infty} \int_H |\ell_{h_m}(u)|\,\mu(du)
+    \;\le\; n,
+\]
+so $h \in H_n$, confirming that $H_n$ is closed.
+
+\begin{remark}
+Fatou's lemma is applicable here because $|\ell_{h_m}(u)| \ge 0$ and pointwise convergence $\ell_{h_m}(u) \to \ell_h(u)$ follows from the continuity of the inner product: $|\langle h_m - h, u\rangle| \le \|h_m - h\|\,\|u\| \to 0$ for each $u$.
+\end{remark}
+
+%% =============================
+%% Application of Baire category theorem
+%% =============================
+\paragraph{Application of the Baire category theorem.}
+Since $H = \bigcup_{n \ge 1} H_n$ is a union of \textbf{closed subsets},
+by the Baire category theorem there exists $n_0 \in \mathbb{N}$ such that
+$H_{n_0}$ has \textbf{non-empty interior}:
+\[
+    \mathring{H}_{n_0} \neq \emptyset.
+\]
+\begin{remark}
+By the Baire category theorem, at least one of the closed sets $H_n$ must be ``thick,'' i.e., it contains an open ball.
+\end{remark}
+Therefore, there exist $\varepsilon > 0$ and $h_0 \in H$ such that
+\[
+    B_\varepsilon(h_0) \;\subseteq\; \mathring{H}_{n_0}.
+\]
+
+%% =============================
+%% Boundedness of m
+%% =============================
+\paragraph{Boundedness of $m$.}
+For all $h \in H$ with $\|h\| \le 1$, observe the decomposition
+\[
+    h \;=\; \frac{2}{\varepsilon}
+    \Big(\,\underbrace{\tfrac{\varepsilon}{2}\,h + h_0}_{\in\; B_\varepsilon(h_0)}
+    \;-\; h_0\Big),
+\]
+\begin{remark}
+The key observation is that since $\|h\| \le 1$, the shifted point $\tfrac{\varepsilon}{2}\,h + h_0$ lies inside the ball $B_\varepsilon(h_0)$.
+\end{remark}
+since
+$\bigl\|\tfrac{\varepsilon}{2}\,h + h_0 - h_0\bigr\|
+= \tfrac{\varepsilon}{2}\,\|h\| \le \tfrac{\varepsilon}{2} < \varepsilon$,
+so $\tfrac{\varepsilon}{2}\,h + h_0 \in B_\varepsilon(h_0) \subseteq H_{n_0}$.
+
+By linearity of $m$:
+\[
+    |m(h)|
+    = \frac{2}{\varepsilon}\,
+      \Big|m\!\Big(\tfrac{\varepsilon}{2}\,h + h_0\Big) - m(h_0)\Big|
+    \;\le\;
+    \frac{2}{\varepsilon}\,
+      \Big|m\!\Big(\tfrac{\varepsilon}{2}\,h + h_0\Big)\Big|
+    \;+\; \frac{2}{\varepsilon}\,|m(h_0)|.
+\]
+The first term satisfies
+\[
+    \Big|m\!\Big(\tfrac{\varepsilon}{2}\,h + h_0\Big)\Big|
+    \;=\; \bigg|\int_H
+          \Big\langle \tfrac{\varepsilon}{2}\,h + h_0,\; u \Big\rangle
+          \,\mu(du)\bigg|
+    \;\le\; \int_H
+          \Big|\Big\langle \tfrac{\varepsilon}{2}\,h + h_0,\; u
+          \Big\rangle\Big|\,\mu(du)
+    \;\le\; n_0,
+\]
+where the last inequality holds because
+$\tfrac{\varepsilon}{2}\,h + h_0 \in H_{n_0}$.
+Therefore,
+\[
+    \sup_{\|h\| \le 1} |m(h)|
+    \;\le\; \frac{2\,n_0}{\varepsilon} + \frac{2}{\varepsilon}\,|m(h_0)|
+    \;<\; \infty.
+\]
+By the \textbf{Riesz representation theorem}, there exists $m \in H$ such that
+$m(h) = \langle m, h \rangle$ for all $h \in H$.
+
+\begin{remark}
+The application of the Riesz representation theorem converts the abstract linear functional $h \mapsto m(h)$ into an inner product with a concrete element $m \in H$.  The Baire category argument preceding this step is essential: it establishes the \emph{continuity} of $h \mapsto m(h)$, which is the necessary hypothesis for Riesz's theorem.  Without this step, one would only know that $m(\cdot)$ is linear, but not that it is bounded --- and unbounded linear functionals on infinite-dimensional spaces cannot be represented by inner products.
+\end{remark}
+
+%% =============================
+%% Construction of the covariance operator Q
+%% =============================
+\paragraph{Construction of the covariance operator $Q$.}
+\begin{remark}
+The covariance operator $Q$ is obtained by applying the Riesz representation theorem to the bilinear form defined by the second moment of $\mu$.
+\end{remark}
+Concerning $Q$: for each $h \in H$, consider the map
+\[
+    g \;\longmapsto\;
+    \int_H \bigl(\langle g, u \rangle - \langle g, m \rangle\bigr)
+           \bigl(\langle h, u \rangle - \langle h, m \rangle\bigr)
+    \,\mu(du).
+\]
+This defines a bounded linear functional in $g$.
+By the \textbf{Riesz representation theorem}, for every $h \in H$ there
+exists $Q(h) \in H$ such that
+\[
+    \langle Q(h),\, g \rangle
+    \;=\;
+    \int_H \bigl(\langle g, u \rangle - \langle g, m \rangle\bigr)
+           \bigl(\langle h, u \rangle - \langle h, m \rangle\bigr)
+    \,\mu(du).
+\]
+The operator $Q \colon H \to H$ defined this way is the
+\textbf{covariance operator} of $\mu$,
+and $\langle Qh,h \rangle \ge 0$ for some $Q \in L(H)$.
+
+\begin{remark}
+The construction of $Q$ mirrors the construction of $m$: for each fixed $h \in H$, the map $g \mapsto \int_H (\langle g, u\rangle - \langle g, m\rangle)(\langle h, u\rangle - \langle h, m\rangle)\,\mu(du)$ is a bounded linear functional in $g$ (boundedness can again be established via a Baire category argument), and Riesz's theorem produces an element $Q(h) \in H$ representing it.  That the resulting operator $Q$ is symmetric follows from the symmetry of the integrand in $g$ and $h$, and positive semi-definiteness follows from $\langle Qh, h\rangle = \int_H (\langle h, u\rangle - \langle h, m\rangle)^2\,\mu(du) \ge 0$.
+\end{remark}
+
+%% =============================
+%% Lemma: bound on the trace (finite trace condition)
+%% =============================
+\subsection*{Concerning the finite trace condition}
+
+\begin{theorem}[Lemma --- Bound on the trace]
+Let $\mu = \mathcal{N}(0, Q)$ (centered).  Then
+\[
+    1 + \tr(Q)
+    \;\le\;
+    \left(\int_H e^{-\frac{1}{2}\|x\|^2}\,\mu(dx)\right)^{-2}
+    \;<\; \infty.
+\]
+\end{theorem}
+
+\begin{remark}
+This lemma provides a concrete analytic criterion for verifying the trace-class condition.  The bound expresses $\tr(Q)$ in terms of the \textbf{Laplace transform} of the Gaussian measure evaluated at the squared-norm functional $x \mapsto \|x\|^2$.  The right-hand side is always finite because $e^{-\|x\|^2} > 0$ everywhere, so the integral is strictly positive.  In finite dimensions, one simply reads off the trace from the diagonal of the covariance matrix; in infinite dimensions, no such direct computation is available, and this integral bound provides an alternative route.
+\end{remark}
+
+\noindent
+The right-hand side is finite because the integrand $e^{-\|x\|^2} > 0$
+on the support of the measure, so the integral is strictly positive.
+
+%% =============================
+%% Remark: connection to Wiener measure and Girsanov's theorem
+%% =============================
+\paragraph{Remark (Wiener measure / Girsanov).}
+For $h \in L^2([0,T])$, consider the stochastic exponential
+$\mathcal{\xi}((B_t + \,h_t)_t)$ with respect to Wiener measure.
+This is well-defined if and only if
+\[
+    h_t = \int_0^t \dot{h}_s\,ds,
+    \qquad
+    \int_0^T \|\dot{h}_s\|^2\,ds < \infty,
+\]
+which is exactly the \textbf{Girsanov's theorem} condition
+(i.e.\ the Cameron--Martin condition).
+
+\begin{remark}
+The Cameron--Martin space of the Wiener measure on $C([0,T])$ consists of all absolutely continuous functions $h$ starting at $0$ with $\dot{h} \in L^2([0,T])$.  Two Gaussian measures $\mathcal{N}(0,Q)$ and $\mathcal{N}(m,Q)$ are mutually absolutely continuous if and only if $m$ lies in the Cameron--Martin space (the range of $Q^{1/2}$).  Girsanov's theorem provides the explicit Radon--Nikodym derivative between the two measures.
+\end{remark}
+
+%% =============================
+%% Proof of the lemma: finite-dimensional case
+%% =============================
+\paragraph{Proof.}
+\textbf{Step 1: finite-dimensional case.}
+First assume $\dim H = n < \infty$, for $n \in \mathbb{N}$.
+
+\begin{remark}
+The proof strategy is a standard \textbf{finite-dimensional approximation}: first establish the inequality when $H$ is replaced by $\mathbb{R}^n$ (where explicit density formulas are available), and then pass to the limit $n \to \infty$ using monotone convergence and Parseval's identity.  This approach is typical in infinite-dimensional analysis, where direct computations are often impossible.
+\end{remark}
+
+Let $\sigma_1^2, \ldots, \sigma_n^2$ be the eigenvalues of $Q$.
+\begin{remark}
+We may assume without loss of generality that all eigenvalues $\sigma_i^2$ are strictly positive, since zero eigenvalues correspond to degenerate directions that can be factored out.
+\end{remark}
+
+Let $\mu_n = \mathcal{N}(0, Q_n)$ be the distribution of $\mu$ with respect to
+the projection
+\[
+    \Pi_h \colon H \to \mathbb{R}^n,
+    \qquad
+    h \;\mapsto\; \bigl(\langle h, e_1 \rangle,\; \ldots,\;
+                        \langle h, e_n \rangle\bigr),
+\]
+for some CONS $(e_1, e_2, \ldots)$ consisting of
+\textbf{eigenvectors of $Q_n$}.
+Without loss of generality, $\sigma_i^2 > 0$ for all $i$.
+
+Then $\mathcal{N}(0, Q_n) \ll dx$ (absolutely continuous w.r.t.\ Lebesgue measure)
+with density
+\[
+    \frac{1}{\sqrt{(2\pi)^n \det Q_n}}\;
+    e^{-\frac{1}{2}\,\langle Q_n^{-1} x,\, x \rangle}
+    \;=\;
+    \frac{1}{\sqrt{(2\pi)^n \det Q_n}}\;
+    e^{-\sum_{i=1}^{n} \frac{x_i^2}{2\,\sigma_i^2}}.
+\]
+
+\paragraph{Computing the integral.}
+\[
+    \int_{\mathbb{R}^n} e^{-\frac{1}{2}\|x\|^2}\,\mu_n(dx)
+    \;=\;
+    \frac{1}{\sqrt{(2\pi)^n \det Q_n}}
+    \int_{\mathbb{R}^n}
+    e^{-\sum_{i=1}^{n} \frac{(\sigma_i^2 + 1)\,x_i^2}
+                              {2\,\sigma_i^2}}\,dx.
+\]
+
+\begin{remark}
+Each factor is a standard Gaussian integral of the form $\int_{\mathbb{R}} e^{-a\,x^2}\,dx = \sqrt{\pi/a}$, applied here with $a = (\sigma_i^2 + 1)/(2\sigma_i^2)$.
+\end{remark}
+The inner integral factors as a product of one-dimensional Gaussian integrals:
+\[
+    \int_{\mathbb{R}^n}
+    e^{-\sum_{i=1}^{n} \frac{(\sigma_i^2 + 1)\,x_i^2}
+                              {2\,\sigma_i^2}}\,dx
+    \;=\;
+    \prod_{i=1}^{n}
+    \sqrt{\frac{2\pi\,\sigma_i^2}{\sigma_i^2 + 1}}
+    \;=\;
+    \sqrt{(2\pi)^n \prod_{i=1}^{n}
+          \frac{\sigma_i^2}{\sigma_i^2 + 1}}.
+\]
+
+Therefore,
+\[
+    \int_{\mathbb{R}^n} e^{-\|x\|^2}\,\mu_n(dx)
+    \;=\;
+    \frac{
+      \sqrt{(2\pi)^n \displaystyle\prod_{i=1}^{n}
+            \frac{\sigma_i^2}{\sigma_i^2 + 1}}
+    }{
+      \sqrt{(2\pi)^n \det Q_n}
+    }
+    \;=\;
+    \frac{1}{\sqrt{\displaystyle\prod_{i=1}^{n}
+          \bigl(1 + \sigma_i^2\bigr)}},
+\]
+since $\det Q_n = \prod_{i=1}^{n} \sigma_i^2$.
+
+%% =============================
+%% Key inequality in finite dimensions
+%% =============================
+\paragraph{Key inequality.}
+Using the arithmetic--geometric mean inequality
+$1 + \sum_{i=1}^{n} \sigma_i^2 \le \prod_{i=1}^{n}(1 + \sigma_i^2)$,
+we obtain
+\[
+    1 + \sum_{i=1}^{n} \sigma_i^2
+    \;\le\;
+    \prod_{i=1}^{n} \bigl(1 + \sigma_i^2\bigr)
+    \;=\;
+    \left(\int_{\mathbb{R}^n} e^{-\|x\|^2}\,\mu_n(dx)\right)^{-2}.
+\]
+
+\begin{remark}
+The AM--GM inequality used here is the elementary fact that for non-negative $a_i$,
+$1 + \sum_i a_i \le \prod_i (1 + a_i)$,
+which follows by expanding the product: every term in the sum appears in the expansion, together with additional non-negative cross terms.  This is the key step linking the trace (a sum) to the Laplace transform (a product) of the Gaussian measure.
+\end{remark}
+
+%% =============================
+%% Step 2: taking the limit n -> infinity
+%% =============================
+\paragraph{Step 2: taking the limit $n \to \infty$.}
+We have
+\[
+    \lim_{n \to \infty} \tr(Q_n)
+    \;=\; \lim_{n \to \infty} \sum_{i=1}^{n} \langle Q e_i, e_i \rangle
+    \;=\; \sum_{i=1}^{\infty} \langle Q e_i, e_i \rangle
+    \;=\; \tr(Q).
+\]
+For the right-hand side, observe
+\[
+    \lim_{n \to \infty}
+    \int_H e^{-\frac{1}{2}\sum_{i=1}^{n} \langle x, e_i \rangle^2}\,\mu(dx)
+    \;=\;
+    \lim_{n \to \infty}
+    \int_{\mathbb{R}^n} e^{-\frac{1}{2}\|x\|^2}\,\mu_n(dx).
+\]
+\begin{remark}
+In the limit, the partial sums $\sum_{i=1}^{n} \langle x, e_i \rangle^2$ converge to the full norm $\|x\|_H^2$ by Parseval's identity.
+\end{remark}
+The left-hand side converges to
+\[
+    \underbrace{
+    \int_H e^{-\frac{1}{2}\|x\|_H^2}\,\mu(dx)
+    }_{> \; 0},
+\]
+which is strictly positive.
+\begin{remark}
+The integral is strictly positive because $e^{-\|x\|^2/2} > 0$ everywhere on the support of $\mu$. This completes the proof that $\tr(Q) < \infty$.
+\end{remark}
+
+%% =============================
+%% Spectral theorem for trace-class operators
+%% =============================
+\subsection*{Spectral decomposition of $Q$}
+
+\begin{theorem}[Spectral theorem for trace-class operators]
+Let $Q$ be a linear, continuous, symmetric, positive semidefinite operator
+with $\tr(Q) < \infty$.  Then there exists a CONS $(e_k)_{k \ge 1}$ of $H$
+consisting of \textbf{eigenvectors of $Q$}:
+\[
+    Q e_k = \lambda_k\, e_k, \qquad \lambda_k \ge 0.
+\]
+Moreover:
+\begin{itemize}
+    \item $0$ is the only accumulation point of $(\lambda_k)_{k \ge 1}$,
+    \item $\tr(Q) = \displaystyle\sum_{k=1}^{\infty} \lambda_k < \infty$,
+          \quad i.e., the series converges absolutely.
+\end{itemize}
+\end{theorem}
+
+\begin{remark}
+The spectral theorem for compact self-adjoint operators guarantees existence of the eigenbasis.  The trace-class condition $\tr(Q) < \infty$ is strictly stronger than compactness: it forces the eigenvalues $\lambda_k \to 0$ fast enough for the series to converge.  In fact, $Q$ is trace class if and only if $Q$ is the composition of two Hilbert--Schmidt operators.  The eigenvalue decay rate of $Q$ directly controls the regularity of samples drawn from $\mathcal{N}(0,Q)$.
+\end{remark}
+
+\begin{remark}
+From a computational perspective, the spectral decomposition $Q = \sum_k \lambda_k\,e_k \otimes e_k$ (where $(e_k \otimes e_k)(h) := \langle h, e_k\rangle\,e_k$) \textbf{diagonalises} the Gaussian measure: in the eigenbasis of $Q$, the measure $\mathcal{N}(0, Q)$ becomes a product of independent one-dimensional Gaussians $\mathcal{N}(0, \lambda_k)$.  This is the fundamental reason why the eigenbasis of $Q$ is the preferred coordinate system for working with Gaussian measures --- it \textbf{decouples all interactions} between different modes, reducing infinite-dimensional computations to sequences of independent one-dimensional problems.
+\end{remark}
+
+%% =============================
+%% Canonical representation of Gaussian measures
+%% =============================
+\subsection*{Canonical representation of Gaussian measures}
+
+\begin{theorem}[Canonical representation]
+Let $m \in H$, $Q \in L(H)$ (symmetric, positive, trace class) and $(e_k)$ a CONS
+of eigenvectors of $Q$.
+Let $X$ be an $H$-valued random variable on $(\Omega, \mathcal{F}, P)$.
+Then $X \sim \mathcal{N}(m, Q)$ if and only if
+\[
+    X \;=\; \sum_{k=1}^{\infty} \sqrt{\lambda_k}\;\beta_k\,e_k \;+\; m,
+\]
+where $(\beta_k)$ are i.i.d.\ $\mathcal{N}(0,1)$.
+The series converges $P$-a.s.\ and in $L^p$ for all $p < \infty$.
+\end{theorem}
+
+\begin{remark}
+The canonical representation reduces a Gaussian random variable in an infinite-dimensional space to a countable collection of independent standard Gaussians $\beta_k$, weighted by $\sqrt{\lambda_k}$ along the principal directions $e_k$.  The convergence of the series relies on $\sum_k \lambda_k = \tr(Q) < \infty$.  Conversely, given any i.i.d.\ sequence $(\beta_k)$ and any summable sequence $(\lambda_k)$, the right-hand side defines an $H$-valued Gaussian random variable.
+\end{remark}
+
+%% =============================
+%% Abstract Fourier series motivation
+%% =============================
+\paragraph{Abstract Fourier series.}
+Given a (C)ONS $(e_k)_k$ in $H$, every $x \in H$ admits the expansion
+\[
+    x \;=\; \sum_{k=1}^{\infty} \langle x, e_k \rangle\, e_k.
+\]
+
+\begin{remark}
+This is the Hilbert-space generalisation of the classical Fourier series.  The convergence is in the norm of $H$, and Parseval's identity gives $\|x\|^2 = \sum_k |\langle x, e_k\rangle|^2$.  When the ONS consists of eigenvectors of $Q$, the Fourier coefficients $\langle X, e_k\rangle$ of a Gaussian random variable $X \sim \mathcal{N}(m,Q)$ are independent Gaussians, which is the crucial structural simplification that the eigenbasis provides.
+\end{remark}
+
+%% =============================
+%% Explanation: projections and distributions
+%% =============================
+\paragraph{Projections and marginal distributions.}
+If $X \sim \mathcal{N}(m, Q)$, then each coordinate satisfies
+\[
+    \langle X, e_k \rangle
+    \;\sim\;
+    \mathcal{N}\!\bigl(\langle m, e_k \rangle,\;
+    \langle Q e_k, e_k \rangle\bigr)
+    \;\hat{=}\;
+    \sqrt{\lambda_k}\,\mathcal{N}(0,1) + \langle m, e_k \rangle,
+\]
+\begin{remark}
+Here $\hat{=}$ denotes equality in distribution. The identity $\langle Q e_k, e_k \rangle = \lambda_k$ follows from $\|e_k\| = 1$ since $(e_k)$ is an orthonormal system.
+\end{remark}
+since $\langle Q e_k, e_k \rangle = \lambda_k\,\|e_k\|^2 = \lambda_k$.
+
+Therefore,
+\[
+    X \;=\; \sum_{k=1}^{\infty} \langle X, e_k \rangle\,e_k
+    \;=\;
+    \sum_{k=1}^{\infty} \sqrt{\lambda_k}\,\mathcal{N}(0,1)\,e_k
+    \;+\; \sum_{k=1}^{\infty} \langle m, e_k \rangle\,e_k.
+\]
+
+%% =============================
+%% Definition: Q-Wiener process
+%% =============================
+\subsection*{$Q$-Wiener process}
+
+
+
+\begin{definition}[$Q$-Wiener process]
+Let $U$ be a separable Hilbert space. A $U$-valued stochastic process $(W_t)_{t \in [0,T]}$ on $(\Omega, \mathcal{F}, P)$
+is called a \textbf{standard $Q$-Wiener process} if:
+\begin{itemize}
+    \item[(i)] $W_0 = 0$,
+    \item[(ii)] $t \mapsto W_t$ is $P$-a.s.\ continuous
+          \quad (continuous sample paths),
+    \item[(iii)] for $0 = t_0 < t_1 < \cdots < t_n \le T$,
+          the increments
+          \[
+              W_{t_j} - W_{t_{j-1}}, \qquad j = 1, \ldots, n,
+          \]
+          are \textbf{independent} and distributed as
+          \[
+              W_{t_j} - W_{t_{j-1}}
+              \;\sim\;
+              \mathcal{N}\!\bigl(0,\;(t_j - t_{j-1})\,Q\bigr).
+          \]
+\end{itemize}
+\end{definition}
+
+\begin{remark}
+When $U = \mathbb{R}$ and $Q = 1$, the $Q$-Wiener process reduces to the classical scalar Brownian motion.  In infinite dimensions, the covariance operator $Q$ must be trace class to ensure the increments take values in $U$ rather than in a larger space.  The choice of $Q$ determines both the spatial correlation structure and the regularity of the sample paths.  If instead one takes $Q = I$ (the identity, which is \emph{not} trace class on an infinite-dimensional space), one obtains a \emph{cylindrical} Wiener process, which does not take values in $U$ but can still be used as a driving noise for SPDEs after applying a suitable operator.
+\end{remark}
+
+%% =============================
+%% Canonical representation of the Q-Wiener process
+%% =============================
+\paragraph{Canonical representation.}
+\[
+    W_t \;=\; \sum_{k=1}^{\infty} \sqrt{\lambda_k}\;\beta_k(t)\,e_k,
+\]
+where $(\beta_k(t))$ are independent standard Brownian motions.
+The series converges $P$-a.s.\ and
+\begin{itemize}
+    \item uniformly in time in $C([0,T],\,U)$,
+    \item in $L^p\!\bigl(\Omega, \mathcal{F}, P;\;
+          C([0,T],\,U)\bigr)$ for all $p < \infty$.
+\end{itemize}
+
+\begin{remark}
+The canonical representation decomposes the infinite-dimensional $Q$-Wiener process into a countable family of independent scalar Brownian motions $(\beta_k(t))$, each modulated by the eigenvalue $\sqrt{\lambda_k}$ along the direction $e_k$.  The uniform convergence in $C([0,T], U)$ follows from the Kolmogorov continuity criterion together with the summability $\sum_k \lambda_k < \infty$.  In practice, truncating the series at finitely many terms $k \le N$ gives a natural finite-dimensional approximation of the noise, which is the basis of spectral Galerkin methods for the numerical solution of SPDEs.
+\end{remark}
+
+If a sequence of Martingales $(M_t^n)_n$ form a Cauchy sequence at the end point T, Doob's inequality implies that they get close over the whole interval $[0,T]$.
+\[
+\lim_{ n, m \to \infty } \mathbb{E}[ \vert M_{T}^{n}- M_{T}^{m} \vert] = 0 \implies \lim_{  n \to \infty } \mathbb{P}\Bigl(\sup_{0\le t \le T}|M_{t}^{n}- M_{t}| \ge \epsilon\Bigr) =0
+\]
+
+\begin{remark}
+By Doob's maximal inequality (or its $L^p$--version) applied to the martingale differences one has, for $p>1$,
+\[
+\mathbb{E}\Bigl[\sup_{0\le t\le T}|M_t^n - M_t^m|^p\Bigr]
+\le C_p\,\mathbb{E}\bigl[|M_T^n - M_T^m|^p\bigr],
+\]
+so $L^p$--Cauchy at time $T$ implies uniform convergence on $[0,T]$ in $L^p$, and hence in probability.
+\end{remark}
+
+\begin{remark}
+In particular, if $M_T^n\to M_T$ in $L^1$ (or $L^p$) then $M^n\to M$ uniformly on $[0,T]$ in probability (resp. in $L^p$). This is the usual way to lift terminal-time convergence to uniform-in-time convergence for martingales.
+\end{remark}
+
+\end{document}

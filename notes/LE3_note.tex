@@ -1,0 +1,895 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\tr}{tr}
+
+\title{Lecture 3: Stochastic Integration in Hilbert Space}
+\date{30.10.2025}
+\author{Tien Anh Vu}
+\begin{document}
+\maketitle
+
+%% =============================
+%% §3 Stochastic integration in Hilbert space
+%% =============================
+\section*{\S 3 Stochastic Integration in Hilbert Space}
+
+%% =============================
+%% 1.3.1 Martingales in Banach space
+%% =============================
+\subsection*{1.3.1 Martingales in Banach space}
+
+Let $(E, \|\cdot\|)$ be a (real) Banach space.
+
+%% =============================
+%% Bochner integral
+%% =============================
+\subsubsection*{Bochner integral (E-valued integration)}
+
+% The Bochner integral extends the Lebesgue integral to functions
+% taking values in a Banach space E.
+
+Given a finite measure $\mu$ on a probability space $(\Omega, \mathcal{A})$,
+we want to define
+\[
+    \int f\,d\mu \;\in\; E.
+\]
+
+\begin{remark}
+The Bochner integral is the natural generalisation of the Lebesgue integral to functions taking values in a Banach space~$E$.  Just as the Lebesgue integral is built by first defining the integral for simple (step) functions and then extending by density, the Bochner integral follows the same strategy but for $E$-valued functions.  The key challenge in infinite dimensions is that one must distinguish between different notions of measurability (strong vs.\ weak), which coincide in finite-dimensional spaces but can differ in general Banach spaces.
+\end{remark}
+
+%% =============================
+%% Step 1: definition for step functions
+%% =============================
+\paragraph{Step functions.}
+% We first define the integral for simple (step) functions,
+% then extend by taking limits.
+
+For measurable \textbf{vector-valued} functions $f \colon \Omega \to E$,
+given a step function of the form
+\[
+    f \;=\; \sum_{k=1}^{n} x_k\,\mathbf{1}_{A_k},
+    \qquad x_k \in E,\quad A_k \in \mathcal{A},\quad
+    A_k \cap A_\ell = \emptyset, \tag{$*$}
+\]
+define
+\[
+    \int f\,d\mu
+    \;:=\;
+    \sum_{i=1}^{n} \mu(A_k)\,x_k
+    \qquad \text{(linear combination of vectors $x_k$)}.
+\]
+
+\begin{remark}
+The integral of a step function is a finite linear combination of vectors $x_k$ weighted by the measures of the corresponding sets~$A_k$.  This is completely analogous to the Lebesgue integral of real-valued simple functions.  The requirement that the sets $A_k$ are pairwise disjoint ensures that the definition is unambiguous: each $\omega \in \Omega$ belongs to at most one $A_k$, so $f(\omega) = x_k$ is uniquely determined.
+\end{remark}
+
+%% =============================
+%% Bochner inequality
+%% =============================
+\paragraph{Bochner inequality.}
+% This is the key estimate that allows extending
+% the integral to limits of step functions.
+
+We want to take suitable limits. The \textbf{Bochner inequality} gives:
+\[
+    \left\|\int f\,d\mu\right\|
+    \;=\;
+    \left\|\sum_{k=1}^{n} \mu(A_k)\,x_k\right\|_E
+    \;\le\;
+    \sum_{k=1}^{n} \|x_k\|_E\;\mu(A_k)
+    \;=\;
+    \int_\Omega \|f\|_E\,d\mu.
+\]
+
+% For a step function with disjoint A_k, the norm function
+% ||f|| is itself a simple real-valued function:
+For disjoint $A_k$, the norm of $f$ is the real-valued step function:
+\[
+    \|f\|(\omega)
+    \;=\;
+    \sum_{k} \|x_k\|\;\mathbf{1}_{A_k}(\omega),
+\]
+and the right-hand side is just the ordinary \textbf{Lebesgue integral}
+of $\|f\|_E$.
+
+\begin{remark}
+The Bochner inequality is the key estimate that enables extending the integral from step functions to general Bochner-integrable functions.  If a sequence of step functions $f_n \to f$ converges in the $L^1$ norm, then by the Bochner inequality the integrals $\int f_n\,d\mu$ form a Cauchy sequence in~$E$, and since $E$ is complete (being a Banach space), the limit exists and defines $\int f\,d\mu$.  This is exactly the same density argument used to extend the Lebesgue integral from simple functions to $L^1$.
+\end{remark}
+
+%% =============================
+%% Extension to general Bochner-integrable functions
+%% =============================
+\paragraph{Extension to all integrals.}
+% The Bochner inequality allows us to extend the integral
+% from step functions to the closure in L^1 norm.
+
+The Bochner inequality allows us to extend $\int f\,d\mu$ to all functions
+\[
+    f \colon \Omega \to E
+    \quad \text{satisfying:}
+\]
+\begin{itemize}
+    \item $f$ is \textbf{strongly measurable}, i.e.,
+          \[
+              f = \lim_{n \to \infty} f_n
+              \qquad \mu\text{-a.e.\ (in $E$)},
+          \]
+          where $f_n$ are of type $(*)$,
+          % i.e., f can be approximated pointwise a.e. by step functions
+
+    \item $\displaystyle\int_\Omega \|f\|_E\,d\mu < \infty$.
+          % The E-norm of f must be Lebesgue integrable
+\end{itemize}
+
+%% =============================
+%% Remark: strong vs weak measurability
+%% =============================
+\begin{remark}
+In general, it is \textbf{not} true that if
+$f \colon \Omega \to E$ is $\mathcal{A}/\mathcal{B}(E)$-measurable,
+this implies that $f$ can be approximated by step functions of type $(*)$.
+% Borel measurability alone is insufficient in infinite-dimensional spaces.
+Rather, such a function $f$ is only \textbf{weakly measurable}, i.e.,
+for any $\ell \in E'$ (= all continuous linear functionals on $E$),
+the real-valued map $\omega \mapsto \ell(f(\omega))$ is measurable.
+% The distinction between strong and weak measurability is crucial
+% in infinite-dimensional Banach spaces; they coincide in separable spaces
+% by the Pettis measurability theorem.
+\end{remark}
+
+%% =============================
+%% Pettis measurability theorem
+%% =============================
+\begin{theorem}[Pettis measurability theorem]
+A necessary and sufficient condition for
+$f \colon \Omega \to E$ to be \textbf{strongly measurable} is that $f$ is
+\textbf{weakly measurable} and \textbf{separably valued}
+(i.e., $f(\Omega) \subseteq E$ is separable).
+\end{theorem}
+
+\begin{remark}
+In particular, if $E$ is separable
+(e.g.\ $\mathbb{R}^d$, $L^p(\mathbb{R}^d)$, etc.),
+then every weakly measurable mapping $f \colon \Omega \to E$ is
+also \textbf{strongly measurable}.
+% This is because in a separable Banach space, the Borel sigma-algebra
+% coincides with the sigma-algebra generated by continuous linear functionals.
+\end{remark}
+
+%% =============================
+%% Notation: Bochner-Lebesgue spaces
+%% =============================
+\paragraph{Notation.}
+% Bochner--Lebesgue spaces are the E-valued analogues
+% of the classical L^p spaces.
+We write
+\[
+    L^p(\Omega, \mathcal{A}, \mu;\, E),
+    \qquad
+    L^p(\Omega, \mathcal{A}, \mu,\, E)
+\]
+for the space of all Bochner-measurable functions
+$f \colon \Omega \to E$ with
+$\int_\Omega \|f\|_E^p\,d\mu < \infty$.
+
+\begin{remark}
+The Bochner--Lebesgue spaces $L^p(\Omega, \mathcal{A}, \mu;\, E)$ are the natural framework for random variables and stochastic processes taking values in a Banach space~$E$.  For $p = 1$, the space consists of all Bochner-integrable functions.  For $p = 2$ and $E$ a Hilbert space, the space $L^2(\Omega, \mathcal{A}, \mu;\, H)$ is again a Hilbert space, which is essential for developing the $L^2$ theory of stochastic integration.
+\end{remark}
+
+%% =============================
+%% Properties of Bochner's integral
+%% =============================
+\subsection*{Properties of Bochner's integral}
+
+\begin{itemize}
+    \item[(i)] \textbf{Bochner inequality:}
+    \[
+        \left\|\int f\,d\mu\right\|
+        \;\le\;
+        \int \|f\|\,d\mu.
+    \]
+    % This is the E-valued analogue of the triangle inequality for integrals.
+
+    \item[(ii)] \textbf{Linearity:} If $L \colon E \to F$ is a
+    \textbf{continuous, linear} map (where $F$ is also a Banach space), then
+    \[
+        L\!\left(\int f\,d\mu\right)
+        \;=\;
+        \int L(f)\,d\mu.
+    \]
+    % Continuous linear operators commute with the Bochner integral,
+    % which is an interchange of L and the integral.
+
+    \item[(iii)] If $f \in C\bigl([a,b];\, E\bigr)$,
+    then
+    \[
+        f(t) - f(s) \;=\; \int_s^t f'(r)\,dr,
+    \]
+    where the right-hand side is a \textbf{Bochner integral}.
+    % This is the fundamental theorem of calculus for E-valued functions.
+
+\end{itemize}
+
+\begin{remark}
+Property~(iii) is the \textbf{fundamental theorem of calculus} for Banach-space-valued functions.  It asserts that if $f \colon [a,b] \to E$ is continuously differentiable, then $f$ can be recovered from its derivative by Bochner integration, exactly as in the scalar case.  This result is used extensively in the theory of $C_0$-semigroups and evolution equations, where solutions are often expressed as integrals of operator-valued functions.
+\end{remark}
+
+%% =============================
+%% Conditional expectation in Banach spaces
+%% =============================
+\subsection*{Conditional expectation in Banach spaces}
+
+% Here (\Omega, \mathcal{A}, P) is a probability space.
+
+\begin{theorem}[Theorem 1.16 --- Conditional expectation]
+Let $X$ be a random variable $X \colon \Omega \to E$
+with $X \in L^1(\Omega, \mathcal{A}, P;\, E)$,
+i.e., $X$ is a Bochner-integrable $E$-valued random variable.
+Let $\mathcal{A}_0 \subset \mathcal{A}$ be a sub-$\sigma$-algebra of
+$\mathcal{A}$.  Then there exists a $P$-a.s.\ uniquely determined
+\[
+    X_0 \;\in\; L^1(\Omega, \mathcal{A}, P;\, E)
+\]
+such that
+\[
+    \int_A X_0\,dP
+    \;=\;
+    \int_A X\,dP
+    \qquad
+    \forall\, A \in \mathcal{A}_0.
+\]
+$X_0$ is called the \textbf{conditional expectation} of $X$ given
+$\mathcal{A}_0$, and we write
+$X_0 \equiv E(X \mid \mathcal{A}_0)$.
+\end{theorem}
+
+\begin{remark}
+Bochner's inequality implies the following estimate for
+conditional expectations:
+\[
+    \bigl\|E(X \mid \mathcal{A}_0)\bigr\|_E
+    \;\le\;
+    E\!\bigl(\|X\|_E \;\big|\; \mathcal{A}_0\bigr).
+\]
+% The norm of the conditional expectation is controlled by the
+% conditional expectation of the norm.
+% In the Hilbert space setting, it is not possible to require
+% monotonicity of conditional expectations (as in the real-valued case),
+% because there is no natural ordering on a Hilbert space.
+In a Hilbert space, it is \textbf{not} possible to require
+monotonicity ($\ge$) for conditional expectations,
+since there is no natural partial order on $H$.
+\end{remark}
+
+%% =============================
+%% Proof sketch of Theorem 1.16
+%% =============================
+\paragraph{Proof (sketch).}
+Start with a step function
+$X = \sum_{k=1}^{n} x_k\,\mathbf{1}_{A_k}$
+(pairwise disjoint $A_k$).  Then
+\[
+    E(X \mid \mathcal{A}_0)
+    \;=\;
+    \sum_{k=1}^{n} x_k\;E\!\bigl(\mathbf{1}_{A_k}
+    \mid \mathcal{A}_0\bigr).
+\]
+% Each term uses the real-valued conditional expectation
+% of an indicator function, which is well-defined.
+
+Hence,
+\[
+    \bigl\|E(X \mid \mathcal{A}_0)\bigr\|
+    \;\le\;
+    \sum_{k=1}^{n} \|x_k\|\;
+    E\!\bigl(\mathbf{1}_{A_k} \mid \mathcal{A}_0\bigr)
+    \;=\;
+    E\!\bigl(\|X\| \mid \mathcal{A}_0\bigr).
+\]
+% The general case follows by approximating an arbitrary
+% Bochner-integrable function by step functions and passing
+% to the limit using converging sequences.
+Generalize by using converging sequences.
+
+\begin{remark}
+The extension from step functions to general $E$-valued random variables follows the same approximation scheme as in the scalar case: approximate $X$ by step functions $X_n$, apply the conditional expectation to each~$X_n$ (which is explicit), and pass to the limit.  The Bochner inequality ensures that the conditional expectation operator is a \textbf{contraction} on $L^1(\Omega, \mathcal{A}, P;\, E)$: if $X_n \to X$ in $L^1$, then $E(X_n \mid \mathcal{A}_0) \to E(X \mid \mathcal{A}_0)$ in $L^1$, guaranteeing existence and uniqueness of the limit.
+\end{remark}
+
+%% =============================
+%% Definition: E-valued martingale
+%% =============================
+\subsection*{Martingales in Banach spaces}
+
+\begin{definition}[$E$-valued martingale]
+An $E$-valued stochastic process $(M_t)_{t \ge 0}$ is called an
+$(\mathcal{A}_t)$-\textbf{martingale}
+(with respect to the filtration $(\mathcal{A}_t)$) if:
+\begin{itemize}
+    \item[(i)] $E\!\bigl(\|M_t\|\bigr) < \infty$
+          \quad (Bochner integrability),
+    \item[(ii)] $M_t$ is $\mathcal{A}_t$-adapted,
+    \item[(iii)] $E(M_t \mid \mathcal{A}_s) = M_s$,
+          \quad $0 \le s \le t$.
+\end{itemize}
+\end{definition}
+
+\begin{remark}
+The definition directly generalises scalar-valued martingales to the Banach space setting.
+Condition~(i) ensures that the Bochner integral (and hence the conditional expectation in~(iii)) is well-defined; it replaces the classical requirement $E(|M_t|) < \infty$.
+Condition~(ii) is the usual adaptedness: $M_t$ may only depend on the information available at time~$t$.
+Condition~(iii) is the \textbf{martingale identity}, now interpreted via \textbf{Bochner conditional expectation} (Theorem~1.16).
+The key subtlety in infinite dimensions is that the conditional expectation must be constructed using the Bochner integral theory, and one cannot rely on monotonicity arguments as in the real-valued case.
+\end{remark}
+
+\begin{remark}
+If $(M_t)$ is an $E$-valued $(\mathcal{A}_t)$-martingale,
+then for every $\ell \in E'$ (continuous linear functional),
+$\bigl(\ell(M_t)\bigr)_{t \ge 0}$ is a \textbf{real-valued}
+$(\mathcal{A}_t)$-martingale.
+% This follows from property (ii) of the Bochner integral:
+% continuous linear maps commute with the integral,
+% hence with conditional expectations.
+\end{remark}
+
+%% =============================
+%% Example: Q-Wiener process is a martingale
+%% =============================
+\paragraph{Example: $Q$-Wiener process.}
+Let $(W_t)$ be a $Q$-Wiener process taking values in $U$
+with filtration $(\mathcal{A}_t)$.
+Then $(W_t)$ is an $(\mathcal{A}_t)$-martingale, since
+$E\!\bigl(\|W_t\|_U^2\bigr) < \infty$.
+
+% We verify the finite second moment using the canonical
+% representation of the Q-Wiener process.
+
+Indeed, using the \textbf{canonical representation} of
+the Wiener process,
+\begin{align*}
+    E\!\left(\|W_t\|_U^2\right)
+    &\;=\;
+    E\!\left(
+        \left\|\sum_{k=1}^{\infty}
+        \sqrt{\lambda_k}\,\beta_k(t)\,e_k
+        \right\|_U^2
+    \right) \\[6pt]
+    %% Apply Parseval's identity: ||x||^2 = sum |<x, e_k>|^2
+    &\;=\;
+    E\!\left(
+        \sum_{k=1}^{\infty}
+        \bigl\langle W_t,\, e_k \bigr\rangle_U^2
+    \right)
+    \qquad\text{(Parseval's identity)} \\[6pt]
+    %% Each coordinate: <W_t, e_k> = sqrt(lambda_k) beta_k(t)
+    &\;=\;
+    E\!\left(
+        \sum_{k=1}^{\infty}
+        \lambda_k\,\beta_k^2(t)
+    \right) \\[6pt]
+    %% Interchange sum and expectation by Fubini/monotone convergence
+    &\;\stackrel{\text{Fubini}}{=}\;
+    \sum_{k=1}^{\infty} \lambda_k\;
+    \underbrace{E\!\bigl(\beta_k^2(t)\bigr)}_{=\;t} \\[6pt]
+    &\;=\;
+    t\,\sum_{k=1}^{\infty} \lambda_k
+    \;=\;
+    t\;\tr(Q).
+\end{align*}
+
+\begin{remark}
+Here $(e_k)$ is a CONS of $U$ consisting of eigenvectors of $Q$
+with eigenvalues $\lambda_k$, and $(\beta_k(t))$ are independent
+standard Brownian motions.
+The interchange of summation and expectation is justified by
+Fubini's theorem (or monotone convergence), since all terms
+are non-negative.  The identity
+$E(\beta_k^2(t)) = t$ is the variance of a standard Brownian motion.
+\end{remark}
+
+%% =============================
+%% Martingale property of Q-Wiener process (verification)
+%% =============================
+\paragraph{Verification of the martingale property.}
+% We check E(W_t | A_s) = W_s using independent increments.
+
+For $s \le t$:
+\[
+    E(W_t \mid \mathcal{A}_s)
+    \;=\;
+    E\!\bigl(\underbrace{W_t - W_s}_{\text{independent of } \mathcal{A}_s}
+    + W_s \;\big|\; \mathcal{A}_s\bigr)
+    \;=\;
+    \underbrace{E(W_t - W_s)}_{=\;0}
+    + W_s
+    \;=\;
+    W_s.
+\]
+% The increment W_t - W_s is independent of A_s and has mean 0,
+% so the Q-Wiener process is indeed a martingale.
+
+Hence the $Q$-Wiener process is a martingale.
+
+\begin{remark}
+The verification uses two key properties: (1)~the increment $W_t - W_s$ is \textbf{independent} of $\mathcal{A}_s$ (by definition of the $Q$-Wiener process), and (2)~it has \textbf{mean zero} since $W_t - W_s \sim \mathcal{N}(0, (t-s)Q)$.  Independence allows us to factor the conditional expectation, and the zero-mean property gives the result.  This is the same argument as for scalar Brownian motion, but carried out in the Hilbert space~$U$ using the Bochner-integral formulation of conditional expectation.
+\end{remark}
+
+%% =============================
+%% Doob's maximal inequality in Banach spaces
+%% =============================
+\subsection*{Doob's maximal inequality}
+
+\begin{theorem}[Doob's maximal inequality]
+Let $(M_t)$ be a right-continuous $E$-valued
+$(\mathcal{A}_t)$-martingale.  Then for $p > 1$:
+\[
+    \left(
+        E\!\left(\sup_{0 \le t \le T} \|M_t\|^p\right)
+    \right)^{1/p}
+    \;\le\;
+    \frac{p}{p-1}\;
+    \bigl(E\!\bigl(\|M_T\|^p\bigr)\bigr)^{1/p}
+    \qquad \forall\, p > 1.
+\]
+\end{theorem}
+
+\begin{remark}
+Doob's maximal inequality controls the \textbf{supremum process}
+$\sup_{0 \le t \le T} \|M_t\|$ in terms of the \textbf{terminal value}
+$\|M_T\|$.  The constant $\frac{p}{p-1}$ diverges as $p \to 1^+$,
+reflecting the fact that the inequality fails for $p = 1$
+(one needs the weaker $L^1$ maximal inequality in that case).
+For martingales, the key idea is that $\|M_t\|^p$ is a
+\textbf{submartingale} (by Jensen's inequality applied to the
+convex function $\|\cdot\|^p$), and the inequality then follows
+from the classical Doob submartingale inequality.
+This result is fundamental for proving convergence of stochastic
+integrals and for establishing pathwise regularity of solutions to SPDEs.
+\end{remark}
+
+%% =============================
+%% Space of L^p-bounded martingales
+%% =============================
+\paragraph{Space of $L^p$-bounded martingales.}
+% Define the martingale M^p space with the supremum norm.
+
+Let $\mathcal{M}^p := \bigl\{(M_t)_{t \in [0,T]} :
+\text{$E$-valued continuous $(\mathcal{A}_t)$-martingale,
+$L^p$-bounded}\bigr\}$ with norm
+\[
+    \|M\|_{\mathcal{M}^p}
+    \;:=\;
+    \sup_{0 \le t \le T}
+    \bigl(E\!\bigl(\|M_t\|_E^p\bigr)\bigr)^{1/p}
+    \;<\; \infty.
+\]
+This is a Banach space for $p > 1$ (Hilbert space if $p = 2$
+and $E$ is a Hilbert space).
+
+\begin{remark}
+By Doob's maximal inequality, an equivalent norm on $\mathcal{M}^p$ is
+\[
+    \left(E\!\left(\sup_{0 \le t \le T}
+    \|M_t\|_E^p\right)\right)^{1/p}.
+\]
+\end{remark}
+
+%% =============================
+%% 1.3.2 Stochastic integral
+%% =============================
+\subsection*{1.3.2 Stochastic integral}
+
+Fix a $U$-valued $Q$-Wiener process $(W_t)$ with filtration
+$(\mathcal{A}_t)$.  We want to define
+\[
+    \int \Phi(s)\,dW_s \;\in\; H.
+\]
+
+\begin{remark}
+The construction of the stochastic integral $\int_0^T \Phi_s\,dW_s$ follows the same three-step programme as the classical It\^o integral in finite dimensions:
+(1)~define the integral for \emph{elementary} (step) processes by a finite sum;
+(2)~establish an \emph{isometry} (the Wiener--It\^o isometry) that controls the $L^2$ norm of the integral in terms of the integrand;
+(3)~\emph{extend} the integral to all square-integrable predictable integrands by a density/completion argument.
+The main new feature in infinite dimensions is that the integrand $\Phi_s$ is an \emph{operator} from $U$ to $H$ (not a scalar or a vector), and the isometry involves the \textbf{Hilbert--Schmidt norm} of $\Phi_s \circ \sqrt{Q}$ rather than the squared absolute value $|\phi_s|^2$ familiar from the scalar case.
+\end{remark}
+
+%% =============================
+%% Step 1: Integration of elementary processes
+%% =============================
+\paragraph{Step 1: Integration of elementary processes.}
+
+% An elementary process is a step function in time
+% with values that are bounded linear operators U -> H.
+
+An \textbf{elementary process} has the form:
+\[
+    \Phi(t)
+    \;=\;
+    \sum_{m=0}^{k-1} \Phi_m\;\mathbf{1}_{]t_m,\, t_{m+1}]}(t),
+    \qquad
+    0 = t_0 < t_1 < \cdots < t_k = T, \tag{$\star$}
+\]
+where each $\Phi_m$ is $\mathcal{A}_{t_m}$-measurable and
+$\Phi_m \colon U \to H$ is a bounded linear operator,
+i.e., $\Phi_m \in L(U, H)$.
+
+% The stochastic integral of an elementary process is defined
+% as a finite sum of martingale increments applied through the operators.
+
+Then define
+\[
+    \int_0^T \Phi_s\,dW_s
+    \;:=\;
+    \sum_{m=0}^{k-1}
+    \Phi_m\!\bigl(W_{t_{m+1} \wedge t} - W_{t_m \wedge t}\bigr)
+    \;\in\; H.
+\]
+% Each term: the operator \Phi_m (from U to H) is applied to
+% the Wiener increment W_{t_{m+1}} - W_{t_m} (which lives in U),
+% yielding an element of H.
+
+This yields a \textbf{linear mapping}:
+\[
+    I \colon \mathcal{E}
+    \;\longrightarrow\;
+    \mathcal{M}^2,
+\]
+where $\mathcal{E}$ denotes the space of all elementary processes
+of type $(\star)$.
+
+\begin{remark}
+Each term $\Phi_m(W_{t_{m+1} \wedge t} - W_{t_m \wedge t})$ in the definition applies the \textbf{operator} $\Phi_m \colon U \to H$ to the Wiener increment $W_{t_{m+1} \wedge t} - W_{t_m \wedge t} \in U$, producing an element of $H$.  The adaptedness requirement ($\Phi_m$ is $\mathcal{A}_{t_m}$-measurable) ensures that the integrand is determined by information available \emph{before} the increment occurs --- this is the \textbf{non-anticipativity} condition that distinguishes It\^o integration from other stochastic calculi (e.g.\ Stratonovich).
+\end{remark}
+
+%% =============================
+%% Step 2: Wiener--Itô isometry
+%% =============================
+\paragraph{Step 2: Wiener--Itô isometry.}
+
+% If f takes values in a general Banach space, there is no
+% Wiener--Itô isometry. This is specific to the Hilbert space setting.
+
+\begin{remark}
+If $\Phi$ takes values in a general Banach space,
+there is \textbf{no} Wiener--Itô isometry.
+The isometry requires $Q$ to be trace class and $\sqrt{Q}$
+to be Hilbert--Schmidt.
+\end{remark}
+
+%% =============================
+%% Hilbert--Schmidt operators
+%% =============================
+\paragraph{Hilbert--Schmidt operators.}
+
+\begin{definition}[Hilbert--Schmidt operator]
+An operator $L \in L(U, H)$ is called \textbf{Hilbert--Schmidt} if
+\[
+    \|L\|_{L_2(U,H)}^2
+    \;:=\;
+    \sum_{k=1}^{\infty} \|L\,e_k\|_H^2
+    \;<\; \infty
+\]
+for all CONS $(e_k)$ of $U$.
+\end{definition}
+
+\begin{remark}
+The definition is independent of the choice of CONS $(e_k)$.
+% This can be verified by expanding in two different CONS
+% and using Parseval's identity.
+\end{remark}
+
+\begin{remark}
+Hilbert--Schmidt operators form a two-sided ideal in the algebra of bounded operators: if $A \in L_2(U, H)$ and $B \in L(H, V)$, $C \in L(V', U)$ are bounded, then $B \circ A$ and $A \circ C$ are also Hilbert--Schmidt.  The Hilbert--Schmidt norm satisfies $\|L\|_{\mathrm{op}} \le \|L\|_{L_2(U,H)}$, so every Hilbert--Schmidt operator is bounded, but the converse is false in infinite dimensions.  In finite dimensions ($U = \mathbb{R}^n$, $H = \mathbb{R}^m$), every linear operator is Hilbert--Schmidt and $\|L\|_{L_2}^2 = \sum_{i,j} L_{ij}^2$ equals the sum of squared matrix entries (the \textbf{Frobenius norm}).
+\end{remark}
+
+Let $L_2(U, H)$ be the (linear) space of all Hilbert--Schmidt operators
+from $U$ to $H$.  Then $L_2(U, H)$ is again a (real) \textbf{Hilbert space}
+with the scalar product
+\[
+    \langle A, B \rangle_{L_2(U,H)}
+    \;:=\;
+    \sum_{k=1}^{\infty}
+    \langle A\,e_k,\; B\,e_k \rangle_H.
+\]
+
+%% =============================
+%% Wiener--Itô isometry statement
+%% =============================
+\paragraph{Wiener--Itô isometry.}
+
+Then the following \textbf{Wiener--Itô isometry} holds:
+\[
+    E\!\left(
+        \left\|\int_0^t \Phi_s\,dW_s\right\|_H^2
+    \right)
+    \;=\;
+    E\!\left(
+        \int_0^t
+        \bigl\|\Phi_s \circ \sqrt{Q}\,\bigr\|_{L_2(U,H)}^2
+        \,ds
+    \right).
+\]
+
+% In the M^2 norm, this reads:
+In particular,
+\[
+    \left\|\int \Phi_s\,dW_s\right\|_{\mathcal{M}^{2}_{T}}^2
+    \;=\;
+    E\!\left(
+        \int_0^T
+        \bigl\|\Phi_s \circ \sqrt{Q}\,\bigr\|_{L_2(U,H)}^2
+        \,ds
+    \right),
+\]
+where the left-hand side is the norm in the space of continuous
+$H$-valued, $\mathcal{A}_t$-adapted martingales.
+
+\begin{remark}
+The Wiener--It\^o isometry is the infinite-dimensional analogue of the classical It\^o isometry $E\!\bigl[\bigl(\int_0^T \phi_s\,dB_s\bigr)^2\bigr] = E\!\bigl[\int_0^T \phi_s^2\,ds\bigr]$ for scalar Brownian motion.  The key difference is that the integrand $\Phi_s$ is now an \emph{operator} from $U$ to $H$, and the squared integrand $|\phi_s|^2$ is replaced by the \textbf{Hilbert--Schmidt norm} $\|\Phi_s \circ \sqrt{Q}\|_{L_2(U,H)}^2$.  The appearance of $\sqrt{Q}$ reflects the spatial correlation of the driving noise: the composition $\Phi_s \circ \sqrt{Q}$ ``pre-whitens'' the noise, and the Hilbert--Schmidt norm measures the total energy injected into~$H$ per unit time.  This isometry is the foundation for extending the stochastic integral from elementary processes to all square-integrable predictable integrands via a density argument, exactly as the scalar It\^o integral is extended.
+\end{remark}
+
+%% =============================
+%% Proof sketch of the Wiener--Itô isometry
+%% =============================
+\paragraph{Proof sketch.}
+% Expand ||sum Phi_m Delta_m||^2 using bilinearity of the inner product.
+
+We compute, writing $\Delta_m := W_{t_{m+1}} - W_{t_m}$:
+\begin{align*}
+    E\!\left(
+        \left\|\int_0^T \Phi_s\,dW_s\right\|_H^2
+    \right)
+    &\;=\;
+    E\!\left(
+        \left\|\sum_{m=0}^{k-1}
+        \Phi_m\,\Delta_m\right\|_H^2
+    \right) \\[6pt]
+    &\;=\;
+    \sum_{m,n}
+    E\!\bigl(
+        \langle \Phi_m\,\Delta_m,\;
+                \Phi_n\,\Delta_n \rangle_H
+    \bigr).
+\end{align*}
+
+% For m ≠ n, the cross terms vanish due to the martingale property
+% and independence of increments.
+\begin{remark}
+For $m \neq n$, the cross terms vanish:
+$E\!\bigl(\langle \Phi_m\,\Delta_m,\;\Phi_n\,\Delta_n \rangle_H\bigr) = 0$.
+This follows from the independence of the Wiener increments and
+the adaptedness of $\Phi_m$.
+\end{remark}
+
+Hence only the diagonal terms $m = n$ survive.
+Using the \textbf{canonical representation} of the Wiener process,
+$\Delta_m = \sum_{k} \sqrt{\lambda_k}\;\bigl(\beta_k(t_{m+1}) -
+\beta_k(t_m)\bigr)\,e_k$, we get:
+
+\begin{align*}
+    E\!\bigl(\langle \Phi_m\,\Delta_m,\;
+             \Phi_n\,\Delta_n \rangle_H\bigr)
+    &\;=\;
+    \sum_{k,\ell}
+    \sqrt{\lambda_k}\,\sqrt{\lambda_\ell}\;
+    E\!\Bigl[
+        \bigl\langle \Phi_m\!\bigl(e_k\bigr),\;
+              \Phi_n\!\bigl(e_\ell\bigr)
+        \bigr\rangle_H \\
+    &\qquad\qquad\qquad \cdot
+        \bigl(\beta_k(t_{m+1}) - \beta_k(t_m)\bigr)
+        \bigl(\beta_\ell(t_{n+1}) - \beta_\ell(t_n)\bigr)
+    \Bigr].
+\end{align*}
+
+\begin{remark}
+When $m = n$, the expectation of the product of Brownian increments gives
+$E\!\bigl((\beta_k(t_{m+1}) - \beta_k(t_m))(\beta_\ell(t_{m+1}) -
+\beta_\ell(t_m))\bigr) = \delta_{k\ell}\,(t_{m+1} - t_m)$,
+where $\delta_{k\ell}$ is the Kronecker delta. This is because the
+$\beta_k$ are independent standard Brownian motions.
+The sum then reduces to the Hilbert--Schmidt norm
+$\|\Phi_m \circ \sqrt{Q}\|_{L_2(U,H)}^2$.
+\end{remark}
+
+%% =============================
+%% Detailed computation of the cross and diagonal terms
+%% =============================
+\paragraph{Detailed computation (continued).}
+
+% For m < n, use the tower property of conditional expectation and
+% condition on the past sigma-algebra \mathcal{A}_{t_n}.
+% The future increment \beta_\ell(t_{n+1})-\beta_\ell(t_n) has
+% conditional mean zero given \mathcal{A}_{t_n}.
+
+\noindent\textbf{Case $m < n$:} Starting from the cross term,
+\begin{align*}
+    &E\!\bigl(\langle \Phi_m\,\Delta_m,\;\Phi_n\,\Delta_n\rangle_H\bigr) \\[4pt]
+    &\;=\;
+    \sum_{k,\ell}\sqrt{\lambda_k}\,\sqrt{\lambda_\ell}\;
+    E\!\Bigl(
+        \bigl\langle \Phi_m(e_k),\;\Phi_n(e_\ell)\bigr\rangle_H\,
+        \bigl(\beta_k(t_{m+1})-\beta_k(t_m)\bigr)\,
+        \bigl(\beta_\ell(t_{n+1})-\beta_\ell(t_n)\bigr)
+    \Bigr).
+\end{align*}
+Now apply the tower property with respect to $\mathcal{A}_{t_n}$:
+\begin{align*}
+    &E\!\Bigl(
+        \bigl\langle \Phi_m(e_k),\;\Phi_n(e_\ell)\bigr\rangle_H\,
+        \bigl(\beta_k(t_{m+1})-\beta_k(t_m)\bigr)\,
+        \bigl(\beta_\ell(t_{n+1})-\beta_\ell(t_n)\bigr)
+    \Bigr) \\[4pt]
+    &\;=\;
+    E\!\Bigl(
+        E\!\Bigl[
+            \bigl\langle \Phi_m(e_k),\;\Phi_n(e_\ell)\bigr\rangle_H\,
+            \bigl(\beta_k(t_{m+1})-\beta_k(t_m)\bigr)\,
+            \bigl(\beta_\ell(t_{n+1})-\beta_\ell(t_n)\bigr)
+            \,\Big|\, \mathcal{A}_{t_n}
+        \Bigr]
+    \Bigr) \\[4pt]
+    &\;=\;
+    E\!\Bigl(
+        \bigl\langle \Phi_m(e_k),\;\Phi_n(e_\ell)\bigr\rangle_H\,
+        \bigl(\beta_k(t_{m+1})-\beta_k(t_m)\bigr)\,
+        E\!\bigl[
+            \beta_\ell(t_{n+1})-\beta_\ell(t_n)
+            \,\big|\, \mathcal{A}_{t_n}
+        \bigr]
+    \Bigr) \\[4pt]
+    &\;=\; 0.
+\end{align*}
+Here $\Phi_m$ and $\Phi_n$ are $\mathcal{A}_{t_n}$-measurable (since $m<n$ and the integrand is adapted), and $\beta_k(t_{m+1})-\beta_k(t_m)$ is also $\mathcal{A}_{t_n}$-measurable because $t_{m+1}\le t_n$. The future increment $\beta_\ell(t_{n+1})-\beta_\ell(t_n)$ is independent of $\mathcal{A}_{t_n}$ and has mean zero, so
+\[
+E\!\bigl[\beta_\ell(t_{n+1})-\beta_\ell(t_n)\mid \mathcal{A}_{t_n}\bigr]=0.
+\]
+Thus every summand is zero, and therefore the whole sum is zero. Similarly for $m > n$ by symmetry.
+
+\begin{remark}
+The vanishing of cross terms ($m \neq n$) is the fundamental \textbf{orthogonality property} of the stochastic integral and is the reason the It\^o integral is a martingale.
+The argument uses the \textbf{tower property} of conditional expectation: for $m < n$, condition on $\mathcal{A}_{t_n}$ to separate the past increment $\beta_k(t_{m+1}) - \beta_k(t_m)$ (which is $\mathcal{A}_{t_n}$-measurable together with $\Phi_m$ and $\Phi_n$) from the future increment $\beta_\ell(t_{n+1}) - \beta_\ell(t_n)$ (which is independent of $\mathcal{A}_{t_n}$ with mean zero).
+Factoring out the $\mathcal{A}_{t_n}$-measurable parts and using $E[\beta_\ell(t_{n+1}) - \beta_\ell(t_n) \mid \mathcal{A}_{t_n}] = 0$ yields zero.
+This is the same mechanism that makes the classical scalar It\^o integral a martingale.
+\end{remark}
+
+% Now handle the case m = n in detail.
+\noindent\textbf{Case $m = n$:}
+\begin{align*}
+    &\sum_{k,\ell}
+    \sqrt{\lambda_k}\,\sqrt{\lambda_\ell}\;
+    E\!\Bigl(
+        \bigl\langle \Phi_m(e_k),\;\Phi_m(e_\ell)
+        \bigr\rangle_H
+        \cdot
+        \bigl(\beta_k(t_{m+1}) - \beta_k(t_m)\bigr)
+        \bigl(\beta_\ell(t_{m+1}) - \beta_\ell(t_m)\bigr)
+    \Bigr) \\[6pt]
+    %% Use independence: E(beta_k * beta_ell) = delta_{kl} * (t_{m+1} - t_m)
+    &\;=\;
+    \sum_{k}
+    \lambda_k\;
+    E\!\bigl(\|\Phi_m\,e_k\|_H^2\bigr)
+    \cdot (t_{m+1} - t_m) \\[6pt]
+    %% Recognize sqrt(lambda_k) e_k = sqrt(Q) e_k
+    &\;=\;
+    \sum_{k}
+    E\!\bigl(
+        \bigl\|\Phi_m\!\bigl(\sqrt{\lambda_k}\,e_k\bigr)
+        \bigr\|_H^2
+    \bigr)
+    \cdot (t_{m+1} - t_m) \\[6pt]
+    %% Since sqrt(Q) e_k = sqrt(lambda_k) e_k, this is ||Phi_m(sqrt(Q) e_k)||^2
+    &\;=\;
+    E\!\left(
+        \sum_{k}
+        \bigl\|\Phi_m \circ \sqrt{Q}\;e_k\bigr\|_H^2
+    \right)
+    \cdot (t_{m+1} - t_m) \\[6pt]
+    %% The sum over k is the HS norm squared
+    &\;=\;
+    E\!\Bigl(
+        \bigl\|\Phi_m \circ \sqrt{Q}\,\bigr\|_{L_2(U,H)}^2
+    \Bigr)
+    \cdot (t_{m+1} - t_m).
+\end{align*}
+
+% In the last step we used the definition of the Hilbert--Schmidt norm:
+% ||A||_{L_2}^2 = sum_k ||A e_k||^2.
+
+\begin{remark}
+The key identity used above is $\sqrt{Q}\,e_k = \sqrt{\lambda_k}\,e_k$,
+since $(e_k)$ are eigenvectors of $Q$ with eigenvalues $\lambda_k$,
+and hence eigenvectors of $\sqrt{Q}$ with eigenvalues $\sqrt{\lambda_k}$.
+\end{remark}
+
+%% =============================
+%% Summing over m to complete the isometry
+%% =============================
+\noindent
+Summing over $m = 0, \ldots, k-1$:
+\begin{align*}
+    \sum_{m,n} E\!\bigl(\langle \Phi_m\,\Delta_m,\;
+    \Phi_n\,\Delta_n\rangle_H\bigr)
+    &\;=\;
+    \sum_{m=0}^{k-1}
+    E\!\Bigl(
+        \bigl\|\Phi_m \circ \sqrt{Q}\,\bigr\|_{L_2(U,H)}^2
+    \Bigr)
+    \cdot (t_{m+1} - t_m) \\[6pt]
+    &\;=\;
+    E\!\left(
+        \int_0^T
+        \bigl\|\Phi_s \circ \sqrt{Q}\,\bigr\|_{L_2(U,H)}^2
+        \,ds
+    \right),
+\end{align*}
+which completes the proof of the Wiener--Itô isometry. \qed
+
+\begin{remark}
+The Wiener--It\^o isometry, once established for elementary processes, extends to all \textbf{predictable} integrands $\Phi$ satisfying $E\!\bigl(\int_0^T \|\Phi_s \circ \sqrt{Q}\|_{L_2(U,H)}^2\,ds\bigr) < \infty$.
+The extension proceeds by a standard \textbf{completion argument}: approximate $\Phi$ by elementary processes $\Phi^{(n)}$ in the $L^2(\Omega \times [0,T])$ norm.  By the isometry, $\int \Phi^{(n)}\,dW$ is a Cauchy sequence in $\mathcal{M}^2$, and since $\mathcal{M}^2$ is complete (as a Banach space), the limit exists and defines $\int \Phi\,dW$.
+This is completely analogous to how one extends the Lebesgue integral from simple functions to $L^1$, or the scalar It\^o integral from step processes to $L^2$-integrands.
+\end{remark}
+
+%% =============================
+%% Adjoint operator and trace identity
+%% =============================
+\subsection*{Adjoint operator and trace identity}
+
+% For A in L_2(U,H), there is a natural connection between
+% the HS norm and the trace of A^*A.
+
+Let $A \in L_2(U, H)$.  The \textbf{adjoint operator}
+$A^* \colon H \to U$ satisfies $A^* \in L_2(H, U)$
+(i.e.\ $A^*$ maps $H$ back to $U$).
+
+\begin{remark}
+One can prove that the composition $A^*\!A \colon U \to U$ is a
+\textbf{finite-trace} operator on $U$.
+% This is because A is Hilbert--Schmidt, so A^*A is trace class.
+\end{remark}
+
+\noindent
+Indeed, its trace satisfies:
+\begin{align*}
+    \tr(A^*\!A)
+    &\;=\;
+    \sum_{k} \langle A^*\!A\,e_k,\; e_k \rangle_U \\[6pt]
+    %% Use <A^*A e_k, e_k>_U = <A e_k, A e_k>_H by definition of adjoint.
+    &\;=\;
+    \sum_{k} \langle A\,e_k,\; A\,e_k \rangle_H \\[6pt]
+    &\;=\;
+    \sum_{k} \|A\,e_k\|_H^2 \\[6pt]
+    &\;=\;
+    \|A\|_{L_2(U,H)}^2
+    \qquad \text{(HS norm)}.
+\end{align*}
+
+\begin{remark}
+This identity shows that the Hilbert--Schmidt norm of $A$ equals
+the square root of the trace of $A^*\!A$:
+\[
+    \|A\|_{L_2(U,H)}
+    \;=\;
+    \sqrt{\tr(A^*\!A)}.
+\]
+In particular, $A \in L_2(U,H)$ if and only if $A^*\!A$ is a
+trace-class operator on $U$.
+The key step uses the definition of the adjoint:
+$\langle A^*\!A\,e_k, e_k \rangle_U = \langle A\,e_k, A\,e_k \rangle_H$,
+which follows from $\langle A^*y, x \rangle_U = \langle y, Ax \rangle_H$
+for all $x \in U$, $y \in H$.
+\end{remark}
+
+\end{document}

@@ -1,0 +1,764 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\tr}{tr}
+\newcommand{\dual}[2]{{}_{V'}\langle #1, #2 \rangle_{V}}
+
+\title{Lecture 10: Variational Solutions of SPDEs and the Monotonicity Trick}
+\date{18.12.2025}
+\author{Tien Anh Vu}
+
+\begin{document}
+\maketitle
+
+Lecture 10 concerns the rigorous mathematical machinery required to establish the existence and uniqueness of solutions to SPDEs. Please take a seat. We rely heavily on the variational approach, utilizing Gelfand triples, It\^o's formula in infinite dimensions, and finite-dimensional Galerkin approximations.
+
+We now walk through the fundamental arguments step-by-step.
+
+\section*{1. The Core SPDE and the Functional Setting}
+We begin with our standard stochastic evolution equation, denoted by $(\ast)$ in the notes:
+\[
+  du_t = A(u_t)\,dt + B(u_t)\,dW_t.
+\]
+
+To make sense of this equation rigorously, we operate within the framework of a Gelfand triple, denoted as
+\[
+  V \subset H \subset V'.
+\]
+Here, $H$ is our central Hilbert space, $V$ is a continuously and densely embedded Banach space (often a Sobolev space in physical applications), and $V'$ is the dual space of $V$.
+
+When we look at the decomposition of the process $u_t$, we can write it in its integral form:
+\[
+  u_t = u_0 + \int_0^t v(s)\,ds + M_t.
+\]
+
+In this decomposition, we must be extremely precise about the spaces these objects live in:
+\begin{itemize}
+\item The process itself, $u_t$, resides in $L^2([0,T],V)$.
+\item The drift term, $v(s)$ (which corresponds to $A(u_s)$), takes values in the dual space $L^2([0,T],V')$.
+\item The stochastic integral part is represented by a continuous local martingale, $M_t$, which belongs to the space $M_{\mathrm{loc}}^c(H)$.
+\end{itemize}
+
+Because we have a process where the drift is in $V'$ and the martingale part is in $H$, a fundamental result in stochastic analysis guarantees that the process $u$ actually possesses continuous paths in $H$. Therefore, we can conclude that
+\[
+  u \in C([0,T],H)
+\]
+almost surely.
+
+\section*{2. Infinite-Dimensional It\^o Formula}
+To establish a priori estimates, we need to apply It\^o's formula to the squared $H$-norm of our process, $\|u(t)\|_H^2$. Applying the infinite-dimensional It\^o formula yields:
+\[
+  \|u(t)\|_H^2
+  = \|u_0\|_H^2
+  + 2\int_0^t \langle u_s, v_s \rangle\,ds
+  + \langle M \rangle_t
+  + 2\int_0^t \langle u_s, dM_s \rangle.
+\]
+
+Notice the terms here: the quadratic variation of the martingale part $\langle M \rangle_t$, and the stochastic integral $2\int_0^t \langle u_s, dM_s \rangle$, which is crucial for handling the noise. The pairing $\langle u_s, v_s \rangle$ represents the duality pairing between $V$ and $V'$.
+
+(Note: While the exact definition of $\langle M \rangle_t$ depends on the covariance structure of the Wiener process, in standard SPDE theory, this relates to the trace of the diffusion operator. I am supplying this standard context to help you fully digest the lecture notes).
+
+\section*{3. Finite-Dimensional Galerkin Approximations}
+Because we are working in infinite-dimensional spaces, directly proving the existence of a solution is highly non-trivial. Our strategy is to use Galerkin approximations.
+
+We construct a finite-dimensional subspace
+\[
+  V_n = \mathrm{span}\{e_1,\dots,e_n\},
+\]
+where the basis vectors $(e_k)$ form a Complete Orthonormal System (CONS) of our Hilbert space $H$. We then project our infinite-dimensional SPDE onto this finite-dimensional space $V_n$, resulting in an approximate solution $u_n$. By doing this, we reduce the complex SPDE to a system of standard Stochastic Differential Equations (SDEs), which we already know how to solve.
+
+\section*{4. The Crucial A Priori Estimates}
+To ensure that our finite-dimensional approximations $u_n$ actually converge to a true solution of the infinite-dimensional SPDE as $n \to \infty$, we must prove that they do not blow up. We need uniform bounds independent of $n$.
+
+As noted in the margins of my writing, while deterministic PDEs might allow for pathwise, non-random bounds, the stochastic case strictly requires us to take the expectation. Thus, the following a priori estimate holds for the stochastic case:
+\[
+  \sup_n \mathbb{E}\Bigl(\sup_{t\in[0,T]} \|u_n(t)\|_H^2 + \int_0^T \|u_n(s)\|_V^2\,ds\Bigr) < \infty.
+\]
+
+Let us break down what this profound inequality tells us. The supremum over $n$ guarantees that our bound is uniform across all Galerkin approximations. Inside the expectation, we are bounding two distinct quantities:
+\begin{itemize}
+\item The maximum spatial norm in $H$ over the entire time interval: $\sup_{t\in[0,T]} \|u_n(t)\|_H^2$.
+\item The integrated spatial norm in the smaller, more regular space $V$: $\int_0^T \|u_n(s)\|_V^2\,ds$.
+\end{itemize}
+
+\section*{5. Conclusions and Implications for the Operators}
+The fact that this supremum is finite is the cornerstone of our existence proof. The conclusion is that this a priori estimate implies the uniform boundedness of $u_n(t,\omega)$ for $n \ge 1$ in the intersection of two vital functional spaces:
+\[
+  L^2(\Omega, C([0,T],H)) \cap L^2(\Omega, L^2([0,T],V)).
+\]
+
+I want to draw your attention specifically to the second space, $L^2(\Omega, L^2([0,T],V))$. By applying Fubini's theorem, we can see that this space is isomorphic $(\cong)$ to
+\[
+  L^2(\Omega \times [0,T], V; P \otimes dt),
+\]
+where $P \otimes dt$ denotes the product measure of the probability measure $P$ and the Lebesgue measure $dt$ on the time interval.
+
+Finally, we must consider the behavior of our drift and diffusion operators under these bounds. We assume a linear growth condition on the drift operator $A$:
+\[
+  \|A(u)\|_{V'} \le M(1 + \|u\|_V).
+\]
+
+Because $u_n$ is bounded in $L^2(\Omega \times [0,T], V; P \otimes dt)$, this linear growth condition immediately implies that the sequence of approximated drifts, $(A(u_n))_n$, is bounded in the dual space $L^2(\Omega, V')$.
+
+Similarly, for the diffusion term, the sequence $(B(u_n) \circ \sqrt{Q})_n$ is contained and bounded within the space of Hilbert--Schmidt operators, denoted as
+\[
+  L^2(\Omega, L_2(U,H)).
+\]
+
+From here, classical functional analysis---specifically the Banach--Alaoglu theorem---allows us to extract weakly convergent subsequences from these bounded sequences. Passing to the limit as $n \to \infty$ is what ultimately gives us the existence of a unique, global solution to the original SPDE.
+
+
+We now examine the next page of the Lecture 10 notes. This page condenses several technical steps of the variational approach into one clear logical flow.
+
+We proceed through the page from top to bottom, synthesizing the previous discussion.
+
+\section*{6. Weak Convergence and the Banach--Alaoglu Theorem}
+At the very top, the notes remind us of a critical functional analytic subtlety: because we are operating in Banach spaces rather than purely in Hilbert spaces, we must rely on the Banach--Alaoglu theorem to extract weakly convergent subsequences from our uniformly bounded Galerkin approximations.
+
+By doing this, we establish three fundamental weak limits for a subsequence (which we still denote by $n$):
+\begin{itemize}
+\item The Process: The approximate solutions $u_n$ converge weakly to a limit $u$ in the space $L^2(\Omega, L^2([0,T],V))$.
+\item The Drift Term: The non-linear drift term $A(u_n)$ converges weakly to an abstract limit $g$. As we discussed earlier, the blank space in the notes here is meant to be the dual space $L^2(\Omega, L^2([0,T],V'))$.
+\item The Diffusion Term: The diffusion term $B(u_n) \circ \sqrt{Q}$ converges weakly to another abstract limit, denoted as $\xi \circ \sqrt{Q}$, in the space of Hilbert--Schmidt operators $L^2(\Omega, L^2([0,T], L_2(U,H)))$.
+\end{itemize}
+
+\section*{7. The Finite Galerkin Approximation in Fourier Coefficients}
+With these weak limits established, we write down the explicit equation for our finite Galerkin approximation by projecting it onto our basis vectors $e_k$. This gives us the equation for the Fourier coefficients:
+\[
+  \langle u_n(t), e_k \rangle = \langle u_0, e_k \rangle + \int_0^t \langle A(u_n(s)), e_k \rangle\,ds + \int_0^t \langle e_k, B(u_n(s))\,dW_n(s) \rangle.
+\]
+This is essentially our SPDE evaluated strictly within the finite-dimensional span of our first $n$ basis vectors.
+
+\section*{8. Passing to the Limit}
+The middle of the page dictates our next profound step: ``pass to the limit''. We let $n \to \infty$ in our Fourier coefficient equation. To rigorously justify moving the limit inside the time and stochastic integrals, we use the dominated convergence theorem.
+
+Replacing the approximated terms with their weak limits yields the equation for our limiting process $u(t)$:
+\[
+  \langle u(t), e_k \rangle = \langle u_0, e_k \rangle + \int_0^t \langle g(s), e_k \rangle\,ds + \int_0^t \langle e_k, \xi \circ \sqrt{Q} \rangle\,dW(s) \qquad \forall k.
+\]
+These represent the Fourier coefficients of the limiting cases.
+
+However, at this stage, we merely have abstract limits $g$ and $\xi \circ \sqrt{Q}$. To close the loop, the notes invoke Lemma 3.10, which guarantees that $g=A(u)$ and $\xi \circ \sqrt{Q}=B(u)\circ \sqrt{Q}$. This proves that our weak limit $u$ actually satisfies the original infinite-dimensional SPDE.
+
+\section*{9. Proof Setup for Lemma 3.8}
+The bottom half of the page steps back to carefully justify the existence of those finite-dimensional approximations we just used. It outlines the proof for Lemma 3.8, demonstrating that we can represent $u_n$ as the solution to a standard stochastic differential equation in $\mathbb{R}^n$.
+
+This finite-dimensional system is given as equation $(3.9)$:
+\[
+  d\tilde u_n(t) = \tilde A(\tilde u_n(t))\,dt + \tilde B(\tilde u_n(t))\,dW_n(t) \text{ in } \mathbb{R}^n.
+\]
+
+To bridge the gap between $\mathbb{R}^n$ and our Hilbert space $H$, we define an identification mapping $i_n$ (or simply $i$) where $i(\tilde u_n)=u_n$. As seen in the right margin, this mapping takes an $n$-dimensional vector $x=(x_1,\dots,x_n)$ and maps it to the linear combination
+\[
+  \sum_{k=1}^n x_k e_k,
+\]
+relying heavily on the fact that our basis vectors $e_k$ reside in the highly regular subspace $V \subset H$.
+
+We then construct the coefficients for this $\mathbb{R}^n$-valued SDE:
+\begin{itemize}
+\item The Projected Drift ($\tilde A$): We define $\tilde A(\tilde u)=\pi_n A(i_n \tilde u)$. Here, $\pi_n$ is the natural orthogonal projection from the dual space $V'$ into $\mathbb{R}^n$, defined explicitly by mapping a functional $f \mapsto (\langle f,e_1 \rangle,\dots,\langle f,e_n \rangle)$.
+\item The Projected Diffusion ($\tilde B$): We define the matrix operator $\tilde B(\tilde u)=(B_k(i_n \tilde u))_{k=1,\dots,n}$. Each individual element is defined by its action on a vector $h\in U$ as $B_k(u)h:=\langle B(u)h,e_k \rangle$, where $e_k\in H$.
+\end{itemize}
+
+This entire page acts as the backbone of the existence proof: dropping down to $\mathbb{R}^n$ using natural projections to secure solutions via Lemma 3.8, establishing uniform bounds, using the Banach--Alaoglu theorem to find weak limits, and finally using Lemma 3.10 to pass the limit and recover the infinite-dimensional solution.
+
+
+We continue with the next page of the notes, which treats the final delicate step of the existence proof: identifying the abstract weak limits extracted in the previous step.
+
+We analyze this page line by line.
+
+\section*{10. The Projected Wiener Process and Lemma 3.8}
+At the very top of the page, we finalize the setup for our finite-dimensional stochastic noise. We define the $n$-dimensional Wiener process $\tilde W_n(t)$ whose components are given by the inner products of the infinite-dimensional cylindrical Wiener process $W(t)$ with the basis elements:
+\[
+  \tilde W_n(t) = (\langle W(t), f_l \rangle)_{l=1,\dots,n}.
+\]
+Notice that here we are using $\{f_l\}$, which forms a Complete Orthonormal System (CONS) for our noise space $U$.
+
+With this finite-dimensional noise rigorously defined, we can state Lemma 3.8 formally. For every integer $n$, there exists an adapted process $u_n$ with continuous paths in our finite-dimensional subspace $V_n$, meaning
+\[
+  u_n \in C([0,T];V_n).
+\]
+This process exactly satisfies our Galerkin approximated equation:
+\[
+  \langle u_n(t), e_k \rangle = \langle u_0, e_k \rangle + \int_0^t \langle A(u_n(s)), e_k \rangle\,ds + \int_0^t B_k(u_n(s))\,dW_n(s).
+\]
+
+Why are we so confident this solution exists? Because, as I have explicitly noted, once we have projected everything down to $\mathbb{R}^n$, we are simply looking at the existence and uniqueness of strong solutions to a standard Stochastic Differential Equation (SDE), which you all know well from Probability Theory III.
+
+\section*{11. The Crucial Identification: Lemma 3.10}
+Now we arrive at the heart of the matter: Lemma 3.10. Recall that from our Banach--Alaoglu compactness argument, we knew our drift and diffusion terms converged weakly to some abstract limits $g$ and $\xi \circ \sqrt{Q}$. Lemma 3.10 is the definitive statement that $g$ is exactly $A(u)$ and the diffusion limit is exactly $B(u)\circ \sqrt{Q}$.
+
+Proving this requires a profound technique from non-linear functional analysis known as the Minty--Browder trick for monotone operators. To execute this, we start with a simplification. Without loss of generality (w.l.o.g.), we assume our operators satisfy a strict monotonicity condition:
+\[
+  2\langle A(u)-A(v), u-v \rangle + \|(B(u)-B(v))\circ \sqrt{Q}\|_{L_2(U,H)}^2 \le 0.
+\]
+(Note: In the general SPDE framework, there is usually an additional $+\lambda\|u-v\|_H^2$ term to account for dissipativity, but standardizing it to $\le 0$ simplifies the core algebraic mechanism of the proof without losing the essential mathematical truth.)
+
+\section*{12. Exploiting the Monotonicity Condition}
+We take this monotonicity inequality and apply it to our finite-dimensional Galerkin approximation $u_n(s)$ and an arbitrary, fixed test process $v(s)$. Integrating this relationship over our entire time horizon $[0,T]$ yields a fundamental bound that holds for all $n$:
+\[
+  \int_0^T \Bigl( 2\langle A(u_n(s))-A(v(s)), u_n(s)-v(s) \rangle + \|(B(u_n(s))-B(v(s)))\circ \sqrt{Q}\|_{L_2(U,H)}^2 \Bigr)\,ds \le 0.
+\]
+By expanding this inequality, we generate a variety of cross-terms (for example, pairing $A(u_n)$ with $v$, or $A(v)$ with $u_n$). This is exactly where our weak convergence properties become incredibly powerful.
+
+\section*{13. Passing to the Weak Limits}
+The bottom section of the page details exactly how the weak convergence of $u_n$, $A(u_n)$, and $B(u_n)$ allows us to pass to the limit $n\to\infty$ on these specific cross-terms.
+
+Let us look at the three specific convergence limits I have written down, using an arbitrary test function $v\in L^2([0,T],V)$:
+\begin{itemize}
+\item The Drift Term (Approximated Drift against Test Process): Because $A(u_n)$ converges weakly to $g$, the integral of its pairing with the fixed test function $v$ must converge to the pairing of the weak limit $g$ with $v$. Thus,
+\[
+  \int_0^T \langle A(u_n), v \rangle\,ds \to \int_0^T \langle g, v \rangle\,ds.
+\]
+\item The Drift Term (Test Drift against Approximated Process): Similarly, because our process $u_n$ converges weakly to the limit process $u$, testing it against a fixed operator $A(v)$ behaves perfectly under the limit:
+\[
+  \int_0^T \langle A(v(s)), u_n \rangle\,ds \to \int_0^T \langle A(v), u \rangle\,ds.
+\]
+\item The Diffusion Term (Hilbert--Schmidt Inner Product): Finally, we look at the inner product of the diffusion terms in the space of Hilbert--Schmidt operators, $L_2(U,H)$. Because $B(u_n)\circ \sqrt{Q}$ converges weakly, its inner product with the fixed test diffusion $B(v)\circ \sqrt{Q}$ converges to the inner product of the weak limit $\xi\circ \sqrt{Q}$ with $B(v)\circ \sqrt{Q}$:
+\[
+  \int_0^T \langle B(u_n)\circ \sqrt{Q}, B(v)\circ \sqrt{Q} \rangle_{L_2(U,H)}\,ds \to \int_0^T \langle \xi\circ \sqrt{Q}, B(v)\circ \sqrt{Q} \rangle_{L_2(U,H)}\,ds.
+\]
+\end{itemize}
+
+By plugging these three convergence results back into the expanded monotonicity inequality, we construct an inequality strictly involving the limiting process $u$, the test process $v$, the abstract limits $g$ and $\xi$, and the deterministic operators.
+
+From that resulting inequality, by cleverly choosing the test process $v$ to be a small perturbation of the actual solution $u$ (that is, $v=u-\varepsilon w$), we can force the conclusion that $g$ must equal $A(u)$ and $\xi\circ \sqrt{Q}$ must equal $B(u)\circ \sqrt{Q}$ almost everywhere.
+
+
+We now reach the conclusion of the existence proof. This page represents the final step of the variational approach, where we execute the Minty--Browder monotonicity trick to finalize the identification of our weak limits.
+
+The structure of this page is a standard mathematical two-step: we first state a hypothesis at the top to derive our final results, and then we prove that the hypothesis itself is true at the bottom. Let us break down this piece of machinery.
+
+\section*{14. The Core Hypothesis}
+At the very top of the page, I have written ``Suppose that'', followed by a fundamental inequality involving the limit inferior. We are assuming that the expectation of the integral involving our abstract weak limits,
+\[
+  \mathbb{E}\Bigl(\int_0^T 2\langle g(s), u(s) \rangle + \|\xi \circ \sqrt{Q}\|_{L_2(U,H)}^2\,ds\Bigr),
+\]
+is bounded above by the limit inferior as $n\to\infty$ of the expectation of the integral involving our Galerkin approximations,
+\[
+  \mathbb{E}\Bigl(\int_0^T 2\langle A(u_n), u_n \rangle + \|B(u_n)\circ \sqrt{Q}\|_{L_2(U,H)}^2\,ds\Bigr).
+\]
+
+This inequality is the mathematical key that unlocks the monotonicity trick. By substituting this assumed upper bound into the expanded monotonicity condition we derived on the previous page, we immediately obtain a cleaner, non-positive expectation. As the implication arrow ($\Rightarrow$) shows, this yields
+\[
+  \mathbb{E}\Bigl(\int_0^T 2\langle g-A(v), u-v \rangle + \|\xi-B(v)\circ \sqrt{Q}\|_{L_2(U,H)}^2\,ds\Bigr) \le 0,
+\]
+an inequality that must hold for every possible test process $v\in L^2([0,T];V)$.
+
+\section*{15. Deducing the Diffusion Limit}
+Because this inequality holds for all test processes $v$, we have the freedom to choose $v$ carefully. As noted on the page, our first move is to choose $v=u$.
+
+When we substitute the limiting process $u$ in place of the test process $v$, the drift component of the integral, $\langle g-A(u), u-u \rangle$, collapses to zero. This implies that the expectation of the remaining diffusion term must be zero, which forces the norm
+\[
+  \|(\xi-B(u))\circ \sqrt{Q}\|_{L_2(U,H)}
+\]
+to equal zero.
+
+With this single choice of $v$, we have proven that our abstract diffusion limit $\xi\circ \sqrt{Q}$ is equal to $B(u)\circ \sqrt{Q}$ almost everywhere.
+
+\section*{16. The Minty--Browder Trick for the Drift Limit}
+Having identified the diffusion limit, the term involving $\xi$ vanishes from our inequality, leaving us with the statement
+\[
+  \mathbb{E}\Bigl(\int_0^T \langle g-A(v), u-v \rangle\,ds\Bigr) \le 0
+\]
+for all test processes $v\in L^2(\Omega, L^2([0,T];V))$.
+
+To identify the drift limit $g$, we apply the classical monotonicity trick. Instead of choosing $v=u$, we perturb our limit process slightly and choose $v=u-\varepsilon w$, where $w$ is an arbitrary process and $\varepsilon$ is a strictly positive scalar.
+
+By substituting $u-\varepsilon w$ into the inequality, dividing by $\varepsilon$, and carefully passing to the limit as $\varepsilon\to 0$ (exploiting the hemicontinuity of our operators), the mathematics forces the conclusion that $g=A(u)$. Both of our abstract weak limits have now been identified as the drift and diffusion operators applied to our limit process $u$.
+
+\section*{17. Proving the Core Hypothesis via It\^o's Formula}
+Of course, this entire deduction relied on the ``Suppose that'' assumption at the top of the page. The bottom half of the page provides the justification for that hypothesis.
+
+We begin by applying It\^o's formula to our finite-dimensional Galerkin approximation. The notes show that the expectation
+\[
+  \mathbb{E}\Bigl(\int_0^T 2\langle A(u_n), u_n \rangle + \|B(u_n)\circ \sqrt{Q}\|_{L_2(U,H)}^2\,ds\Bigr)
+\]
+is precisely equal to
+\[
+  \mathbb{E}(\|u_n(T)\|_H^2) - \|u_0\|_H^2.
+\]
+
+Next, we recall a crucial consequence of the Banach--Alaoglu theorem: our approximate end-time states $u_n(T)$ converge weakly to the true end-time state $u(T)$ in the Hilbert space $L^2(\Omega,H)$.
+
+In functional analysis, weak convergence in a Hilbert space guarantees the weak lower semicontinuity of the norm. I have written this property directly on the page:
+\[
+  \mathbb{E}(\|u(T)\|_H^2) \le \liminf_n \mathbb{E}(\|u_n(T)\|_H^2).
+\]
+
+Finally, by applying an energy equality (referenced as ``Lemma'' at the bottom) to our limiting process $u$, we know that
+\[
+  \mathbb{E}(\|u(T)\|_H^2) - \|u_0\|_H^2
+\]
+expands exactly into the expectation of the integral involving $g$ and $\xi$, written as
+\[
+  \mathbb{E}\Bigl(\int_0^T 2\langle g, u \rangle\,ds + \int_0^T \|\xi\circ \sqrt{Q}\|_{L_2(U,H)}^2\,ds\Bigr).
+\]
+
+By chaining the It\^o expansion of the finite approximations, the weak lower semicontinuity of the norm, and the energy equality of the limit process together, we recover the limit inferior inequality that we assumed at the very beginning of the page.
+
+This completes the argument. The existence of a unique solution to the infinite-dimensional SPDE is rigorously proven.
+
+
+\section*{18. Final Chain of Equalities and Inequalities}
+\begin{enumerate}
+\item It\^o's Formula for the Approximation $(u_n)$:
+\[
+\mathbb{E}\Bigl(\int_0^T 2\langle A(u_n), u_n \rangle + \|B(u_n)\circ \sqrt{Q}\|_{L_2(U,H)}^2\,ds\Bigr)
+= \mathbb{E}(\|u_n(T)\|_H^2) - \|u_0\|_H^2.
+\]
+
+\item Weak Lower Semicontinuity: Because $u_n(T) \to u(T)$ weakly in $L^2(\Omega,H)$, the norm is weakly lower semicontinuous:
+\[
+\mathbb{E}(\|u(T)\|_H^2) \le \liminf_{n\to\infty} \mathbb{E}(\|u_n(T)\|_H^2).
+\]
+
+\item Energy Equality (Lemma) for the Limit Process $(u)$: Applying the limit process to our lemma yields:
+\[
+\mathbb{E}(\|u(T)\|_H^2) - \|u_0\|_H^2
+= \mathbb{E}\Bigl(\int_0^T 2\langle g, u \rangle\,ds + \int_0^T \|\xi\circ \sqrt{Q}\|_{L_2(U,H)}^2\,ds\Bigr).
+\]
+
+\item Chaining the Equations: Taking the limit inferior of Step 1, applying the inequality from Step 2, and substituting Step 3 gives us the final result:
+\[
+\liminf_{n\to\infty} \mathbb{E}\Bigl(\int_0^T 2\langle A(u_n), u_n \rangle + \|B(u_n)\circ \sqrt{Q}\|_{L_2(U,H)}^2\,ds\Bigr)
+= \liminf_{n\to\infty}\bigl(\mathbb{E}(\|u_n(T)\|_H^2)\bigr) - \|u_0\|_H^2
+\]
+\[
+\ge \mathbb{E}(\|u(T)\|_H^2) - \|u_0\|_H^2
+= \mathbb{E}\Bigl(\int_0^T 2\langle g, u \rangle\,ds + \int_0^T \|\xi\circ \sqrt{Q}\|_{L_2(U,H)}^2\,ds\Bigr).
+\]
+\end{enumerate}
+
+
+Excellent. Now that we have successfully navigated the dense, abstract forest of the variational approach, the Minty--Browder trick, and weak convergence, we can finally reap the rewards.
+
+As I have noted at the very top of this new page, everything we just proved culminates in one statement: we have established a ``strong probabilistic solution (weak analytic)''. This means our solution is perfectly adapted to the underlying filtration of our Wiener process (probabilistically strong), but the spatial derivatives only make sense in the context of duality pairings within our Gelfand triple (analytically weak).
+
+To digest this, let us ground this abstract machinery into a concrete example: the stochastic heat equation with multiplicative noise.
+
+Let us walk through this page step-by-step.
+
+\section*{19. The Equation and the Functional Setting}
+We are looking at the stochastic partial differential equation on the real line $\mathbb{R}$:
+\[
+\partial_t u(t,x)=\frac{1}{2}\partial_{xx}u(t,x)+\theta\partial_x u(t,x)\partial_t W_t.
+\]
+Here, the noise is driven by a one-dimensional Brownian motion, so our noise space is $U=\mathbb{R}$. The formal term $\partial_t W_t$ denotes white noise. The noise is multiplicative because the diffusion term depends on the spatial gradient of the solution itself, $\partial_x u$.
+
+To apply our existence theorem, we must define our Gelfand triple $V\subset H\subset V'$.
+
+Our central Hilbert space $H$ is the standard space of square-integrable functions, $L^2(\mathbb{R})$.
+
+Our highly regular space $V$ is the Sobolev space $H^1(\mathbb{R})$, which contains functions that are in $L^2$ and whose first weak derivatives are also in $L^2$.
+
+Therefore, our Gelfand triple is naturally
+\[
+H^1(\mathbb{R})\subset L^2(\mathbb{R})\cong L^2(\mathbb{R})'\subset (H^1(\mathbb{R}))'.
+\]
+
+\section*{20. Step (1): The Drift Operator and Duality}
+Our deterministic drift operator is simply the Laplacian (or second derivative in one dimension):
+\[
+A(u)=\frac{1}{2}u_{xx}.
+\]
+We need to compute the duality pairing $\langle A(u),u\rangle$ to check our structural conditions. When we pair the second derivative with $u$ and integrate over $\mathbb{R}$, we apply integration by parts. Assuming the functions vanish at infinity, the boundary terms drop out, yielding
+\[
+\langle A(u),u\rangle=\frac{1}{2}\int u_{xx}u\,dx=-\frac{1}{2}\int u_x^2\,dx.
+\]
+As I have written on the page, we can express this in terms of our functional norms. Because the squared $H^1$-norm is defined as
+\[
+\|u\|_{H^1}^2=\|u\|_{L^2}^2+\|u_x\|_{L^2}^2,
+\]
+we can algebraically rewrite the negative gradient norm as
+\[
+\langle A(u),u\rangle=-\frac{1}{2}\|u\|_{H^1}^2+\frac{1}{2}\|u\|_H^2.
+\]
+This demonstrates that the Laplacian is a strongly dissipative operator; it pulls energy out of the system, dragging it toward equilibrium.
+
+\section*{21. Step (2): The Diffusion Operator and Hilbert--Schmidt Norm}
+Next, we examine the diffusion operator
+\[
+B(u)h=\theta\partial_x u\cdot h,
+\]
+where $h$ represents an increment of our Brownian motion.
+
+For our abstract theory to hold, we must compute the Hilbert--Schmidt norm of this operator, denoted as $\|B(u)\circ \sqrt{Q}\|_{L_2(\mathbb{R},H)}^2$. Because our noise is simply a one-dimensional standard Brownian motion, the covariance operator $Q$ is just the identity, and the trace over the one-dimensional noise space $U=\mathbb{R}$ simplifies immensely.
+
+The Hilbert--Schmidt norm collapses directly into the standard $L^2$ norm of the spatial coefficient:
+\[
+\|B(u)\circ \sqrt{Q}\|_{L_2(U,H)}^2=\|\theta\partial_x u\|_{L^2(\mathbb{R})}^2.
+\]
+
+\section*{22. Step (3): The Crucial Coercivity Condition}
+Now we reach the main point of the example. The existence of a unique solution relies on the coercivity condition, which guarantees that the deterministic smoothing of the drift can control the energy injected by the noise.
+
+We must evaluate the sum
+\[
+2\langle A(u),u\rangle+\|B(u)\circ \sqrt{Q}\|_{L_2(U,H)}^2.
+\]
+Let us plug in our findings from Steps 1 and 2:
+\[
+=2\Bigl(-\frac{1}{2}\|\partial_x u\|_{L^2}^2\Bigr)+\theta^2\|\partial_x u\|_{L^2}^2
+\]
+\[
+=-\|\partial_x u\|_{L^2}^2+\theta^2\|\partial_x u\|_{L^2}^2
+\]
+\[
+=(\theta^2-1)\|\partial_x u\|_{L^2}^2.
+\]
+Alternatively, using the norm breakdown written in the margin, this is equivalent to
+\[
+-\|u\|_{H^1}^2+\|u\|_{L^2}^2+\theta^2\|\partial_x u\|_{L^2}^2.
+\]
+For the SPDE to satisfy the coercivity condition, this final expression must be bounded above by
+\[
+-c\|u\|_V^2+\lambda\|u\|_H^2
+\]
+for some positive constant $c$. In practical terms, this means the coefficient in front of the gradient norm must be strictly negative.
+
+Therefore, as I have boxed at the bottom of the page, this condition is satisfied if and only if
+\[
+|\theta|<1.
+\]
+
+\section*{23. The Physical and Mathematical Insight}
+This is a beautiful result. It tells us that this stochastic equation behaves as a proper, well-posed parabolic PDE only if the intensity of the noise, $\theta$, is strictly less than $1$.
+
+Think about the physics of the equation: the Laplacian $\frac{1}{2}u_{xx}$ is constantly trying to smooth the solution out. The multiplicative noise $\theta\partial_x u\partial_t W_t$ is constantly trying to roughen it up, specifically attacking the gradient. If $|\theta|\ge 1$, the noise injects energy into the gradient faster than the Laplacian can smooth it out. The coercivity is broken, the a priori bounds discussed in the abstract theory collapse, and the solution will blow up in finite time.
+
+By imposing $|\theta|<1$, we guarantee that the deterministic smoothing dominates the stochastic roughening, allowing the abstract variational framework to secure a unique, global solution.
+
+
+\section*{24. Why the Laplacian Pulls Energy Out of the System}
+Take the deterministic heat part
+\[
+\partial_t u = \frac{1}{2}u_{xx}.
+\]
+Use the $L^2$ energy
+\[
+E(t)=\frac{1}{2}\|u(t)\|_{L^2}^2.
+\]
+Differentiate:
+\[
+\frac{d}{dt}E(t)=\langle \partial_t u,u\rangle=\left\langle \frac{1}{2}u_{xx},u\right\rangle.
+\]
+Now integrate by parts:
+\[
+\left\langle \frac{1}{2}u_{xx},u\right\rangle
+=\frac{1}{2}\int u_{xx}u\,dx
+=-\frac{1}{2}\int |u_x|^2\,dx
+\le 0.
+\]
+So
+\[
+\frac{d}{dt}E(t)\le 0.
+\]
+That means the energy $\|u(t)\|_{L^2}^2$ decreases in time, or at least does not increase.
+
+This is why we say:
+\begin{itemize}
+\item the operator does not create energy,
+\item it removes energy from the solution,
+\item hence it ``pulls energy out of the system''.
+\end{itemize}
+
+
+\section*{25. When the Energy Estimate Breaks Down}
+It means the key a priori bound no longer has the correct sign.
+
+In the good case, you want
+\[
+2\langle A(u),u\rangle + \|B(u)\circ \sqrt{Q}\|_{L_2(U,H)}^2
+\le -c\|u\|_V^2 + \lambda \|u\|_H^2
+\]
+with $c>0$.
+
+That negative $-c\|u\|_V^2$ term is what gives control of the more regular norm. It is the term that lets you prove boundedness of the approximations.
+
+In your example,
+\[
+2\langle A(u),u\rangle + \|B(u)\circ \sqrt{Q}\|^2
+=(\theta^2-1)\|\partial_x u\|_{L^2}^2.
+\]
+So:
+\begin{itemize}
+\item if $|\theta|<1$, then $\theta^2-1<0$, hence
+\[
+(\theta^2-1)\|\partial_x u\|^2<0,
+\]
+and you get dissipation.
+\item if $|\theta|=1$, then this term is $0$, so you lose the coercive control.
+\item if $|\theta|>1$, then
+\[
+(\theta^2-1)\|\partial_x u\|^2>0,
+\]
+so instead of decreasing energy, the equation increases it in the gradient part.
+\end{itemize}
+
+That is what ``energy estimate breaks down'' means: the estimate no longer gives a uniform bound like
+\[
+\sup_n \mathbb{E}\Bigl(\sup_{t\le T}\|u_n(t)\|_H^2+\int_0^T \|u_n(s)\|_V^2\,ds\Bigr)<\infty.
+\]
+Without that bound:
+\begin{itemize}
+\item you cannot control the approximations,
+\item you may not extract weakly convergent subsequences,
+\item the existence proof via the variational method fails.
+\end{itemize}
+
+
+Let us continue right where we left off. In our previous discussion, we established that our stochastic heat equation is well-posed, meaning the deterministic smoothing of the Laplacian strictly dominates the random noise, if and only if the noise intensity satisfies $|\theta|<1$.
+
+But we must ask: what happens at the exact boundary, and what happens when the noise overpowers the system? On the next page of the notes, we explore exactly these pathological regimes.
+
+\section*{26. The Critical Boundary Case: $\theta=1$}
+At the very top of the page, the specific equation for the critical case $\theta=1$ is
+\[
+du=\frac{1}{2}\partial_{xx}u\,dt+\partial_x u\,dW_t.
+\]
+This is an edge case. If one applies It\^o's formula carefully, one can verify that this equation yields an explicit solution:
+\[
+u(t,x)=u_0(x+W_t).
+\]
+\begin{proof}
+Indeed, set
+\[
+v(t,x):=u_0(x+W_t).
+\]
+Apply the one-dimensional It\^o formula to the function \(f(y)=u_0(x+y)\) with \(y=W_t\). Then
+\[
+d\,u_0(x+W_t)
+=u_0'(x+W_t)\,dW_t+\frac12 u_0''(x+W_t)\,dt.
+\]
+Since
+\[
+\partial_x v(t,x)=u_0'(x+W_t),\qquad
+\partial_{xx}v(t,x)=u_0''(x+W_t),
+\]
+this becomes
+\[
+dv=\partial_x v\,dW_t+\frac12 \partial_{xx}v\,dt,
+\]
+which is exactly
+\[
+du=\frac12 \partial_{xx}u\,dt+\partial_x u\,dW_t.
+\]
+\end{proof}
+Symmetrically, if $\theta=-1$, the solution is driven in the opposite direction:
+\[
+u(t,x)=u_0(x-W_t).
+\]
+
+Physically, this means that the solution at time $t$ is exactly the initial condition $u_0$, randomly shifted in space by the Brownian motion $W_t$.
+
+Because it is purely a random spatial shift, there is no smoothing effect. If one starts with a rough initial condition, for example $u_0\in L^2(\mathbb{R})$, then the solution at any future time $u_t$ remains in $L^2(\mathbb{R})$; it does not gain a derivative and enter the more regular Sobolev space $H^1$.
+
+This can be contrasted directly with the standard deterministic heat equation just below it. Recall the classical solution via convolution with the Gaussian heat kernel:
+\[
+u(t,x)=\frac{1}{\sqrt{2\pi t}}\int_{\mathbb{R}}u_0(y)e^{-\frac{|x-y|^2}{2t}}\,dy.
+\]
+Because we are integrating against the infinitely differentiable exponential kernel, the deterministic heat equation takes rough $L^2$ initial data and immediately smooths it into a $C^\infty$ function for any $t>0$.
+
+In the critical stochastic case $\theta=1$, the noise exactly cancels this deterministic smoothing mechanism, leaving a pure, non-smoothing stochastic transport equation.
+
+\section*{27. The Ill-Posed Regime: $|\theta|>1$}
+Now consider the unstable regime $|\theta|>1$.
+
+Recall the coercivity sum calculated on the previous page:
+\[
+2\langle A(u),u\rangle+\|B(u)\circ \sqrt{Q}\|^2=-(1-\theta^2)\|\partial_x u\|_{L^2}^2.
+\]
+If $|\theta|>1$, then $\theta^2>1$, meaning $(1-\theta^2)$ is negative. Consequently, the entire right-hand side of the energy balance becomes strictly positive. The noise injects energy into the gradient faster than the Laplacian can dissipate it.
+
+To understand the consequences, note that this behaves like reversing time in the heat equation, which yields the backward heat equation. Formally, this behaves like
+\[
+\partial_t u=-\partial_{xx}u.
+\]
+In a normal heat equation, positive curvature pushes the solution up and negative curvature pushes the solution down, flattening everything out toward equilibrium. Because of the negative sign in $-\partial_{xx}u$, the behavior is inverted. Where the function has a peak, the equation pushes it further upward; where it has a trough, it pushes it further downward.
+
+The system blows up. Therefore, in this regime the problem is not well posed. If one tries to simulate this with a computer, one encounters severe numerical instability. Instead of gaining regularity, the solution goes to the opposite regularity and ceases to be smooth.
+
+\section*{28. Opposite Regularity}
+The phrase ``instead of gaining regularity, the solution goes to the opposite regularity and ceases to be smooth'' means that the equation becomes anti-smoothing.
+
+For the usual heat equation,
+\[
+\partial_t u=\partial_{xx}u,
+\]
+high-frequency modes are damped:
+\[
+a_k(t)=e^{-k^2 t}a_k(0).
+\]
+So the solution gets smoother as $t$ increases.
+
+For the backward heat-type behavior,
+\[
+\partial_t u=-\partial_{xx}u,
+\]
+high-frequency modes are amplified:
+\[
+a_k(t)=e^{+k^2 t}a_k(0).
+\]
+So tiny oscillations grow very fast.
+
+That is what the phrase means:
+\begin{itemize}
+\item instead of smoothing out,
+\item the solution becomes rougher,
+\item gradients and oscillations grow,
+\item regularity is lost rather than gained.
+\end{itemize}
+
+So ``goes to the opposite regularity'' is informal language for
+\[
+\text{smoothing} \longrightarrow \text{anti-smoothing}.
+\]
+
+It does not mean a precise new function space; it means the solution becomes less regular and may even become ill posed.
+
+\section*{29. Broader Context: Stochastic Transport and Microscopic Limits}
+At the bottom of the page, there is some broader context for where these mechanics appear in modern research.
+
+This specific combination of a Laplacian drift and a gradient-multiplicative noise, coming from the It\^o formula, is a foundational model in the theory of stochastic transport. The mathematician B. Gess has done extensive work on the regularizing effects of noise in these transport-type SPDEs.
+
+Finally, there is a brief note about the microscopic picture. The macroscopic stochastic heat equation can be derived as a limit of interacting particle systems. Specifically, if one looks at the empirical measure of a large number of independent Brownian particles,
+\[
+\frac{1}{n}\sum \delta_{W_i},
+\]
+and scales it correctly as $n\to\infty$, the macroscopic density evolves according to the deterministic heat equation. The SPDE studied here captures the mesoscopic fluctuations around that deterministic limit.
+
+To summarize this lecture: the delicate balance between the drift operator $A$ and the diffusion operator $B$ is central. The Gelfand triple gives the space to measure it, the It\^o formula gives the coercivity condition to test it, and as this page shows, violating that condition destroys the physical reality of the solution.
+
+
+\section*{30. Why There Is No Smoothing at $\theta=1$}
+For $\theta=1$, the equation is
+\[
+du=\frac12 u_{xx}\,dt+u_x\,dW_t.
+\]
+Take
+\[
+u(t,x)=u_0(x+W_t).
+\]
+By It\^o's formula,
+\[
+d\,u_0(x+W_t)=u_0'(x+W_t)\,dW_t+\frac12 u_0''(x+W_t)\,dt,
+\]
+so
+\[
+du=u_x\,dW_t+\frac12 u_{xx}\,dt.
+\]
+Thus this is indeed the solution.
+
+Now
+\[
+u(t,\cdot)=u_0(\cdot+W_t),
+\]
+which is just a translation of the initial function. A translation does not improve regularity.
+
+So:
+\begin{itemize}
+\item if $u_0\in L^2$, then $u(t,\cdot)\in L^2$,
+\item if $u_0\notin H^1$, then $u(t,\cdot)\notin H^1$.
+\end{itemize}
+Hence there is no smoothing. The heat part would smooth, but at $\theta=1$ the noise exactly cancels that effect.
+
+
+\section*{31. Regularization by Noise}
+Let us turn to this rather brief, but conceptually important, page of the notes. Here, we transition from observing noise as a destructive force to seeing it as a mathematical stabilizing mechanism. This page illustrates one of the most active themes of modern stochastic analysis: the phenomenon of regularization by noise.
+
+Look at the equations at the top of the page. While there is an initial drift scribble on the first line, the main stochastic differential equation written just below it is
+\[
+dX_t=\sqrt{|X_t|}\,dt+dW_t.
+\]
+To understand the significance of this equation, it is helpful to first think about its purely deterministic counterpart, where the Brownian motion is removed, that is, $dW_t=0$. Then we are left with the ordinary differential equation
+\[
+dx_t=\sqrt{|x_t|}\,dt.
+\]
+
+As recalled from standard ODE theory, the Picard--Lindel\"of theorem guarantees a unique solution only if the drift coefficient is Lipschitz continuous. However, the function $\sqrt{|x|}$ is not Lipschitz at the origin. Because of this singularity, the deterministic equation is ill posed. If the system starts at the origin, $x(0)=0$, there are infinitely many valid solutions. The particle can stay at zero forever, or it can depart at an arbitrary time $t_0\ge 0$ following the trajectory
+\[
+x(t)=\frac14 (t-t_0)^2.
+\]
+Deterministically, the system does not select a unique evolution.
+
+Now we introduce the noise back into the system through the term $+dW_t$.
+
+The sketch on the page is summarized by the phrase ``noise kicks out and regularizes''. The idea is that Brownian motion has infinite variation and is highly erratic. If the stochastic process $X_t$ hits the problematic singularity at the origin, namely $X_t=0$, the noise immediately kicks the particle away from zero. The random fluctuations are so persistent that the process does not remain trapped at the singular point long enough for deterministic non-uniqueness to dominate. Instead, the particle is repeatedly pushed into regions where the drift $\sqrt{|x|}$ behaves better.
+
+As a result, one gains additional regularity from the noise. In the deterministic setting, the singularity destroys uniqueness. In the stochastic setting, by the classical Yamada--Watanabe theorem, this SDE possesses a unique strong solution. The noise cures the pathology of the drift.
+
+\section*{32. The Yamada--Watanabe Theorem}
+The Yamada--Watanabe theorem is a fundamental result for stochastic differential equations. Roughly speaking, it says that if one has
+\begin{itemize}
+\item existence of a weak solution, and
+\item pathwise uniqueness,
+\end{itemize}
+then one obtains a unique strong solution.
+
+For an SDE of the form
+\[
+dX_t=b(X_t)\,dt+\sigma(X_t)\,dW_t,
+\]
+the theorem connects the different notions of solution:
+\begin{itemize}
+\item a weak solution allows one to choose the probability space and Brownian motion,
+\item a strong solution is built from a given Brownian motion on a given probability space,
+\item pathwise uniqueness means that if two solutions use the same Brownian motion and the same initial condition, then they are indistinguishable.
+\end{itemize}
+
+Very roughly, the theorem says
+\[
+\text{weak existence}+\text{pathwise uniqueness}
+\Longrightarrow
+\text{strong existence and uniqueness}.
+\]
+
+This is why it is relevant here. For
+\[
+dX_t=\sqrt{|X_t|}\,dt+dW_t,
+\]
+the drift is not Lipschitz at $0$, so the deterministic ODE is not unique. But the addition of stochastic noise restores enough well-posedness that one gets uniqueness of the SDE solution, and the Yamada--Watanabe theorem upgrades that to a unique strong solution.
+
+\section*{33. The Singularity at the Origin}
+Here ``singularity'' means the bad point of the drift, namely at $x=0$, where the drift is not regular enough. For
+\[
+f(x)=\sqrt{|x|},
+\]
+the derivative is
+\[
+f'(x)=
+\begin{cases}
+\dfrac{1}{2\sqrt{x}}, & x>0,\\[6pt]
+-\dfrac{1}{2\sqrt{-x}}, & x<0.
+\end{cases}
+\]
+Equivalently,
+\[
+f'(x)=\frac{\operatorname{sgn}(x)}{2\sqrt{|x|}}
+\qquad (x\neq 0).
+\]
+At $x=0$, the derivative does not exist. The problematic point is therefore $x=0$ because:
+\begin{itemize}
+\item the derivative of $\sqrt{|x|}$ blows up there,
+\item the function is not Lipschitz there,
+\item the usual uniqueness theorem cannot be applied there.
+\end{itemize}
+So ``singularity'' here does not mean that the function itself is infinite. It means that there is an irregular point where the drift is too sharp, and that bad behavior causes non-uniqueness.
+
+This provides a useful counterpoint to the stochastic heat equation discussed on the previous pages. There, sufficiently strong multiplicative noise, namely $|\theta|\ge 1$, can overpower the deterministic Laplacian, destroy coercivity, and lead to blow-up. Here, the mechanism is the opposite: the deterministic drift is broken, but the addition of noise restores well posedness and enforces uniqueness.
+
+Knowing when noise destroys regularity and when noise creates regularity is the hallmark of a true expert in stochastic partial differential equations.
+
+\end{document}

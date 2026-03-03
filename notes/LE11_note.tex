@@ -1,0 +1,340 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\tr}{tr}
+\newcommand{\dual}[2]{{}_{V'}\langle #1, #2 \rangle_{V}}
+
+\title{Lecture 11: Compact Embeddings and the Non-Monotone Case}
+\date{25.12.2025}
+\author{Tien Anh Vu}
+
+\begin{document}
+\maketitle
+
+Welcome to Lecture 11 on Stochastic Partial Differential Equations. Please settle down. Today marks a profound turning point in our theoretical framework.
+
+In our previous lectures, we successfully established the existence and uniqueness of SPDEs using the variational approach, relying heavily on the Minty--Browder trick. However, that trick strictly required our operators to be monotone. Today, we ask a vital question: what if our system is not monotone? How do we pass to the limit in our non-linear terms?
+
+The answer, as outlined on the first page of today's notes, is to introduce compact embedding. We now walk through this page step-by-step.
+
+\section*{1. The Main Additional Assumption: Compact Embedding}
+We continue to study our core SPDE on the central Hilbert space $H$:
+\[
+  du_t = A(u_t)\,dt + B(u_t)\,dW_t.
+\]
+
+We are still operating within the framework of our Gelfand triple,
+\[
+  V \hookrightarrow H \simeq H' \hookrightarrow V'.
+\]
+However, there is now a main additional assumption: the highly regular Banach space $V$ is compactly embedded into $H$. This is denoted by
+\[
+  V \hookrightarrow \hookrightarrow H.
+\]
+
+Analytically, this means that any set that is bounded in the strong topology of $V$ is relatively compact in the strong topology of $H$. Stated formally, if we take a closed ball of radius $K$ in the space $V$, denoted by
+\[
+  B_K^V(0)=\{v\in V:\|v\|_V\le K\},
+\]
+then this entire set is a compact subset when viewed inside $H$.
+
+Consequently, if we have a sequence of functions uniformly bounded in $V$, then we are guaranteed to find a subsequence that converges strongly, and not merely weakly, in $H$.
+
+\section*{2. Examples and Geometric Intuition}
+To ground this abstraction, let us look at the standard Sobolev spaces. A classical example of a compact embedding is
+\[
+  H^{1,2}(\Omega) \hookrightarrow \hookrightarrow L^2(\Omega),
+\]
+provided that the spatial domain $\Omega\subset \mathbb{R}^d$ is bounded.
+
+Why is the boundedness of the domain $\Omega$ required? Suppose instead that our domain is the entire unbounded space $\mathbb{R}^d$. Consider a simple smooth bump function $e(x)$. Now form the sequence of translates
+\[
+  e(x-n), \qquad n\ge 1.
+\]
+Because we are only sliding the function along the axis, the spatial norms remain invariant:
+\[
+  \|e(x-n)\|_{H^{1,2}} = \|e(x)\|_{H^{1,2}}.
+\]
+Thus this sequence of translated bumps is uniformly bounded in $H^{1,2}$. In particular, each function still has the same finite norm, and the sequence is uniformly bounded in $L^2$ as well. However, as $n\to\infty$, the bump drifts off to positive infinity. It escapes every fixed compact region, so it cannot possibly possess a strongly convergent subsequence in $L^2$.
+
+This is exactly the obstruction to compactness: if one can find a bounded sequence with no strongly convergent subsequence, then the embedding is not compact. Compactness therefore fails on unbounded domains. Translations to infinity destroy compact embeddings.
+\[
+  H^{1,2}(\mathbb{R}^d) \hookrightarrow \hookrightarrow L^2(\mathbb{R}^d)
+\]
+is therefore not compact.
+
+\section*{3. Spectral Illustration: The Dirichlet Laplacian}
+To give a clearer picture of how compact embeddings work, consider Fourier series on the unit interval and the space $H_0^{1,2}(0,1)$ with Dirichlet boundary conditions.
+
+Consider the Dirichlet Laplacian operator $-\Delta_D$. Its eigenvectors form a complete orthonormal system for the space, given by
+\[
+  e_k(x)=\sin(k\pi x), \qquad k=1,2,\dots.
+\]
+Any function $u$ in this space can be represented by its Fourier coefficients
+\[
+  u_k=\int_0^1 u(x)e_k(x)\,dx.
+\]
+
+Crucially, the $H^1$-norm in this spectral representation penalizes high frequencies. This means that oscillatory modes cost more in the $H^1$-norm. In the spectral picture,
+\[
+  \|u\|_{H^1}^2 \sim \sum_{k=1}^{\infty} (1+k^2)|u_k|^2.
+\]
+So higher frequencies $k$ are multiplied by a larger weight $k^2$. Low modes are cheap, whereas high modes are expensive. If $u$ contains a lot of high-frequency oscillation, then its $H^1$-norm becomes large. This is exactly what it means to say that the norm penalizes high frequencies: the norm suppresses oscillatory behavior by assigning a large cost to high-frequency coefficients.
+
+A function $u$ belongs to $H_0^{1,2}(0,1)$ if and only if
+\[
+  \sum_{k=1}^{\infty} k^2 u_k^2 < \infty.
+\]
+
+Now consider a bounded set in $V$, meaning we restrict ourselves to functions such that
+\[
+  \sum_{k=1}^{\infty} k^2 u_k^2 \le M
+\]
+for some constant $M$. Because of the factor $k^2$, the higher modes are forced to become small as $k\to\infty$. Indeed, for each fixed $k$ one has
+\[
+  k^2 u_k^2 \le M,
+\]
+hence
+\[
+  |u_k| \le \frac{\sqrt{M}}{k}.
+\]
+So the coefficients decay at least like $1/k$. More importantly, the entire high-frequency tail is small in the $H$-norm. Indeed, for every $N\ge 1$,
+\[
+  \sum_{k>N} u_k^2
+  \le \frac{1}{N^2}\sum_{k>N} k^2 u_k^2
+  \le \frac{M}{N^2}.
+\]
+Hence
+\[
+  \sum_{k>N} u_k^2 \to 0
+  \qquad \text{uniformly as } N\to\infty.
+\]
+This is the relevant compactness statement: the high-frequency tail becomes negligible in $H$, so most of the $H$-mass is trapped in the first few modes.
+
+Because the higher modes are suppressed, the problem is effectively reduced to finite dimensions. From there, classical real analysis takes over: the Bolzano--Weierstrass theorem guarantees that any bounded sequence in a finite-dimensional space has a convergent subsequence. In this way, one obtains a strongly convergent subsequence in $H$.
+
+\section*{4. Adjusting our Core Assumptions}
+At the bottom of the page, we detail how compact embedding affects the core assumptions established earlier in the lecture notes.
+
+What do we keep?
+
+Assumption (V1) --- Coercivity: we retain the coercivity condition
+\[
+  2\langle A(u),u\rangle + \|B(u)\circ \sqrt{Q}\|_{L_2(U,H)}^2
+  \le -\alpha \|u\|_V^2 + \lambda \|u\|_H^2.
+\]
+This remains the engine of the a priori estimates. It guarantees the uniform boundedness
+\[
+  \sup_n \mathbb{E}\Bigl(\sup_{t\in[0,T]}\|u_n(t)\|_H^2 + \int_0^T \|u_n(s)\|_V^2\,ds\Bigr)<\infty.
+\]
+This bound provides the tightness of the Galerkin approximations and ensures that the associated probability mass does not escape to infinity.
+
+\subsection*{4.1. Tightness of the Galerkin Approximations}
+If $\mu_n=\mathrm{Law}(u_n)$ denotes the law of the Galerkin approximation $u_n$, then tightness means that these probability measures do not drift off to infinity in the ambient function space. Concretely, for every $\varepsilon>0$, there exists a compact set $K$ such that
+\[
+  \mu_n(K^c)<\varepsilon
+  \qquad \text{for all } n.
+\]
+Here $K^c$ denotes the complement of $K$ in the ambient function space $X$ where the laws $\mu_n$ are defined, that is,
+\[
+  K^c=X\setminus K.
+\]
+Thus, uniformly in $n$, almost all of the probability mass is contained in one fixed compact region. This is the probabilistic compactness statement: after passing to a subsequence, one obtains a convergent subsequence of probability laws, which then provides a candidate limit solution.
+
+We continue by keeping Assumption (V3), namely the linear growth condition on the drift operator.
+
+Assumption (V3) --- Linear Growth:
+\[
+  \|A(u)\|_{V'}\le M(1+\|u\|_V).
+\]
+This means that the drift $A(u)$ grows at most linearly with respect to the size of the solution $u$.
+
+Assumption (V5) --- Diffusion Growth: we assume the slightly sub-linear growth condition
+\[
+  \|B(u)\circ \sqrt{Q}\|_{L_2(U,H)} \le M\bigl(1+\|u\|_V^{1-\delta}\bigr)
+\]
+for some constants $M,\delta>0$.
+
+What do we drop?
+
+Here lies the central point of today's setup: we completely drop the monotonicity assumption.
+
+By relying on the compact embedding
+\[
+  V \hookrightarrow \hookrightarrow H,
+\]
+we will extract strongly convergent subsequences of our Galerkin approximations. Strong convergence allows us to pass to the limit directly inside highly non-linear, non-monotone drift operators $A(u_n)$. We no longer need the algebraic structure of the Minty--Browder trick because topology now performs the essential work.
+
+\section*{5. Finalizing the Assumptions}
+We now record the remaining assumptions required to replace the Minty--Browder monotonicity trick with compact embedding.
+
+Assumption (V.6) records the compact embedding already discussed in detail:
+\[
+  V \hookrightarrow \hookrightarrow H.
+\]
+
+Here $V_{\mathrm{weak}}$ means the space $V$ equipped with its weak topology. Thus
+\[
+  u_n \to u \text{ in } V_{\mathrm{weak}}
+\]
+means exactly that
+\[
+  u_n \rightharpoonup u \text{ weakly in } V.
+\]
+Similarly, $V'_{\mathrm{weak}}$ denotes the dual space $V'$ equipped with its weak topology.
+
+Assumption (V.7) specifies the continuity required once monotonicity has been dropped. We require:
+\begin{itemize}
+\item the drift operator to be a continuous map
+\[
+  A:V_{\mathrm{weak}}\cap H \to V'_{\mathrm{weak}},
+\]
+\item the diffusion operator to be a continuous map
+\[
+  B:V_{\mathrm{weak}}\cap H \to L_2(U,H).
+\]
+\end{itemize}
+
+More explicitly, this means the following: if
+\[
+  u_n \rightharpoonup u \text{ weakly in } V
+  \qquad \text{and} \qquad
+  u_n \to u \text{ strongly in } H,
+\]
+then
+\[
+  A(u_n)\rightharpoonup A(u) \text{ weakly in } V'
+\]
+and
+\[
+  B(u_n)\to B(u) \text{ in } L_2(U,H).
+\]
+Thus the drift operator is continuous in this mixed weak/strong sense, while the diffusion operator is continuous into the Hilbert--Schmidt space equipped with its usual norm topology.
+
+\section*{6. The Topological Bridge: Skorokhod Representation Theorem}
+Because we are now relying on compactness, specifically through Prokhorov's theorem, the Galerkin approximations will first yield only weak convergence of probability laws, that is, convergence in distribution.
+
+\subsection*{6.1. Detour: Prokhorov's Theorem and Weak Convergence of Probability Measures}
+Prokhorov's theorem is the result that connects tightness with compactness of probability measures. Roughly speaking, if a family of probability measures is tight, then it is relatively compact in the weak topology on probability measures.
+
+Thus, if $(\mu_n)$ is tight, then there exists a subsequence $(\mu_{n_k})$ and a probability measure $\mu$ such that
+\[
+  \mu_{n_k}\Rightarrow \mu.
+\]
+Here the symbol
+\[
+  \Rightarrow
+\]
+means weak convergence of probability measures. This is also called convergence in distribution or weak convergence of laws.
+
+Concretely, the convergence
+\[
+  \mu_{n_k}\Rightarrow \mu
+\]
+means that for every bounded continuous test function $F$,
+\[
+  \int F\,d\mu_{n_k}\to \int F\,d\mu.
+\]
+
+In the present setting, if
+\[
+  \mu_n=\mathrm{Law}(u_n),
+\]
+then Prokhorov's theorem gives a subsequence of the laws of the Galerkin approximations that converges weakly as probability measures.
+
+However, convergence in the weak topology on probability measures is not enough to pass to the limit inside highly non-linear operators such as $A(\cdot)$ and $B(\cdot)$. To do that, one needs almost sure convergence of the random paths themselves.
+
+The theorem that bridges this gap is the Skorokhod representation theorem. In the simple one-dimensional case, suppose random variables $X_n$ converge weakly to $X$, so that their distribution functions satisfy
+\[
+  F_{X_n}(x)\to F_X(x)
+\]
+at all continuity points of $F_X$.
+
+Skorokhod tells us that one can pass to a new probability space, for example the unit interval $(0,1)$ equipped with Lebesgue measure $\lambda$, and define new random variables by the quantile representation
+\[
+  \widetilde X_n(r)=F_{X_n}^{-1}(r), \qquad r\in(0,1).
+\]
+Then
+\[
+  \widetilde X_n(r)\to \widetilde X(r)
+\]
+almost everywhere, while the new variables retain exactly the same laws as the original ones. Indeed, for every $x\in\mathbb{R}$,
+\[
+  \lambda(\widetilde X_n\le x)
+  =\lambda\bigl(\{r:F_{X_n}^{-1}(r)\le x\}\bigr)
+  =\lambda\bigl(\{r:r\le F_{X_n}(x)\}\bigr)
+  =F_{X_n}(x).
+\]
+So the price of gaining almost sure convergence is that we move to a new probability space.
+
+\section*{7. The Paradigm Shift: Martingale Solutions}
+This leads to the conceptual shift emphasized in the notes: after applying Skorokhod representation, we have transplanted the distributions of the approximate solutions onto a new probability space. In doing so, we lose the original filtration and the original driving Wiener process.
+
+Therefore, we can no longer work with a strong probabilistic solution tied to a fixed Brownian motion. Instead, we pass to a weak probabilistic formulation, called a martingale solution.
+
+A probability measure $P$ on $(\Omega,\mathcal F)$ is called a martingale solution to the SPDE
+\[
+  du(t)=A(u(t))\,dt+B(u(t))\,dW(t)
+\]
+if the following hold:
+\begin{enumerate}
+\item the initial condition is satisfied almost surely,
+\[
+  P\bigl(u(0)=u_0\bigr)=1;
+\]
+\item the process
+\[
+  M_t:=u(t)-u(0)-\int_0^t A(u(s))\,ds
+\]
+is a continuous $H$-valued martingale under $P$.
+\end{enumerate}
+Moreover, this martingale must have the quadratic variation prescribed by the diffusion coefficient:
+\[
+  \langle M\rangle_t=\int_0^t B(u(s))\,Q\,B(u(s))^*\,ds.
+\]
+Here $Q$ is the covariance operator on the noise space $U$, and $B(u(s))^*:H\to U$ denotes the adjoint operator.
+
+Because $M_t$ is a continuous martingale with this specific quadratic variation, the It\^o representation theorem allows one to reconstruct a new Wiener process $\widetilde W$ on the new probability space such that
+\[
+  M_t=\int_0^t B(u(s))\,d\widetilde W(s).
+\]
+So the SPDE is recovered in weak probabilistic form.
+
+\section*{8. The Equivalent Formulation via Test Functions}
+To prove that the limit of the Galerkin approximations satisfies this martingale property, one uses the equivalent scalar martingale formulation obtained by testing against basis vectors and smooth functions.
+
+Fix a basis vector $e_k$ and a test function
+\[
+  \varphi\in C_b^2(\mathbb{R}).
+\]
+Define the scalar process
+\[
+  M_t^{\varphi}:=\varphi\bigl(\langle u(t),e_k\rangle_H\bigr)-\varphi\bigl(\langle u_0,e_k\rangle_H\bigr)
+\]
+\[
+  \qquad -\int_0^t \varphi'\bigl(\langle u(s),e_k\rangle_H\bigr)\,\langle A(u(s)),e_k\rangle\,ds
+\]
+\[
+  \qquad -\frac12\int_0^t \varphi''\bigl(\langle u(s),e_k\rangle_H\bigr)\,\|B(u(s))^*e_k\|_U^2\,ds.
+\]
+The martingale problem formulation says that $M_t^{\varphi}$ must be a martingale.
+
+Equivalently, for every $0\le s\le t\le T$ and every bounded $\mathcal F_s$-measurable test random variable $\Phi_s$ depending on the past up to time $s$, one must have
+\[
+  \mathbb E_P\bigl[(M_t^{\varphi}-M_s^{\varphi})\Phi_s\bigr]=0.
+\]
+By verifying this identity for all test functions $\varphi$, all basis vectors $e_k$, and all past-dependent bounded random variables $\Phi_s$, one proves that the law $P$ constructed through the compactness and Skorokhod argument is indeed a martingale solution to the SPDE.
+
+This page marks the functional shift of the lecture: the Minty--Browder monotonicity trick is replaced by compact embedding, Prokhorov compactness, and the Skorokhod representation theorem.
+
+\end{document}

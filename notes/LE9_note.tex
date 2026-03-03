@@ -1,0 +1,787 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\tr}{tr}
+\newcommand{\dual}[2]{{}_{V'}\langle #1, #2 \rangle_{V}}
+
+\title{Lecture 9: Galerkin Approximation and Compactness Method}
+\date{11.12.2025}
+\author{Tien Anh Vu}
+\begin{document}
+\maketitle
+
+\section*{Chapter 3: Variational approach to SPDEs (continued)}
+
+\subsection*{Setting: Gelfand triple}
+We work with a (dense) \emph{Gelfand triple}
+\[
+V \hookrightarrow H \simeq H' \hookrightarrow V',
+\]
+meaning that $V$ is continuously and densely embedded into $H$, and we identify $H$ with its dual $H'$ via the Riesz map.
+In particular, the embedding $V\hookrightarrow H$ is continuous, so there exists a constant $C>0$ such that
+\[
+\|u\|_{H}\le C\|u\|_{V}\qquad \text{for all }u\in V.
+\]
+W.l.o.g.\ (by replacing $\|\cdot\|_{V}$ with an equivalent norm if needed) we may assume $C=1$, i.e.
+\[
+\|u\|_{H}\le \|u\|_{V}\qquad \text{(the $H$-norm is controlled by the $V$-norm).}
+\]
+
+\subsection*{Evolution equation and coercivity up to a lower-order term}
+Let
+\[
+A:V\to V'
+\]
+be an operator satisfying the estimate
+\[
+\dual{Au}{u}\le -\alpha\|u\|_{V}^{2}+\lambda\|u\|_{H}^{2},
+\]
+for some $\alpha>0$, $\lambda\in\mathbb{R}$.
+This inequality should be read as a \emph{(generalized) dissipativity/coercivity} condition: the $V$-part contributes a negative term $-\alpha\|u\|_{V}^{2}$, while $\lambda\|u\|_{H}^{2}$ is a lower-order correction that is controlled using the embedding $V\hookrightarrow H$.
+
+Assume further that
+\[
+f\in L^{2}([0,T],V').
+\]
+We consider the (deterministic) variational evolution equation
+\[
+\frac{du}{dt}=Au+f\in V',
+\qquad
+u(0)=u_{0}\in H,
+\]
+and we aim to obtain a solution with regularity
+\[
+u\in C([0,T];H)\cap L^{2}([0,T];V).
+\]
+The point of this space is that $u(t)$ is meaningful as an $H$-valued function for each $t$, while the $L^{2}([0,T];V)$ part gives enough spatial regularity to interpret $Au$ in $V'$.
+
+\subsection*{Galerkin approximation}
+Let $(e_{k})$ be a complete orthonormal system (CONS) of $H$ such that $e_{k}\in V$ for all $k$.
+For each $n\in\mathbb{N}$ we project the problem onto the finite-dimensional subspace
+\[
+H_{n}:=\operatorname{span}\{e_{1},\dots,e_{n}\},
+\]
+and look for an approximation of the form
+\[
+u_{n}(t)=\sum_{j=1}^{n} c_{j}^{(n)}(t)e_{j}\in H_{n}.
+\]
+Testing the projected equation with the basis functions $e_{k}$ (for $k=1,\dots,n$) yields the finite system
+\[
+\begin{cases}
+\dfrac{d}{dt}\langle u_{n}(t),e_{k}\rangle_{H}=\langle A u_n(t)+f(t),\,e_k\rangle_{V',V},\qquad k=1,\dots,n,\\[6pt]
+\langle u_{n}(0),e_{k}\rangle_{H}=\langle u_{0},e_{k}\rangle_{H}.
+\end{cases}
+\]
+The usual energy estimate is obtained by testing the Galerkin equation with $u_n(t)$ (i.e.\ take $v=u_n(t)$). Then
+\[
+\frac12\frac{d}{dt}\|u_n(t)\|_H^2
+=
+\dual{A u_n(t)}{u_n(t)}+\dual{f(t)}{u_n(t)}.
+\]
+Using the coercivity bound for $A$ and Young's inequality on $\dual{f(t)}{u_n(t)}$ gives an inequality of the form
+\[
+\frac{d}{dt}\|u_n(t)\|_H^2+\alpha\|u_n(t)\|_V^2
+\le
+C\|u_n(t)\|_H^2+\|f(t)\|_{V'}^2,
+\]
+for some constant $C>0$.
+This yields an \emph{a priori estimate} of the form
+\[
+\sup_{n\in\mathbb{N}}\left(
+\sup_{t\in[0,T]}\|u_{n}(t)\|_{H}^{2}
+\;+\;
+\int_{0}^{T}\|u_{n}(s)\|_{V}^{2}\,ds
+\right)
+<\infty,
+\]
+with a bound that is uniform in $n$.
+Consequently, $(u_{n})$ is bounded in $L^{2}([0,T],V)$ and (since $\dot u_{n}=Au_{n}+f$ in $V'$) one also gets a corresponding bound for $\frac{du_{n}}{dt}$ in a suitable dual space. In words: uniformly in $n$, the approximations have finite energy on $[0,T]$ (bounded in $L^{\infty}(0,T;H)$) and finite ``dissipation''/regularity (bounded in $L^{2}(0,T;V)$), so they cannot blow up as the Galerkin dimension increases.
+
+\subsection*{Compactness method}
+To pass to the limit, one uses compactness in time and space.
+
+\[
+L^{2}([0,T],V)\cap H^{1,2}([0,T],V')\hookrightarrow L^{2}([0,T],H)
+\]
+is compact. Since $(u_n)$ is bounded in $L^{2}([0,T],V)\cap H^{1,2}([0,T],V')$, there exist a subsequence $(u_{n_k})$ and some $u\in L^{2}([0,T],H)$ such that
+\[
+u_{n_k}\to u \qquad \text{strongly in }L^{2}([0,T],H)\quad (k\to\infty).
+\]
+
+Compactness of the embedding means that bounded sequences in
+\(
+L^{2}([0,T],V)\cap H^{1,2}([0,T],V')
+\)
+have \emph{strongly} convergent subsequences in \(L^{2}([0,T],H)\).
+This is exactly what is needed in the Galerkin method: the a priori estimate gives boundedness in the left-hand space, and the compactness upgrade gives strong convergence in \(L^{2}([0,T],H)\), which is often necessary to pass to the limit in terms that are not weakly sequentially continuous (for example, nonlinearities).
+The subsequence language is unavoidable at this stage because compactness guarantees existence of convergent subsequences, not convergence of the full sequence; if the limit is later shown to be unique, then the whole sequence converges.
+
+The above compact embedding property, i.e.\ the compactness of
+\[
+L^{2}([0,T],V)\cap H^{1,2}([0,T],V')\hookrightarrow L^{2}([0,T],H),
+\]
+holds if
+\[
+V\hookrightarrow H \quad \text{is compact}.
+\]
+(i.e.\ \(B\subset V\) bounded \(\Rightarrow\) \(B\subset H\) precompact, i.e.\ \(\overline{B}\subset H\) compact.)
+In any metric space (in particular, in \(H\)), a subset \(B\subset H\) is compact if every sequence \((x_n)\subset B\) admits a subsequence that converges in \(H\) to a limit in \(B\).
+In complete spaces such as Hilbert/Banach spaces, it is often convenient to use the equivalent criterion: \(B\) is compact if and only if it is closed and \emph{totally bounded}, i.e.\ for every \(\varepsilon>0\), \(B\) can be covered by finitely many \(H\)-balls of radius \(\varepsilon\).
+
+The condition \(V\hookrightarrow H\) compact is a \emph{spatial} compactness assumption (e.g.\ Rellich--Kondrachov in PDEs), while the time regularity \(H^{1,2}([0,T],V')\) provides \emph{time} compactness (control of oscillations in time, in a weak/dual topology).
+Together, they imply compactness in \(L^{2}([0,T],H)\) via Aubin--Lions type results.
+For instance, if \(D\subset\mathbb{R}^{d}\) is bounded with (say) Lipschitz boundary, then the Rellich--Kondrachov theorem states that the Sobolev embedding
+\[
+W^{1,p}(D)\hookrightarrow L^{q}(D)
+\]
+is compact whenever \(1\le p<d\) and \(1\le q< p^\ast:=\frac{dp}{d-p}\): bounded sequences with more regularity (\(W^{1,p}\)) have strongly convergent subsequences in a space of less regularity (\(L^{q}\)). A concrete special case is
+\[
+H^{1}(D)=W^{1,2}(D)\hookrightarrow L^{2}(D),
+\]
+which is compact for bounded \(D\) (and likewise \(H_{0}^{1}(D)\hookrightarrow L^{2}(D)\) is compact). In this common PDE setting one often takes \(V=H_{0}^{1}(D)\) and \(H=L^{2}(D)\).
+
+\subsection*{Example: the Laplacian}
+Let $D\subset\mathbb{R}^{d}$ be a bounded domain and set $V:=H_{0}^{1,2}(D)$.
+Consider the Laplacian (with Dirichlet boundary conditions) as an operator
+\[
+\Delta: H_{0}^{1,2}(D)\to H_{0}^{1,2}(D)'.
+\]
+For $u\in V$ we estimate its $V'$-norm by definition:
+\[
+\|\Delta u\|_{V'}
+:=\sup_{\|v\|_{V}\le 1}\dual{\Delta u}{v}.
+\]
+Using integration by parts (in the weak sense) one has $\dual{\Delta u}{v}=-\int_{D}\langle\nabla u,\nabla v\rangle\,dx$, hence
+\[
+\begin{aligned}
+\|\Delta u\|_{V'}
+&=\sup_{\|v\|_{V}\le 1}\left|\int_{D}\langle\nabla u,\nabla v\rangle\,dx\right|\\
+&\overset{\text{(Cauchy--Schwarz)}}{\le} \sup_{\|v\|_{V}\le 1}\int_D \|\nabla u\|_{\mathbb{R}^{d}}\,\|\nabla v\|_{\mathbb{R}^{d}}\,dx\\
+&\overset{\text{(H\"older)}}{\le} \sup_{\|v\|_{V}\le 1}\|\nabla u\|_{L^{2}(D)}\|\nabla v\|_{L^{2}(D)}\\
+&\le \|u\|_{V}.
+\end{aligned}
+\]
+Here we used that for \(V=H_0^{1}(D)\) one may take, for example,
+\[
+\|u\|_{V}:=\Big(\|u\|_{L^{2}(D)}^{2}+\|\nabla u\|_{L^{2}(D)}^{2}\Big)^{1/2},
+\]
+so in particular \(\|\nabla u\|_{L^{2}(D)}\le \|u\|_{V}\) (and by Poincar\'e one can equivalently work with \(\|u\|_{V}=\|\nabla u\|_{L^{2}(D)}\)). Hence \(\|v\|_{V}\le 1\) implies \(\|\nabla v\|_{L^{2}(D)}\le 1\) and therefore
+\[
+\sup_{\|v\|_{V}\le 1}\|\nabla u\|_{L^{2}(D)}\|\nabla v\|_{L^{2}(D)}\le \|\nabla u\|_{L^{2}(D)}=\|u\|_{V}.
+\]
+In particular, we have shown the estimate
+\[
+\|\Delta u\|_{V'}\le 1\cdot \|u\|_{V}.
+\]
+This shows that $\Delta$ is bounded from $V$ to $V'$ (and also illustrates how duality estimates naturally produce $V$-norm control).
+
+\begin{lemma}[Aubin--Lions lemma]
+If \(V\hookrightarrow H\) is compact, then
+\[
+\underbrace{L^{2}([0,T],V)\cap H^{1,2}([0,T],V')}_{=:X}\hookrightarrow L^{2}([0,T],H)
+\]
+is compact.
+\end{lemma}
+
+\begin{proof}
+Let \(g\in L^{2}([0,T],V)\). By definition, \(g(t)\in V\) for almost every \(t\in[0,T]\) (after choosing a representative), but \(g(t_{0})\) need not be meaningful for every fixed \(t_{0}\) since \(L^{2}\)-functions are only defined a.e.
+We therefore introduce a \emph{time-averaging operator} \(J_\varepsilon\) (a time mollifier), which replaces \(g\) by a continuous-in-time representative; this allows us to use compactness criteria in \(C([0,T],H)\) (Arzel\`a--Ascoli) and then pass back to \(g\) by letting \(\varepsilon\to 0\).
+As \(\varepsilon\downarrow 0\) one recovers \(g\) in the natural sense \(J_\varepsilon g\to g\) in \(L^{2}([0,T],V)\) (and, after choosing a representative, also \(J_\varepsilon g(t)\to g(t)\) for a.e.\ \(t\) by the Lebesgue differentiation theorem).
+Let the integral operator
+\[
+J_\varepsilon(g)(s):=\frac{1}{2\varepsilon}\int_{s-\varepsilon}^{s+\varepsilon}g(t)\,dt
+=\frac{1}{2\varepsilon}\int_{-\varepsilon}^{\varepsilon}g(s+t)\,dt
+\]
+(extend \(g\) by \(0\) outside \([0,T]\)).
+
+Then
+\[
+J_\varepsilon:L^{2}([0,T],V)\to C([0,T],V)
+\]
+and
+\[
+\|J_\varepsilon g(s)\|_{V}
+=\left\|\frac{1}{2\varepsilon}\int_{-\varepsilon}^{\varepsilon}g(s+t)\,dt\right\|_{V}
+\overset{\text{(Bochner)}}{\le}\frac{1}{2\varepsilon}\int_{-\varepsilon}^{\varepsilon}\|g(s+t)\|_{V}\,dt
+\]
+\[
+\overset{\text{(Jensen)}}{\le}\left(\frac{1}{2\varepsilon}\int_{-\varepsilon}^{\varepsilon}\|g(s+t)\|_{V}^{2}\,dt\right)^{1/2}
+\le\frac{1}{2\varepsilon}\|g\|_{L^{2}([0,T],V)}.
+\]
+Here we use Jensen's inequality in the form: if \(\mu\) is a probability measure, \(\varphi:\mathbb{R}\to\mathbb{R}\) is convex, and \(f\in L^{1}(\mu)\), then
+\[
+\varphi\Big(\int f\,d\mu\Big)\le \int \varphi(f)\,d\mu.
+\]
+We apply it with \(\varphi(x)=x^{2}\), \(f(t)=\|g(s+t)\|_{V}\), and \(d\mu=\frac{1}{2\varepsilon}\,dt\) on \([-\varepsilon,\varepsilon]\), which yields exactly the displayed estimate.
+
+The operator \(J_\varepsilon\) is a \emph{time mollifier} (a local average in time).
+It improves time regularity: starting from \(L^{2}\) in time, it produces a continuous-in-time representative.
+The displayed inequalities are the standard estimate showing that the averaging does not blow up the \(V\)-norm too much (up to the expected \(\varepsilon\)-dependence).
+
+We now proceed in two steps. First we prove that, for each fixed \(\varepsilon>0\), the image of bounded sets in \(X\) under \(J_\varepsilon\) is precompact in \(C([0,T],H)\). Second, we let \(\varepsilon\downarrow 0\) and use that \(J_\varepsilon g\) approximates \(g\) in \(L^{2}([0,T],V)\) to transfer compactness back to the original sequence.
+To start, we show that the mapping
+\[
+J_\varepsilon:X\to C([0,T],H)
+\]
+is compact (using Arzel\`a--Ascoli theorem).
+Recall Arzel\`a--Ascoli: \(J\subset C([0,T],H)\) is relatively compact if (i) for each \(t\in[0,T]\), the set \(\{u(t):u\in J\}\) is relatively compact in \(H\), and (ii) \(J\) is equicontinuous in \(H\), i.e.\ for every \(\eta>0\) there exists \(\delta>0\) such that for all \(u\in J\) and all \(t_{1},t_{2}\in[0,T]\) with \(|t_{1}-t_{2}|<\delta\), one has \(\|u(t_{1})-u(t_{2})\|_{H}<\eta\).
+Therefore, to show that \(J_\varepsilon(A)\subset C([0,T],H)\) is precompact (hence relatively compact), it suffices to verify the following two properties for \(J:=J_\varepsilon(A)\) when \(A\subset X\) is bounded:
+
+(i)
+\[
+\sup_{u\in J}\|u(t)\|_{V}<\infty\qquad \forall\,t\in[0,T]
+\]
+This is a uniform-in-\(u\) bound at each fixed time \(t\).
+In particular, for every \(t\) the set \(\{u(t):u\in J\}\) is bounded in \(V\), and since \(V\hookrightarrow H\) is compact it is relatively compact in \(H\).
+This uniform \(V\)-bound follows from the estimate already proved above: for any \(g\in L^{2}([0,T],V)\) and any \(t\in[0,T]\),
+\[
+\|J_\varepsilon g(t)\|_{V}\le \frac{1}{2\varepsilon}\,\|g\|_{L^{2}([0,T],V)}.
+\]
+Hence, if \(A\subset X\) is bounded then \(\sup_{g\in A}\|J_\varepsilon g(t)\|_{V}<\infty\) for each fixed \(t\).
+
+(ii)
+\[
+\sup_{u\in J}\sup_{|s|<h}\|u(t+s)-u(t)\|_{V}\to 0
+\quad \text{as }h\to 0
+\]
+One convenient way to ensure this is to work with H\"older continuity in time on \([0,T]\) with values in \(V\), for some exponent \(\alpha\in(0,1]\): define the H\"older \emph{seminorm}
+\[
+[u]_{C^{0,\alpha}([0,T];V)}
+:=\sup_{t_{1}\neq t_{2}}\frac{\|u(t_{1})-u(t_{2})\|_{V}}{|t_{1}-t_{2}|^{\alpha}}.
+\]
+The corresponding norm is
+\[
+\|u\|_{C^{0,\alpha}([0,T];V)}:=\|u\|_{C([0,T];V)}+[u]_{C^{0,\alpha}([0,T];V)},
+\]
+and \(u\in C^{0,\alpha}([0,T];V)\) means \([u]_{C^{0,\alpha}([0,T];V)}<\infty\) (equivalently, \(\|u\|_{C^{0,\alpha}([0,T];V)}<\infty\)).
+Then, by definition, for all \(t\in[0,T]\) and all \(s\) with \(t,t+s\in[0,T]\),
+\[
+\|u(t+s)-u(t)\|_{V}\le [u]_{C^{0,\alpha}([0,T];V)}\,|s|^{\alpha}.
+\]
+If moreover \(|s|<h\), then \(|s|^{\alpha}\le h^{\alpha}\), so
+\[
+\sup_{|s|<h}\|u(t+s)-u(t)\|_{V}\le [u]_{C^{0,\alpha}([0,T];V)}\,h^{\alpha}.
+\]
+In particular, if \(\sup_{u\in J}[u]_{C^{0,\alpha}([0,T];V)}\le C\), then
+\[
+\sup_{u\in J}\sup_{|s|<h}\|u(t+s)-u(t)\|_{V}\le Ch^{\alpha}\xrightarrow[h\to 0]{}0.
+\]
+This is the equicontinuity requirement: small time increments \(s\) produce small changes \(u(t+s)-u(t)\), uniformly over all \(u\in J\).
+It rules out fast oscillations in time and, together with (i), is the input needed for Arzel\`a--Ascoli to conclude precompactness in \(C([0,T],H)\).
+
+To verify (ii) for \(J_\varepsilon(A)\) with \(A\subset X\) bounded, one estimates differences of the time-mollified functions.
+Indeed, any \(u\in J:=J_\varepsilon(A)\) can be written as \(u=J_\varepsilon g\) for some \(g\in A\). Thus the equicontinuity requirement for \(J\),
+\(\|u(t_{1})-u(t_{2})\|_{H}\) uniformly in \(u\in J\), is equivalent to estimating \(\|J_\varepsilon g(t_{1})-J_\varepsilon g(t_{2})\|_{H}\) uniformly in \(g\in A\).
+Let \(t_{1},t_{2}\in[0,T]\) with \(t_{2}\ge t_{1}\). Then
+\[
+\|J_\varepsilon g(t_{1})-J_\varepsilon g(t_{2})\|_{H}
+=\left\|\int_{t_{1}}^{t_{2}}\frac{d}{ds}J_\varepsilon g(s)\,ds\right\|_{H}
+=\left\|\int_{t_{1}}^{t_{2}}\frac{1}{2\varepsilon}\bigl(g(s+\varepsilon)-g(s-\varepsilon)\bigr)\,ds\right\|_{H}
+\]
+\[
+\le \frac{1}{2\varepsilon}\int_{t_{1}}^{t_{2}}\|g(s+\varepsilon)-g(s-\varepsilon)\|_{H}\,ds.
+\]
+Using Cauchy--Schwarz:
+\[
+\le \frac{1}{2\varepsilon}\,|t_{2}-t_{1}|^{1/2}
+\left(\int_{t_{1}}^{t_{2}}\|g(s+\varepsilon)-g(s-\varepsilon)\|_{H}^{2}\,ds\right)^{1/2}
+\le \frac{|t_{2}-t_{1}|^{1/2}}{\varepsilon}\,\|g\|_{X}.
+\]
+\[
+\|g\|_{X}:=\|g\|_{L^{2}([0,T],V)}+\|g\|_{H^{1,2}([0,T],V')}.
+\]
+\begin{align*}
+\int_{t_{1}}^{t_{2}}\|g(s+\varepsilon)-g(s-\varepsilon)\|_{H}^{2}\,ds
+&\le 2\int_{t_{1}}^{t_{2}}\|g(s+\varepsilon)\|_{H}^{2}\,ds
++2\int_{t_{1}}^{t_{2}}\|g(s-\varepsilon)\|_{H}^{2}\,ds\\
+&\le 4\|g\|_{L^{2}([0,T],H)}^{2}
+\le C\|g\|_{L^{2}([0,T],V)}^{2}
+\le C\|g\|_{X}^{2}.
+\end{align*}
+Let \(A\subset X\) be bounded.
+Then \(J_\varepsilon(A)\subset C([0,T],H)\) is bounded: indeed, using the estimate proved above,
+\[
+\|J_\varepsilon g(t)\|_{V}\le \frac{1}{2\varepsilon}\|g\|_{L^{2}([0,T],V)}\qquad \forall\,t\in[0,T],
+\]
+and the continuous embedding \(V\hookrightarrow H\), we obtain \(\sup_{g\in A}\sup_{t\in[0,T]}\|J_\varepsilon g(t)\|_{H}<\infty\).
+Moreover, \(J_\varepsilon(A)\) is uniformly equicontinuous since
+\[
+\sup_{g\in A}\|J_\varepsilon g(t_{1})-J_\varepsilon g(t_{2})\|_{H}
+\le \frac{|t_{2}-t_{1}|^{1/2}}{\varepsilon}\sup_{g\in A}\|g\|_{X}\to 0
+\quad \text{as }|t_{1}-t_{2}|\to 0.
+\]
+Hence, \(J_\varepsilon(A)\subset C([0,T],H)\) is precompact (therefore also precompact in \(L^{2}([0,T],H)\)).
+
+Next we use that \(J_\varepsilon\) is an approximation of the identity as \(\varepsilon\downarrow 0\):
+\[
+\|J_\varepsilon(g)-g\|_{L^{2}([0,T],V)}\le \frac{3}{2}\,\varepsilon\,\|g\|_{X}
+\qquad \text{(see lecture notes).}
+\]
+In particular,
+\[
+\left\|\frac{1}{2\varepsilon}\int_{t-\varepsilon}^{t+\varepsilon}g(s)\,ds-g(t)\right\|_{V}\to 0,
+\]
+and the rate is consistent with the time regularity (with H\"older exponent \(\alpha=1/2\)).
+\[
+\left\|\frac{1}{2\varepsilon}\int_{t-\varepsilon}^{t+\varepsilon}g(s)\,ds-g(t)\right\|_{V}
+\le \|g\|_{C^{0,\alpha}([0,T];V)}\,\frac{\varepsilon^{\alpha}}{1+\alpha}\to 0.
+\]
+\[
+g\in C^{0,\alpha}([0,T];V)\ \Longrightarrow\ J_\varepsilon g(t)\to g(t)\ \text{in }V\ \text{as }\varepsilon\to 0.
+\]
+In words: if \(g\) is H\"older continuous in time (with values in \(V\)), then the local time average \(J_\varepsilon g\) converges to \(g\) as the averaging window \(\varepsilon\to 0\).
+
+\medskip
+\noindent
+We now record the remaining standard argument (as in the lecture notes) that uses \(J_\varepsilon\) and a compactness/approximation estimate to conclude strong convergence in \(L^{2}([0,T],H)\).
+
+\[
+\begin{aligned}
+\frac{1}{2\varepsilon}\int_{t-\varepsilon}^{t+\varepsilon}\|g(s)-g(t)\|_{V}\,ds
+&\le \frac{1}{2\varepsilon}\int_{t-\varepsilon}^{t+\varepsilon}[g]_{C^{0,\alpha}([0,T];V)}\,|s-t|^{\alpha}\,ds\\
+&= \frac{[g]_{C^{0,\alpha}([0,T];V)}}{2\varepsilon}\cdot \frac{2}{1+\alpha}\,\varepsilon^{1+\alpha}
+= \frac{\varepsilon^{\alpha}}{1+\alpha}\,[g]_{C^{0,\alpha}([0,T];V)}\\
+&\le \frac{\varepsilon^{\alpha}}{1+\alpha}\,\|g\|_{C^{0,\alpha}([0,T];V)},
+\end{aligned}
+\qquad \text{(H\"older estimate).}
+\]
+
+Combining this approximation estimate (which shows that \(J_\varepsilon g\) is close to \(g\) for small \(\varepsilon\), uniformly on bounded subsets of \(X\)) with the fact that for each fixed \(\varepsilon>0\) the operator \(J_\varepsilon:X\to L^{2}([0,T],H)\) is compact, we conclude that bounded sequences in \(X\) have strongly convergent subsequences in \(L^{2}([0,T],H)\). The approximation estimate is essential here: compactness of \(J_\varepsilon\) alone only gives strong convergence of the mollified sequence \(J_\varepsilon g_n\); the bound \(\|g_n-J_\varepsilon g_n\|_{L^{2}([0,T],H)}\to 0\) (uniformly on bounded sets) lets us pass from compactness of \(J_\varepsilon g_n\) to compactness of \(g_n\) itself. In other words,
+\[
+X\hookrightarrow L^{2}([0,T],H)
+\]
+is compact, i.e.\ if \((g_n)\subset X\) is bounded then there exist a subsequence \((g_{n_k})\) and some \(\tilde g\in L^{2}([0,T],H)\) such that \(g_{n_k}\to \tilde g\) strongly in \(L^{2}([0,T],H)\).
+Moreover, since \(X\) is a Hilbert space, every bounded sequence admits a weakly convergent subsequence; thus, after extracting a subsequence if needed, we may assume \(g_{n}\rightharpoonup g\) weakly in \(X\).
+Fix \(\varepsilon>0\). Since \(J_\varepsilon:X\to L^{2}([0,T],H)\) is compact, the sequence \((J_\varepsilon g_n)\) is relatively compact in \(L^{2}([0,T],H)\); hence there exists a subsequence \((g_{n_k})\) such that \(J_\varepsilon g_{n_k}\to w\) strongly in \(L^{2}([0,T],H)\) for some \(w\).
+On the other hand, \(J_\varepsilon\) is linear and continuous, so \(g_{n_k}\rightharpoonup g\) in \(X\) implies \(J_\varepsilon g_{n_k}\rightharpoonup J_\varepsilon g\) weakly in \(L^{2}([0,T],H)\). Therefore the strong limit must be \(w=J_\varepsilon g\), i.e.
+\[
+J_{\varepsilon}(g_{n_k})\to J_{\varepsilon}(g)\ \text{strongly in }L^{2}([0,T],H)\quad (k\to\infty),
+\]
+We now show that \(g_{n_k}\to g\) strongly in \(L^{2}([0,T],H)\).
+
+Given \(\tilde\varepsilon>0\), there exists \(C_{\tilde\varepsilon}>0\) such that
+\[
+\|u\|_{L^{2}([0,T],H)}^{2}\le \tilde\varepsilon\|u\|_{L^{2}([0,T],V)}^{2}+C_{\tilde\varepsilon}\|u\|_{L^{2}([0,T],V')}^{2}
+\]
+(using compact embedding \(V\hookrightarrow H\)).
+
+Indeed,
+\[
+\|u\|_{H}^{2}={}_{V'}\langle u,\,u\rangle_{V}\le \|u\|_{V}\|u\|_{V'}
+\le \frac{\tilde\varepsilon}{2}\|u\|_{V}^{2}+\frac{1}{2\tilde\varepsilon}\|u\|_{V'}^{2}.
+\]
+
+Hence,
+\[
+\|g_{n_k}-g\|_{L^{2}([0,T],H)}
+\le \|g_{n_k}-J_{\varepsilon}(g_{n_k})\|_{L^{2}([0,T],H)}
+\;+\;\|J_{\varepsilon}(g_{n_k})-J_{\varepsilon}(g)\|_{L^{2}([0,T],H)}
+\;+\;\|J_{\varepsilon}(g)-g\|_{L^{2}([0,T],H)}.
+\]
+The middle term \(\to 0\) as \(k\to\infty\).
+
+The first and third terms satisfy (we already had \(\|J_{\varepsilon}(h)-h\|_{L^{2}([0,T],V)}\le \frac{3}{2}\varepsilon\|h\|_{X}\), hence also \(\|J_{\varepsilon}(h)-h\|_{L^{2}([0,T],H)}\le C_{\varepsilon}\|h\|_{X}\); apply with \(h=g_{n_k}\) and \(h=g\))
+\[
+\le C_{\varepsilon}(\|g_{n_k}\|_{X}+\|g\|_{X}).
+\]
+Thus,
+\[
+\limsup_{k\to\infty}\|g_{n_k}-g\|_{L^{2}([0,T],H)}\le C_{\varepsilon}(\|g_{n_k}\|_{X}+\|g\|_{X}).
+\]
+Since \(g_{n_k}\rightharpoonup g\) in \(X\), \((g_{n_k})\) is bounded in \(X\); hence \(C_{\varepsilon}(\|g_{n_k}\|_{X}+\|g\|_{X})\le \tilde C_{\varepsilon}\), and we absorb the bound into the constant.
+Moreover \(C_{\varepsilon}=\frac{3}{2}\varepsilon\to 0\) as \(\varepsilon\to 0\), so also \(\tilde C_{\varepsilon}\to 0\).
+Letting \(\varepsilon\to 0\) yields
+\[
+g_{n_k}\to g\ \text{strongly in }L^{2}([0,T],H).
+\]
+That completes the proof of the Aubin--Lions compactness lemma.
+\qedhere
+\end{proof}
+
+Arzel\`a--Ascoli is a compactness criterion in spaces of continuous functions:
+uniform boundedness plus uniform equicontinuity implies precompactness.
+Here the compact embedding \(V\hookrightarrow H\) is used to turn pointwise-in-time \(V\)-bounds into pointwise-in-time relative compactness in \(H\), while the time regularity (encoded via the \(H^{1,2}([0,T],V')\) part) yields equicontinuity in \(H\) after applying \(J_\varepsilon\).
+
+\subsection*{3.3 Variational approach to SPDE}
+\((W_{t})\) cylindrical Wiener process on \(U\) (with covariance operator \(Q\)).
+
+\medskip
+\noindent
+Here \(U\) is a separable Hilbert space and \(Q:U\to U\) is a symmetric, nonnegative operator which prescribes the covariance of the noise.
+One convenient way to write the noise is in terms of a cylindrical Wiener process \(W\) on \(U\): then the stochastic integral is defined via the Hilbert--Schmidt operator \(B(u)\sqrt{Q}\in L_{2}(U,H)\), and the noise term is written as \(B(u(t))\sqrt{Q}\,dW(t)\) in \(H\).
+
+\medskip
+\noindent
+Let
+\[
+A:V\to V',
+\qquad
+B:V\to L(U,H)
+\]
+
+\medskip
+\noindent
+As before we work in a Gelfand triple \(V\hookrightarrow H\simeq H'\hookrightarrow V'\).
+The drift \(A(u)\) takes values in \(V'\) (so it is tested against \(v\in V\) through \(\langle A(u),v\rangle\)), while the diffusion \(B(u)\) is an operator from \(U\) to \(H\) so that \(B(u)\,dW\) is \(H\)-valued.
+The factor \(\sqrt{Q}\) appears because the noise has covariance \(Q\), and the natural norm for the stochastic integral is the Hilbert--Schmidt norm \(\|\cdot\|_{L_{2}(U,H)}\).
+
+\medskip
+\noindent
+(V.1) Coercivity condition \(\exists \alpha>0,\ \lambda,\ \nu\) s.t.
+\[
+\langle A(u),u\rangle+\|B(u)\sqrt{Q}\|_{L_{2}(U,H)}^{2}\le -\alpha\|u\|_{V}^{2}+\lambda\|u\|_{H}^{2}+\nu
+\qquad \forall\,u\in V.
+\]
+\medskip
+\noindent
+This is the SPDE analogue of an energy inequality: the drift dissipates in the \(V\)-norm (up to the lower-order \(\lambda\|u\|_{H}^{2}\) term), and the diffusion contributes through the Hilbert--Schmidt norm.
+The constant \(\nu\) allows an affine bound (non-homogeneous case).
+
+\medskip
+\noindent
+(V.2) Monotonicity \(\exists \lambda\ge 0\) s.t.
+\[
+2\langle A(u)-A(v),u-v\rangle+\|((B(u)-B(v))\sqrt{Q})\|_{L_{2}(U,H)}^{2}\le \lambda\|u-v\|_{H}^{2}
+\qquad \forall\,u,v\in V.
+\]
+\medskip
+\noindent
+This is a one-sided Lipschitz / monotonicity condition.
+It implies uniqueness and stability: the difference of any two (variational) solutions satisfies a Gr\"onwall-type estimate in the \(H\)-norm. Concretely, one derives an inequality of the form
+\[
+\|u(t)-v(t)\|_{H}^{2}\le \|u(0)-v(0)\|_{H}^{2}+C\int_{0}^{t}\|u(s)-v(s)\|_{H}^{2}\,ds,
+\]
+and Gr\"onwall's lemma yields \(\|u(t)-v(t)\|_{H}^{2}\le e^{Ct}\|u(0)-v(0)\|_{H}^{2}\). In particular, if \(u(0)=v(0)\) then \(u(t)=v(t)\) for all \(t\), so there is at most one solution.
+
+\medskip
+\noindent
+(V.3) Boundedness \(\exists M>0\) s.t.
+\[
+\|A(u)\|_{V'}\le M(1+\|u\|_{V})
+\qquad \forall\,u\in V.
+\]
+\medskip
+\noindent
+This ensures the drift does not grow faster than linearly in the \(V\)-norm, so that \(A(u)\) is integrable as a \(V'\)-valued term in time.
+
+\medskip
+\noindent
+(V.4) Hemicontinuity \(\forall u,v,w\in V\) s.t. \(\lambda\mapsto {}_{V'}\langle A(u+\lambda v),w\rangle_{V}\) is continuous.
+
+\medskip
+\noindent
+This is a weak continuity assumption in one direction, used to pass to the limit when applying monotone operator methods (Minty trick) in the variational setting.
+
+\medskip
+\noindent
+(SPDE)
+\[
+du(t)=A(u(t))\,dt+B(u(t))\sqrt{Q}\,dW(t),
+\qquad
+u(0)=u_{0}.
+\]
+\medskip
+\noindent
+For every test function \(v\in V\),
+\[
+\langle u(t),v\rangle_{H}
+=\langle u_{0},v\rangle_{H}
++\int_{0}^{t}{}_{V'}\langle A(u(s)),v\rangle_{V}\,ds
++\int_{0}^{t}\langle v,\,B(u(s))\sqrt{Q}\,dW(s)\rangle_{H}.
+\]
+Here \(A(u(t))\,dt\in V'\) is the drift and \(B(u(t))\sqrt{Q}\,dW(t)\in H\) is the noise term.
+The initial condition is posed in \(H\).
+
+\medskip
+\noindent
+Theorem 3.5
+
+\medskip
+\noindent
+(V.1)--(V.4) imply that for all \(u_{0}\in H\) there exists a uniquely determined adapted process \(u(t)\), \(t\ge 0\), s.t.
+\[
+u\in C([0,T];H)\cap L^{2}([0,T];V)\quad \mathbb{P}\text{-a.s.}
+\]
+and satisfying the equation
+\[
+\langle u(t),v\rangle_{H}
+=\langle u_{0},v\rangle_{H}
++\int_{0}^{t}{}_{V'}\langle A(u(s)),v\rangle_{V}\,ds
++\int_{0}^{t}\langle v,\,B(u(s))\sqrt{Q}\,dW(s)\rangle_{H}.
+\]
+\medskip
+\noindent
+The statement gives existence and uniqueness of a \emph{variational solution}.
+``Adapted'' means \(u(t)\) depends only on the information available up to time \(t\).
+The equation is written after testing against \(v\in V\), so all terms are well-defined: the drift integral is an ordinary Bochner integral, and the last term is a real-valued It\^o integral.
+
+\medskip
+\noindent
+Annotations written underneath:
+
+\[
+\underbrace{\langle u(t),v\rangle_{H}}_{\text{real-valued random process}}
+=\langle u_{0},v\rangle_{H}
++\underbrace{\int_{0}^{t}{}_{V'}\langle A(u(s)),v\rangle_{V}\,ds}_{\text{bounded finite variation}}
++\underbrace{\int_{0}^{t}\langle v,\,B(u(s))\sqrt{Q}\,dW(s)\rangle_{H}}_{\text{martingale part}},
+\qquad
+\text{hence }\langle u(t),v\rangle_{H}\ \text{is a semimartingale.}
+\]
+
+\smallskip
+\noindent
+``real-valued random process'' (under \(\langle u(t),v\rangle\)).
+\medskip
+\noindent
+For each fixed \(v\in V\), the map \(t\mapsto \langle u(t),v\rangle\) is a scalar stochastic process.
+
+\smallskip
+\noindent
+``semi-martingale''.
+\medskip
+\noindent
+The decomposition into a drift term \(\int_{0}^{t}\langle A(u(s)),v\rangle\,ds\) and a stochastic integral \(\int_{0}^{t}\langle v,\,B(u(s))\sqrt{Q}\,dW(s)\rangle_{H}\) shows \(\langle u(t),v\rangle\) is a semimartingale (finite variation part + martingale part).
+
+\smallskip
+\noindent
+``bounded finite variation'' (under the drift term).
+\medskip
+\noindent
+The drift integral has the form
+\[
+t\longmapsto \int_{0}^{t}{}_{V'}\langle A(u(s)),v\rangle_{V}\,ds,
+\]
+so it is absolutely continuous in time (its time-derivative exists a.e.\ and equals the integrand). In particular it has finite variation on \([0,T]\), with total variation
+\[
+\mathrm{Var}_{[0,T]}\!\left(\int_{0}^{\cdot}{}_{V'}\langle A(u(s)),v\rangle_{V}\,ds\right)
+=\int_{0}^{T}\big|{}_{V'}\langle A(u(s)),v\rangle_{V}\big|\,ds.
+\]
+
+\subsection*{Lemma (It\^o formula-like)}
+\noindent
+The new thing now is:
+in the variational/SPDE setting we cannot directly apply the classical It\^o formula to \(\|u(t)\|_{H}^{2}\), so we prove an ``It\^o formula'' for the \(H\)-norm by projecting onto Fourier modes, applying the one-dimensional It\^o formula to each coefficient, and then summing (Parseval/Galerkin).
+
+Let \(u_{0}\in H\), \(u\in L^{2}(\Omega;V)\) be an adapted process with paths in
+\[
+L^{2}([0,T];V)\cap L^{2}([0,T];V')
+\]
+s.t.
+\[
+u(t)=u_{0}+\int_{0}^{t}v(s)\,ds+M_{t}
+\]
+for some continuous \(H\)-valued local martingale \((M_{t})_{t}\).
+In the SPDE application one typically has
+\[
+M_t=\int_0^t B(u(s))\sqrt{Q}\,dW(s)\qquad\text{(an \(H\)-valued It\^o integral)}.
+\]
+
+Then
+\[
+\|u(t)\|_{H}^{2}
+=\|u_{0}\|_{H}^{2}
++2\int_{0}^{t}{}_{V'}\langle v(s),u(s)\rangle_{V}\,ds
++2\int_{0}^{t}\langle u(s),dM_{s}\rangle_{H}
++\langle M\rangle_{t}
+\qquad \forall\,t\in[0,T].
+\]
+\medskip
+\noindent
+Remark.
+The identity is the infinite-dimensional It\^o formula for the map \(u\mapsto \|u\|_{H}^{2}\): it consists of a drift term \(2\int_{0}^{t}{}_{V'}\langle v(s),u(s)\rangle_{V}\,ds\), a martingale term \(2\int_{0}^{t}\langle u(s),dM_{s}\rangle_{H}\), and the quadratic variation term \(\langle M\rangle_{t}\).
+
+\medskip
+\noindent
+\begin{proof}
+Fourier coefficients:
+\[
+u_{k}(t)=\langle u(t),e_{k}\rangle_{H}
+\quad \text{real-valued semimartingale.}
+\]
+Indeed, from the decomposition \(u(t)=u_{0}+\int_{0}^{t}v(s)\,ds+M_{t}\) in \(H\), taking the \(H\)-inner product with \(e_{k}\) yields
+\[
+u_{k}(t)=\langle u_{0},e_{k}\rangle_{H}+\int_{0}^{t}\langle v(s),e_{k}\rangle\,ds+M_{t}^{k},
+\qquad
+M_{t}^{k}:=\langle M_{t},e_{k}\rangle_{H}.
+\]
+Equivalently, in differential form,
+\[
+du_{k}(t)=\langle v(t),e_{k}\rangle\,dt+dM_{t}^{k}.
+\]
+Now we apply the one-dimensional It\^o formula to \(f(x)=x^{2}\) evaluated at \(u_{k}(t)\).
+Recall that if \(X_t\) is a real-valued semimartingale, then
+\[
+d(X_t^{2})=2X_t\,dX_t+d\langle X\rangle_t.
+\]
+Here we apply this with \(X_t=u_k(t)\).
+Using \(du_k(t)=\langle v(t),e_k\rangle\,dt+dM_t^k\), we obtain
+\[
+d(u_k(t)^2)
+=2u_k(t)\,du_k(t)+d\langle u_k\rangle_t
+=2u_k(t)\langle v(t),e_k\rangle\,dt+2u_k(t)\,dM_t^k+d\langle u_k\rangle_t.
+\]
+Since the finite-variation term \(\langle v(t),e_k\rangle\,dt\) has zero quadratic variation, we have \(\langle u_k\rangle_t=\langle M^k\rangle_t\).
+Substituting \(u_k(t)=\langle u(t),e_k\rangle_H\) gives
+\[
+d u_{k}^{2}(t)
+=2\langle u(t),e_{k}\rangle_{H}\,\langle v(t),e_{k}\rangle\,dt
++2\langle u(t),e_{k}\rangle_{H}\,dM_{t}^{k}
++d\langle M^{k}\rangle_{t},
+\]
+where
+\[
+M_{t}^{k}=\int_{0}^{t}\langle e_{k},\,B(u(s))\sqrt{Q}\,dW(s)\rangle_{H}.
+\]
+
+Summing the scalar It\^o identities over \(k\) gives:
+\[
+\sum_{k}d u_{k}^{2}(t)
+=2\sum_{k}\langle u(t),e_{k}\rangle_{H}\,{}_{V'}\langle v(t),e_{k}\rangle_{V}\,dt
++2\sum_{k}u_{k}(t)\,dM_{t}^{k}
++\sum_{k}d\langle M^{k}\rangle_{t}.
+\]
+\noindent
+For the infinite-dimensional terms we interpret the sums as limits: recall \(u_k(t)=\langle u(t),e_k\rangle_H\) and \(M_t^k=\langle M_t,e_k\rangle_H\). With respect to the orthonormal basis \((e_k)\),
+\[
+\sum_{k=1}^{N}u_k(t)\,dM_t^k
+=\sum_{k=1}^{N}\langle u(t),e_k\rangle_H\,d\langle M_t,e_k\rangle_H
+\xrightarrow[N\to\infty]{}\langle u(t),dM_t\rangle_H,
+\]
+and
+\[
+\sum_{k=1}^{N}d\langle M^{k}\rangle_{t}\xrightarrow[N\to\infty]{}d\langle M\rangle_t,
+\qquad
+\text{where }\langle M\rangle_t:=\sum_{k=1}^{\infty} \langle M^k\rangle_t.
+\]
+Now use that \(u(t)\in V\subset H\) and \((e_k)\) is an orthonormal basis of \(H\) with \(e_k\in V\): expanding \(u(t)=\sum_k \langle u(t),e_k\rangle_H e_k\) in \(H\) and pairing with \(v(t)\in V'\) yields
+\[
+\sum_{k}\langle u(t),e_{k}\rangle_{H}\,{}_{V'}\langle v(t),e_{k}\rangle_{V}
+={}_{V'}\langle v(t),u(t)\rangle_{V}.
+\]
+
+As \(k\to\infty\), \(\sum_k u_k(t)^2=\|u(t)\|_H^2\), so the identity becomes
+\[
+d\|u(t)\|_H^2
+=2\langle u(t),v(t)\rangle_{V',V}\,dt
++2\langle u(t),dM_{t}\rangle_{H}
++d\langle M\rangle_{t}.
+\]
+\noindent
+Integrate both sides from \(0\) to \(t\):
+\[
+\|u(t)\|_{H}^{2}-\|u_{0}\|_{H}^{2}
+=\int_{0}^{t}2\langle u(s),v(s)\rangle_{V',V}\,ds
++\int_{0}^{t}2\langle u(s),dM_{s}\rangle_{H}
++\langle M\rangle_{t}.
+\]
+\noindent
+Rearranging terms (move \(\|u_{0}\|_{H}^{2}\) to the right-hand side) gives the claimed formula for \(\|u(t)\|_{H}^{2}\).
+\qedhere
+\end{proof}
+
+\medskip
+\noindent
+Galerkin step.
+
+\medskip
+\noindent
+We approximate the SPDE in the finite-dimensional space \(V_{n}\) and obtain a strong (finite-dimensional) solution \(u_{n}\).
+On this level the classical It\^o formula applies directly to \(\|u_{n}(t)\|_{H}^{2}\), and we can derive uniform (in \(n\)) energy bounds.
+
+Let \(V_n:=\operatorname{span}\{e_1,\dots,e_n\}\). Projecting the SPDE onto \(V_n\) yields a finite-dimensional SDE: there exists a strong solution \(u_n\in C([0,T];V_n)\) such that for \(k=1,\dots,n\),
+\[
+d\langle u_{n}(t),e_{k}\rangle_{H}
+=\langle A(u_{n}(t)),e_{k}\rangle\,dt
++B_{k}(u_{n}(t))\,dW_{t}^{n}.
+\]
+Here \(W^n\) is the finite-dimensional noise obtained by projecting \(W\) onto \(\operatorname{span}\{f_1,\dots,f_n\}\subset U\),
+\[
+W_{n}(t)=\sum_{\ell=1}^{n}\langle W(t),f_{\ell}\rangle\, f_{\ell},
+\qquad (f_{\ell})\ \text{a CONS of }U,
+\]
+and \(B_k(u)\) denotes the \(k\)-th scalar diffusion coefficient, defined by
+\[
+B_{k}(u)h:=\langle B(u)h,e_{k}\rangle_{H},
+\qquad h\in U.
+\]
+Note that \((e_k)\) and \((f_\ell)\) live in different spaces: \((e_k)\) is a CONS of the state space \(H\) (used for the Galerkin approximation of \(u(t)\)), while \((f_\ell)\) is a CONS of the noise space \(U\) (used to expand/project the Wiener process \(W(t)\)).
+
+\medskip
+\noindent
+Applying the one-dimensional It\^o formula componentwise (equivalently, the finite-dimensional It\^o formula) and then summing gives an energy identity/inequality.
+
+\[
+\sup_{n}\mathbb{E}\Big(\sup_{t\in[0,T]}\|u_{n}(t)\|_{H}^{2}+\int_{0}^{T}\|u_{n}(s)\|_{V}^{2}\,ds\Big)<\infty.
+\]
+
+\medskip
+\noindent
+In differential form, the It\^o formula produces the drift contribution, the stochastic integral (martingale term), and the quadratic variation term (trace term):
+\[
+d\|u_{n}(t)\|_{H}^{2}
+=2\langle A(u_{n}(t)),u_{n}(t)\rangle\,dt
++2\langle u_{n}(t),B_{n}(u_{n}(t))\,dW_{t}^{n}\rangle
++\tr\big(B_{n}(B_{n})^{*}\big)\,dt.
+\]
+\noindent
+Remark (comparison with the It\^o formula-like lemma).
+This is exactly the finite-dimensional version of the identity proved above: if we set
+\[
+v(t):=A(u_n(t)),
+\qquad
+M_t:=\int_0^t B_n(u_n(s))\,dW_s^n,
+\]
+then the abstract formula
+\[
+d\|u_n(t)\|_H^2=2\langle u_n(t),v(t)\rangle_{V',V}\,dt+2\langle u_n(t),dM_t\rangle_H+d\langle M\rangle_t
+\]
+reduces to the displayed Galerkin It\^o formula, with \(d\langle M\rangle_t=\tr(B_n(B_n)^*)\,dt\).
+
+\medskip
+\noindent
+To control the stochastic integral in expectation we use martingale inequalities (e.g.\ Burkholder--Davis--Gundy), which yields bounds of the type
+\[
+\mathbb{E}\Big(\sup_{t\in[0,T]}\int_{0}^{t}\langle u_{n}(t),B_{n}(u_{n}(t))\,dW_{t}^{n}\rangle\Big).
+\]
+Here the point is that even though the stochastic integral is a martingale (hence has mean zero at a fixed time), the supremum in time cannot be controlled by expectation alone. BDG/Doob inequalities estimate the expected supremum of a martingale in terms of its quadratic variation, which can be bounded using the growth assumptions on \(B_n\) together with the energy estimate for \(u_n\). As a consequence one obtains uniform (in \(n\)) bounds such as
+\[
+\mathbb{E}\Big[\sup_{t\in[0,T]}|M_t|^{p}\Big]\le C_p\,\mathbb{E}\big[\langle M\rangle_T^{p/2}\big],
+\qquad p\ge 1,
+\]
+for the martingale \(M_t=\int_0^t \langle u_n(s),B_n(u_n(s))\,dW_s^n\rangle_H\).
+\[
+(u_{n}(t))\subset L^{2}(\Omega,L^{2}([0,T],V))
+\quad \text{bounded.}
+\]
+That is, there exists a constant \(C<\infty\), independent of \(n\), such that
+\[
+\mathbb{E}\int_{0}^{T}\|u_n(t)\|_{V}^{2}\,dt\le C
+\qquad \text{for all }n\in\mathbb{N}.
+\]
+Intuitively, this says none of the Galerkin approximations develops ``too much \(V\)-energy'' on average---neither over time nor over randomness; equivalently, the solutions are uniformly controlled in the stronger space \(V\) (think of spatial regularity such as \(\nabla u\in L^{2}\)) when averaging over \(t\in[0,T]\) and taking expectation.
+Here \(L^{2}(\Omega;L^{2}(0,T;V))\) is a space of random, time-dependent \(V\)-valued functions. Concretely:
+\begin{itemize}
+\item \(\Omega\) is the probability space (randomness).
+\item \(L^{2}(0,T;V)\) is the space of (Bochner measurable) functions \(u:[0,T]\to V\) such that
+\[
+\int_{0}^{T}\|u(t)\|_{V}^{2}\,dt<\infty.
+\]
+\item \(L^{2}(\Omega;L^{2}(0,T;V))\) consists of random variables \(\omega\mapsto u(\cdot,\omega)\) taking values in \(L^{2}(0,T;V)\) such that
+\[
+\mathbb{E}\big[\|u(\cdot)\|_{L^{2}(0,T;V)}^{2}\big]
+=\mathbb{E}\int_{0}^{T}\|u(t)\|_{V}^{2}\,dt<\infty.
+\]
+\end{itemize}
+\medskip
+\noindent
+\end{document}

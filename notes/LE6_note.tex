@@ -1,0 +1,790 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\tr}{tr}
+
+\title{Lecture 6: Stochastic Convolutions, Additive Noise, and Weak Topology}
+\date{20.11.2025}
+\author{Tien Anh Vu}
+\begin{document}
+\maketitle
+
+%% =============================
+%% §6 Continuity of stochastic convolution
+%% =============================
+\section*{\S 6 Continuity of Stochastic Convolutions}
+
+\begin{remark}[Transcription note]
+This note is a transcription of the handwritten page. I keep the formulas close to the page, and I only add short bracketed comments when handwriting is unclear.
+\end{remark}
+
+We start from the semilinear SPDE on a Hilbert space $H$:
+\[
+\left\{
+\begin{aligned}
+dX_t &= \bigl(AX_t + B(t,X_t)\bigr)\,dt + C(t,X_t)\,dW_t,\\
+X_0 &= \xi.
+\end{aligned}
+\right.
+\qquad (X_t \in H)
+\]
+
+Assume $A$ generates a $C_0$-semigroup $(T_t)_{t\ge 0}$. The mild solution is written as
+\[
+X_t
+=
+T_t \xi
++ \int_0^t T_{t-s} B(s,X_s)\,ds
++ \int_0^t T_{t-s} C(s,X_s)\,dW_s.
+\]
+\noindent
+(\emph{handwritten note under the first integral:} ``drift''.)\\
+(\emph{right-margin note near the second integral:} likely a comment about stochastic convolution / continuity; handwriting unclear.)
+
+%% =============================
+%% Existence of a continuous modification
+%% =============================
+\subsection*{Existence of a continuous modification}
+
+\paragraph{Prop 2.2.}
+Let $p>1$ and
+\[
+\Phi \in L^{2p}\!\bigl(\Omega_T,\mathcal{P}_T,P_T;L_2(U,H)\bigr).
+\]
+\noindent
+(\emph{small note near $\mathcal{P}_T$:} looks like ``progressive proc''; likely referring to predictability/progressivity.)
+
+Assume
+\[
+E\!\left(
+\int_0^T \|\Phi(s)\circ \sqrt{Q}\|_{L_2(U,H)}^{2p}\,ds
+\right)
+< \infty.
+\]
+Then there exists a constant $C_T$ such that
+\[
+E\!\left(
+\sup_{t\in[0,T]}
+\left\|
+\int_0^t T_{t-s}\Phi(s)\,dW_s
+\right\|_H^{2p}
+\right)
+\le
+C_T\,E\!\left(
+\int_0^T
+\|\Phi(s)\circ \sqrt{Q}\|_{L_2(U,H)}^{2p}\,ds
+\right).
+\]
+Moreover,
+\[
+W_{A,\Phi}(t)
+:=
+\int_0^t T_{t-s}\Phi(s)\,dW_s
+\]
+has a continuous modification.
+
+\begin{remark}
+This is the standard maximal estimate for the stochastic convolution and the continuity statement obtained via the factorization method.
+\end{remark}
+
+\paragraph{Proof (start).}
+Will use the factorization method.
+
+For $s<t$, use the $\beta$-integral identity
+\[
+\int_s^t (t-r)^{\alpha-1}(r-s)^{-\alpha}\,dr
+=
+\frac{1}{c_\alpha}
+=
+\frac{\Gamma(\alpha)\Gamma(1-\alpha)}{\Gamma(1)}
+=
+\frac{\pi}{\sin(\pi\alpha)}.
+\]
+\noindent
+[The handwritten constant may be $c_\alpha$ or $C_\alpha$; the page is slightly ambiguous. Typically $\alpha\in(0,1)$.]
+
+\begin{remark}[Context for the identity]
+This is the Beta-function identity used in the factorization method. A common normalization is
+\[
+c_\alpha = \frac{\sin(\pi\alpha)}{\pi},
+\]
+so the integral equals $1/c_\alpha$.
+\end{remark}
+
+\paragraph{Continuation of the proof (factorization step).}
+Using the substitution
+\[
+u := \frac{r-s}{t-s},
+\]
+one gets the Beta integral in the normalized form
+\[
+\int_0^1 (1-u)^{\alpha-1}u^{-\alpha}\,du.
+\]
+
+Rewrite
+\[
+W_{A,\Phi}(t)=\int_0^t T_{t-s}\Phi(s)\,dW_s
+\]
+as
+\[
+\begin{aligned}
+W_{A,\Phi}(t)
+&=
+c_\alpha
+\int_0^t
+\left(
+\int_s^t (t-r)^{\alpha-1}(r-s)^{-\alpha}\,dr
+\right)
+T_{t-s}\Phi(s)\,dW_s.
+\end{aligned}
+\]
+\noindent
+(\emph{handwritten note:} ``semigroup'', indicating the split $T_{t-s}=T_{t-r}T_{r-s}$.)
+
+Applying the stochastic Fubini theorem (and changing the order of integration) gives
+\[
+\begin{aligned}
+W_{A,\Phi}(t)
+&=
+	c_\alpha
+	\int_0^t
+	\int_0^r
+	(t-r)^{\alpha-1}(r-s)^{-\alpha}
+	T_{t-s}\Phi(s)\,dW_s\,dr \\
+&=
+c_\alpha
+\int_0^t
+(t-r)^{\alpha-1}
+T_{t-r}
+\left(
+\int_0^r
+(r-s)^{-\alpha}T_{r-s}\Phi(s)\,dW_s
+\right)dr.
+\end{aligned}
+\]
+
+Define
+\[
+y(r)
+:=
+\int_0^r (r-s)^{-\alpha}T_{r-s}\Phi(s)\,dW_s,
+\]
+so that
+\[
+W_{A,\Phi}(t)
+=
+c_\alpha\int_0^t (t-r)^{\alpha-1}T_{t-r}y(r)\,dr.
+\]
+\noindent
+(\emph{handwritten margin note:} this is a deterministic convolution in $t$, hence suggests continuity once integrability is checked.)
+
+\begin{remark}[Choice of $\alpha$]
+The handwritten line appears to indicate the usual condition for Hölder integrability:
+choose $\alpha$ so that $\frac{1}{2p}<\alpha<\frac12$ (so that $\frac{1}{2\alpha}>1$). In particular, the integrability condition later becomes
+\[
+p>\frac{1}{2\alpha}>1.
+\]
+\end{remark}
+
+Then, for $t\in[0,T]$,
+\[
+\|W_{A,\Phi}(t)\|_H^{2p}
+\le
+c_\alpha^{2p}
+\left(
+\int_0^t (t-r)^{\alpha-1}\|T_{t-r}y(r)\|_H\,dr
+\right)^{2p}.
+\]
+\noindent
+(\emph{handwritten note near this step:} ``Bochner int''.)
+
+By H\"older's inequality,
+\[
+\begin{aligned}
+	\|W_{A,\Phi}(t)\|_H^{2p}
+	&\le
+	c_\alpha^{2p}
+	\left(
+	\int_0^t
+	(t-r)^{(\alpha-1)\frac{2p}{2p-1}}
+	\,dr
+	\right)^{2p-1}
+	\int_0^t \|T_{t-r}y(r)\|_H^{2p}\,dr \\
+&\le
+c_\alpha^{2p}
+\left(
+\frac{T^{\,1+(\alpha-1)\frac{2p}{2p-1}}}
+{1+(\alpha-1)\frac{2p}{2p-1}}
+\right)^{2p-1}
+	\int_0^t \|T_{t-r}y(r)\|_H^{2p}\,dr \\
+&\le
+C_{\alpha,p,T}
+	\int_0^t \|T_{t-r}y(r)\|_H^{2p}\,dr.
+\end{aligned}
+\]
+\noindent
+(\emph{handwritten side note near the denominator/exponent line:} ``have to check integrability''.)
+
+\begin{remark}[What integrability is being checked]
+In the H\"older step one needs
+\[
+    \int_0^t (t-r)^{(\alpha-1)\frac{2p}{2p-1}}\,dr < \infty,
+\]
+which holds precisely when $(\alpha-1)\frac{2p}{2p-1}>-1$, i.e.\ $p>\frac{1}{2\alpha}$.
+\end{remark}
+
+\paragraph{Estimating the auxiliary process $y(r)$.}
+The integrability condition in the H\"older step is
+\[
+(\alpha-1)\frac{2p}{2p-1} > -1
+\qquad\Longleftrightarrow\qquad
+p > \frac{1}{2\alpha},
+\]
+which is consistent with the earlier choice $\alpha>\frac{1}{2p}$.
+
+The BDG inequality (generalization of It\^o isometry to higher moments) yields, for each $r\in[0,T]$,
+\[
+\begin{aligned}
+E\!\left(\|y(r)\|_H^{2p}\right)
+&\le
+C_p\,
+E\!\left[
+\left(
+\int_0^r
+(r-s)^{-2\alpha}
+\bigl\|T_{r-s}\Phi(s)\circ\sqrt{Q}\bigr\|_{L_2(U,H)}^2
+\,ds
+\right)^p
+\right].
+\end{aligned}
+\]
+\noindent
+(\emph{handwritten margin note:} ``BDG inequality implies (generalization of It\^o isometry for any exponent $p$)''.)
+
+Using the semigroup bound (absorbed into constants), we obtain
+\[
+\begin{aligned}
+\int_0^T E\!\left(\|y(r)\|_H^{2p}\right)\,dr
+&\le
+C_p\,
+E\!\left[
+\int_0^T
+\left(
+\int_0^r
+(r-s)^{-2\alpha}
+\|\Phi(s)\circ\sqrt{Q}\|_{L_2(U,H)}^2
+\,ds
+\right)^p
+dr
+\right].
+\end{aligned}
+\]
+
+By H\"older's inequality in the inner integral,
+\[
+\begin{aligned}
+\left(
+\int_0^r
+(r-s)^{-2\alpha}
+\|\Phi(s)\circ\sqrt{Q}\|_{L_2(U,H)}^2
+\,ds
+\right)^p
+&\le
+\left(
+\int_0^r (r-s)^{-2\alpha}\,ds
+\right)^{p-1}
+\int_0^r
+(r-s)^{-2\alpha}
+\|\Phi(s)\circ\sqrt{Q}\|_{L_2(U,H)}^{2p}\,ds.
+\end{aligned}
+\]
+Since $\alpha<\frac12$ (the standard factorization choice), we have
+\[
+\int_0^r (r-s)^{-2\alpha}\,ds
+\;=\;
+\int_0^r u^{-2\alpha}\,du
+\;\le\;
+\int_0^T u^{-2\alpha}\,du
+\le
+\int_0^T r^{-2\alpha}\,dr
+=
+\frac{T^{1-2\alpha}}{1-2\alpha}.
+\]
+Hence, by Fubini/Tonelli,
+\[
+\begin{aligned}
+\int_0^T E\!\left(\|y(r)\|_H^{2p}\right)\,dr
+&\le
+C_{p,\alpha,T}\,
+E\!\left[
+\int_0^T
+\int_0^r
+(r-s)^{-2\alpha}
+\|\Phi(s)\circ\sqrt{Q}\|_{L_2(U,H)}^{2p}
+\,ds\,dr
+\right] \\
+&=
+C_{p,\alpha,T}\,
+E\!\left[
+\int_0^T
+\left(\int_s^T (r-s)^{-2\alpha}\,dr\right)
+\|\Phi(s)\circ\sqrt{Q}\|_{L_2(U,H)}^{2p}
+\,ds
+\right] \\
+&\le
+C_{p,\alpha,T}\,
+E\!\left[
+\int_0^T
+\left(\int_0^T u^{-2\alpha}\,du\right)
+\|\Phi(s)\circ\sqrt{Q}\|_{L_2(U,H)}^{2p}
+\,ds
+\right] \\
+&\le
+C_{p,\alpha,T}\,
+E\!\left[
+\int_0^T \|\Phi(s)\circ\sqrt{Q}\|_{L_2(U,H)}^{2p}\,ds
+\right]
+<\infty.
+\end{aligned}
+\]
+
+\noindent
+Therefore,
+\[
+\int_0^T \|y(r)\|_H^{2p}\,dr < \infty
+\qquad\text{a.s.}
+\]
+
+In other words, $y(\cdot,\omega)\in L^{2p}([0,T];H)$ for a.e.\ $\omega\in\Omega$.
+
+\paragraph{Main implication (continuity of the factorized term).}
+The handwritten note states that the deterministic convolution operator
+\[
+g \longmapsto \left[t \longmapsto \int_0^t (t-r)^{\alpha-1}T_{t-r}g(r)\,dr\right]
+\]
+sends
+\[
+L^{2p}([0,T];H)\quad \text{into}\quad C([0,T];H),
+\]
+which gives continuity of $t\mapsto W_{A,\Phi}(t)$ since we already have the factorization identity
+\[
+W_{A,\Phi}(t)=c_\alpha\int_0^t (t-r)^{\alpha-1}T_{t-r}y(r)\,dr.
+\]
+\noindent
+(\emph{handwritten side note near this line appears to say:} ``absolutely contin[uous]'' / ``continuous''; exact wording is unclear.)
+
+\begin{remark}[Deterministic mapping property used above]
+Let $(T_t)_{t\ge 0}$ be a $C_0$-semigroup on $H$. Fix $q>1$ and $\alpha\in(0,1)$ with $\alpha>\frac{1}{q}$.
+For $g\in L^{q}([0,T];H)$ define
+\[
+(\mathcal{K}g)(t):=\int_0^t (t-r)^{\alpha-1}T_{t-r}g(r)\,dr.
+\]
+Then $\mathcal{K}g\in C([0,T];H)$ and
+\[
+\sup_{t\in[0,T]}\|(\mathcal{K}g)(t)\|_H \le C_{\alpha,q,T}\,\|g\|_{L^{q}([0,T];H)}.
+\]
+\emph{Sketch:} by H\"older,
+\[
+\|(\mathcal{K}g)(t)\|_H
+\le
+\left(\int_0^t (t-r)^{(\alpha-1)q'}\,dr\right)^{1/q'}\|g\|_{L^{q}([0,t];H)},
+\qquad q'=\frac{q}{q-1},
+\]
+and $\int_0^t (t-r)^{(\alpha-1)q'}dr<\infty$ iff $(\alpha-1)q'>-1$, i.e.\ $\alpha>\frac{1}{q}$. Continuity in $t$ follows from strong continuity of $T_t$ and dominated convergence using this bound.
+\emph{More explicitly:} if $t_n\to t$, then for a.e.\ $r\in(0,t)$ one has $(t_n-r)^{\alpha-1}T_{t_n-r}g(r)\to (t-r)^{\alpha-1}T_{t-r}g(r)$, and for $n$ large,
+\[
+\|(t_n-r)^{\alpha-1}T_{t_n-r}g(r)\|_H \le C_T\,(t-r)^{\alpha-1}\|g(r)\|_H,
+\]
+where $C_T:=\sup_{0\le \tau\le T}\|T_\tau\|<\infty$. The right-hand side is in $L^1(0,t)$ by H\"older (since $(t-r)^{\alpha-1}\in L^{q'}(0,t)$ and $g\in L^q(0,t;H)$), hence dominated convergence applies.
+\emph{That is,} dominated convergence yields
+\[
+\int_0^t (t_n-r)^{\alpha-1}T_{t_n-r}g(r)\,dr \longrightarrow \int_0^t (t-r)^{\alpha-1}T_{t-r}g(r)\,dr
+\qquad\text{in }H.
+\]
+The remaining tail term satisfies, for $t_n\ge t$,
+\[
+\left\|\int_t^{t_n} (t_n-r)^{\alpha-1}T_{t_n-r}g(r)\,dr\right\|_H
+\le
+C_T\left(\int_t^{t_n} (t_n-r)^{(\alpha-1)q'}\,dr\right)^{1/q'}\|g\|_{L^q([t,t_n];H)}
+\to 0,
+\]
+so $(\mathcal{K}g)(t_n)\to(\mathcal{K}g)(t)$.
+\end{remark}
+
+\begin{remark}
+The page cites this deterministic mapping property as a known fact (with a note pointing to lecture notes / theory of evolution equations). This is the final step turning the factorization representation into existence of a continuous modification.
+\end{remark}
+
+%% =============================
+%% Remark: additive noise
+%% =============================
+\subsection*{Remark: Additive Noise}
+
+Consider the stochastic differential equation with \emph{additive noise}
+\[
+dX_t = \bigl(AX_t + B(X_t)\bigr)\,dt + C\,dW_t,
+\]
+where $C$ does not depend on the state $X_t$.
+
+Let
+\[
+W_{A,C}(t) := \int_0^t T_{t-s}C\,dW_s.
+\]
+Then one can decompose
+\[
+X_t = Y_t + W_{A,C}(t).
+\]
+
+Writing the mild formulation for $X$ and substituting $X_s=Y_s+W_{A,C}(s)$ gives
+\[
+\begin{aligned}
+X_t
+&=
+T_t\xi
++ \int_0^t T_{t-s}B(X_s)\,ds
++ W_{A,C}(t) \\
+&=
+T_t\xi
++ \int_0^t T_{t-s}B\bigl(Y_s+W_{A,C}(s)\bigr)\,ds
++ W_{A,C}(t).
+\end{aligned}
+\]
+Since $X_t=Y_t+W_{A,C}(t)$ by definition, the left-hand side is $Y_t+W_{A,C}(t)$, so subtracting $W_{A,C}(t)$ from both sides yields
+\[
+Y_t
+=
+T_t\xi
++ \int_0^t T_{t-s}B\bigl(Y_s+W_{A,C}(s)\bigr)\,ds,
+\]
+which is the mild form of the (random) deterministic evolution equation
+\[
+\left\{
+\begin{aligned}
+dY_t &= AY_t\,dt + B\bigl(Y_t+W_{A,C}(t)\bigr)\,dt,\\
+Y_0 &= \xi.
+\end{aligned}
+\right.
+\]
+\noindent
+Here ``(random) deterministic'' means: for each fixed outcome $\omega\in\Omega$ the path $t\mapsto W_{A,C}(t,\omega)$ is given, so $Y(\cdot,\omega)$ solves an ordinary deterministic evolution equation in time, but with coefficients/forcing depending on $\omega$.
+
+\begin{remark}
+This reduces the additive-noise SPDE to a deterministic (but random-coefficient) evolution equation for $Y$. The handwritten margin note appears to say this ``accords'' with the stochastic convolution decomposition.
+\end{remark}
+
+%% =============================
+%% Interlude: weak topology
+%% =============================
+\subsection*{Interlude (Appendix B): Weak Topology}
+
+Let $E$ be a real Banach space.
+
+\paragraph{Definition (weak convergence).}
+A sequence $(x_n)\subset E$ converges \emph{weakly} to $x\in E$ if
+\[
+\langle f, x_n\rangle_{E',E} \longrightarrow \langle f, x\rangle_{E',E}
+\qquad\text{for all } f\in E'.
+\]
+Equivalently,
+\[
+f(x_n)\to f(x)\qquad\text{for all } f\in E',
+\]
+where $E'$ denotes the dual space of bounded linear functionals on $E$.
+
+We write
+\[
+x_n \rightharpoonup x
+\]
+in this case.
+
+\begin{remark}
+The notation on the page uses the dual pairing $\langle f,x\rangle$ and also writes it as $f(x)$.
+\end{remark}
+
+\paragraph{Remark.}
+(Strong) convergence with respect to the norm implies weak convergence. Indeed, if
+\[
+\|x_n-x\|_E \to 0,
+\]
+then for every $f\in E'$,
+\[
+\bigl|\langle f,x_n\rangle - \langle f,x\rangle\bigr|
+=
+\bigl|\langle f,x_n-x\rangle\bigr|
+\le
+\|f\|_{E'}\,\|x_n-x\|_E
+\longrightarrow 0.
+\]
+
+\noindent
+(\emph{handwritten note at the bottom is hard to read; it appears to reference the standard duality estimate / Cauchy--Schwarz-type bound in the dual pairing.})
+
+\paragraph{Remark (converse is false).}
+The converse is not true in general: weak convergence does \emph{not} imply norm convergence.
+
+Take the canonical basis $(e_n)$ in $\ell^2$, e.g.
+\[
+e_n = (\delta_{kn})_{k\in\mathbb N}\in \ell^2.
+\]
+\noindent
+Equivalently, $(e_n)_k=\delta_{kn}$ for each $k\in\mathbb N$, i.e.\ $e_n=(0,\dots,0,1,0,\dots)$ with the $1$ in the $n$-th position.
+Then
+\[
+\|e_n\|_{\ell^2}=1 \qquad \text{for all } n,
+\]
+so $(e_n)$ does not converge to $0$ in norm. However,
+\[
+e_n \rightharpoonup 0 \quad \text{in }\ell^2.
+\]
+Indeed, for every $f\in (\ell^2)'$ (identified with an element of $\ell^2$ via the Riesz representation theorem),
+\[
+\langle f,e_n\rangle_{\ell^2} = f_n \longrightarrow 0.
+\]
+\noindent
+Indeed, if $f=(f_k)_{k\in\mathbb{N}}\in \ell^2$, then $\sum_{k=1}^\infty |f_k|^2<\infty$, hence necessarily $|f_n|\to 0$ (otherwise the series could not converge).
+\noindent
+(\emph{handwritten note near this line:} ``converges weakly''.)
+
+\paragraph{Hahn--Banach theorem (extension form, as used here).}
+Let $E$ be a real normed space, let $E_0\subset E$ be a linear subspace, and let
+\[
+\ell \colon E_0 \to \mathbb R
+\]
+be linear and continuous (bounded with respect to the norm of $E$). Then there exists an extension
+\[
+\widetilde{\ell}\in E'
+\]
+such that
+\[
+\widetilde{\ell}\!\restriction_{E_0} = \ell
+\qquad\text{and}\qquad
+\|\widetilde{\ell}\|_{E'}=\|\ell\|_{E_0'}.
+\]
+
+\paragraph{Remark (uniqueness of weak limit).}
+The weak limit is uniquely determined. Equivalently,
+\[
+\langle f,x\rangle = 0 \quad \text{for all } f\in E'
+\qquad\Longrightarrow\qquad
+x=0.
+\]
+This follows from Hahn--Banach: for every $x\in E$ with $x\neq 0$, there exists $f\in E'$ such that $f(x)\neq 0$.
+\noindent
+More explicitly: if $x\in E$ with $x\neq 0$, consider the $1$D subspace $M:=\mathrm{span}\{x\}$ and define $g\colon M\to \mathbb{K}$ by
+\[
+g(\alpha x):=\alpha\|x\|_E,
+\]
+so $g$ is linear and $\|g\|_{M'}=1$. Hahn--Banach extends $g$ to some $f\in E'$ with $\|f\|_{E'}=1$. In particular, $f(x)=g(x)=\|x\|_E\neq 0$.
+Hence for every nonzero $x$ there exists $f\in E'$ with $f(x)\neq 0$.
+
+\begin{remark}[Motivation note from the page]
+The handwritten page sketches the standard normalization argument: assume w.l.o.g.\ that
+\[
+|\ell(u)|\le \|u\| \qquad (u\in E_0),
+\]
+then Hahn--Banach gives an extension $\widetilde{\ell}\in E'$ with
+\[
+\widetilde{\ell}|_{E_0}=\ell
+\qquad\text{and}\qquad
+\|\widetilde{\ell}\|_{E'}\le 1.
+\]
+\end{remark}
+
+\paragraph{Proposition (basic consequences of weak convergence).}
+If $x_n \rightharpoonup x$ in $E$, then:
+\begin{enumerate}
+\item the sequence $(x_n)$ is bounded in $E$;
+\item $\|x\|_E \le \liminf_{n\to\infty}\|x_n\|_E$.
+\end{enumerate}
+
+\begin{remark}[Proof idea recorded on the page]
+For (ii), choose (by Hahn--Banach) $g\in E'$ with $\|g\|_{E'}=1$ and $g(x)=\|x\|_E$ (for $x\neq 0$; the case $x=0$ is trivial). Then
+\[
+\|x\|_E
+=
+|g(x)|
+=
+\lim_{n\to\infty}|g(x_n)|
+\;=\;
+\liminf_{n\to\infty}|g(x_n)|
+\le
+\liminf_{n\to\infty}\|g\|_{E'}\|x_n\|_E
+=
+\liminf_{n\to\infty}\|x_n\|_E.
+\]
+The boundedness of $(x_n)$ is standard (e.g.\ by the uniform boundedness principle applied to the functionals $f\mapsto f(x_n)$ on $E'$).
+\end{remark}
+
+\begin{remark}[Why weak convergence implies boundedness]
+If $x_n\rightharpoonup x$ in $E$, then for each $f\in E'$ the scalar sequence $f(x_n)\to f(x)$ is bounded, i.e.
+\[
+\sup_{n\in\mathbb{N}} |f(x_n)| < \infty.
+\]
+Define $T_n\in \mathcal{L}(E',\mathbb{K})$ by $T_n(f):=f(x_n)$. For each fixed $f\in E'$, weak convergence gives $T_n(f)=f(x_n)\to f(x)$, hence $\sup_n |T_n(f)|<\infty$. Thus $\{T_n\}$ is pointwise bounded on $E'$, and by the Banach--Steinhaus theorem,
+\[
+\sup_{n}\|T_n\|_{\mathcal{L}(E',\mathbb{K})}<\infty.
+\]
+But $\|T_n\|=\sup_{\|f\|_{E'}=1}|f(x_n)|=\|x_n\|_E$ (via the canonical embedding $E\hookrightarrow E''$), hence $\sup_n\|x_n\|_E<\infty$.
+\end{remark}
+
+\paragraph{Proposition (Hilbert space criterion).}
+In a Hilbert space $H$, weak convergence together with convergence of norms implies strong convergence:
+\[
+x_n \rightharpoonup x
+\quad\text{and}\quad
+\|x_n\|_H \to \|x\|_H
+\qquad\Longrightarrow\qquad
+x_n \to x \text{ in } H.
+\]
+
+\paragraph{Proof (start, as on the page).}
+\[
+\|x_n-x\|_H^2
+=
+\|x_n\|_H^2 - 2\langle x_n,x\rangle_H + \|x\|_H^2.
+\]
+Since $x_n \rightharpoonup x$, for every fixed $y\in H$ we have $\langle x_n,y\rangle_H\to \langle x,y\rangle_H$. In particular (taking $y=x$),
+\[
+\langle x_n,x\rangle_H \longrightarrow \langle x,x\rangle_H=\|x\|_H^2.
+\]
+Moreover, $\|x_n\|_H\to \|x\|_H$ implies $\|x_n\|_H^2\to \|x\|_H^2$. Therefore,
+\[
+\|x_n-x\|_H^2
+\longrightarrow
+\|x\|_H^2 - 2\|x\|_H^2 + \|x\|_H^2
+=
+0,
+\]
+so $\|x_n-x\|_H\to 0$, i.e.\ $x_n\to x$ strongly.
+
+\noindent
+(This is exactly the limit computation written at the top of the next page:
+\[
+\|x\|_H^2 - 2\langle x,x\rangle_H + \|x\|_H^2 = 0.
+\])
+
+\paragraph{Theorem (Banach--Alaoglu).}
+This is an extension of the Bolzano--Weierstrass theorem to dual spaces (weak$^\ast$ compactness).
+
+The closed unit ball (more generally, every norm-bounded subset) of $E'$ is compact in the weak$^\ast$ topology
+\[
+\sigma(E',E).
+\]
+Recall that the weak$^\ast$ topology $\sigma(E',E)$ is the coarsest topology on $E'$ (i.e.\ the one with the fewest open sets / weakest notion of convergence) making all evaluation maps
+\[
+E'\ni f \longmapsto \langle f,x\rangle \in \mathbb{K}
+\qquad (x\in E)
+\]
+continuous. Equivalently, $f_n\stackrel{*}{\rightharpoonup} f$ means pointwise convergence on $E$:
+\[
+\langle f_n,x\rangle \to \langle f,x\rangle \quad \text{for all } x\in E.
+\]
+This is typically much weaker than norm convergence $f_n\to f$ in $E'$.
+If the predual $E$ is separable, then on bounded subsets this weak$^\ast$ compactness is sequential (i.e.\ one gets weak$^\ast$ convergent subsequences).
+
+\begin{remark}[Handwritten formulation on the page]
+The page phrases this as: any bounded sequence $(f_n)\subset E'$ has a weak$^\ast$ convergent subsequence (when the relevant separability assumption is available), meaning
+\[
+f_{n_k}\stackrel{*}{\rightharpoonup} f \quad \text{in } E'
+\qquad\Longleftrightarrow\qquad
+\langle f_{n_k},x\rangle \to \langle f,x\rangle
+\ \text{for all } x\in E.
+\]
+\end{remark}
+
+\begin{remark}[Unit ball in the reflexive case]
+Banach--Alaoglu says that the closed unit ball of $E'$ is compact in $\sigma(E',E)$ (weak$^\ast$). Applying Banach--Alaoglu to $E''$ (the dual of $E'$) gives that the closed unit ball of $E''$ is compact in $\sigma(E'',E')$.
+If $E$ is reflexive, we identify $E\simeq E''$ via the canonical embedding $J$, and the weak$^\ast$ topology $\sigma(E'',E')$ restricted to $J(E)$ coincides with the weak topology $\sigma(E,E')$ on $E$. Hence the closed unit ball of $E$ is weakly compact (and therefore relatively weakly compact).
+\end{remark}
+
+\paragraph{Reflexive-space consequence (in particular for Hilbert spaces).}
+If $E$ is reflexive (e.g.\ a Hilbert space), then bounded subsets of $E$ are relatively weakly compact.
+If in addition $E$ is separable, bounded sequences admit weakly convergent subsequences.
+
+\begin{remark}[What reflexive means / why it helps]
+A Banach space $E$ is called \emph{reflexive} if the canonical embedding $J\colon E\to E''$ is surjective (so $E$ can be identified with $E''$). Here the canonical embedding is
+\[
+J(x)(f):=f(x),
+\qquad x\in E,\ f\in E',
+\]
+i.e.\ $J(x)\in E''$ is the functional on $E'$ given by evaluation at $x$.
+Banach--Alaoglu gives weak$^\ast$ compactness of bounded sets in $E''$ (as the dual of $E'$). If $E$ is reflexive, bounded subsets of $E$ become weak$^\ast$ bounded subsets of $E''$ and hence are relatively compact for the weak topology on $E$.
+Hilbert spaces are reflexive, so bounded sequences in Hilbert spaces always have weakly convergent subsequences (and in separable Hilbert spaces one can choose subsequences sequentially).
+\end{remark}
+
+\begin{remark}[Meaning of ``weakly compact'']
+A set $K\subset E$ is \emph{weakly compact} if it is compact with respect to the weak topology on $E$ (not necessarily compact in the norm topology).
+If $E$ is separable, weak compactness on bounded sets is sequential, i.e.\ it can be tested by existence of weakly convergent subsequences.
+\end{remark}
+
+\begin{remark}[Meaning of ``relatively weakly compact'']
+A set $S\subset E$ is \emph{relatively weakly compact} if its closure in the weak topology of $E$ is weakly compact.
+In particular, if $E$ is separable, relative weak compactness implies: every bounded sequence in $S$ has a weakly convergent subsequence with limit in the weak closure of $S$.
+\end{remark}
+
+\paragraph{Remark (weak convergence of measures).}
+For finite measures (or probability measures) $\mu_n,\mu$ on $\Omega$, one writes
+\[
+\mu_n \Rightarrow \mu
+\]
+for weak convergence, and the page notes the functional-analytic characterization
+\[
+\mu_n \Rightarrow \mu
+\qquad\Longleftrightarrow\qquad
+\int_\Omega f\,d\mu_n \to \int_\Omega f\,d\mu
+\quad \text{for all test functions } f \ (\text{typically } f\in C_b(\Omega)\text{ for probability measures}).
+\]
+\noindent
+(\emph{handwritten note:} ``functional analytic sense'' / ``weak conv'' near the integral criterion.)
+\smallskip
+
+\noindent
+Here \emph{finite measure} means $\mu(\Omega)<\infty$. Probability measures are the special case $\mu(\Omega)=1$.
+\noindent
+In the probability-measure case, $\mu_n\Rightarrow \mu$ is also called \emph{weak convergence of probabilities} or \emph{convergence in distribution} (convergence in law).
+Equivalently, if $X_n,X$ are random variables with $\mathcal{L}(X_n)=\mu_n$ and $\mathcal{L}(X)=\mu$, then
+\[
+X_n \xrightarrow{d} X \qquad\Longleftrightarrow\qquad \mu_n \Rightarrow \mu.
+\]
+
+\begin{remark}[About the test-function class]
+The page appears to mention a space like $C(\Omega)$ or $C_0(\Omega)$ (the handwriting is slightly unclear). Standard versions are:
+\[
+f\in C_b(\Omega)
+\quad\text{for weak convergence of probability measures,}
+\]
+or
+\[
+f\in C_0(\Omega)
+\quad\text{in the Riesz--Markov / Radon-measure duality setting.}
+\]
+\noindent
+Here $C_b(\Omega)$ denotes the space of bounded continuous functions on $\Omega$, and (for locally compact Hausdorff $\Omega$) $C_0(\Omega)$ denotes the space of continuous functions vanishing at infinity.
+\end{remark}
+
+\paragraph{Riesz--Radon (Riesz representation) reminder.}
+The final line on the page records the duality identification (in an abbreviated form):
+\[
+C(\Omega)' \;\cong\; \{\text{finite signed measures on }\Omega\},
+\]
+In words: $C(\Omega)'$ is isomorphic to the space of finite signed measures on $\Omega$.
+where \emph{finite signed} means $|\mu|(\Omega)<\infty$. In words: every continuous linear functional on $C(\Omega)$ is uniquely obtained by integrating a continuous function against a finite signed measure, and conversely every finite signed measure gives such a functional. For compact Hausdorff $\Omega$ this gives the dual of $C(\Omega)$, while for locally compact Hausdorff $\Omega$ one uses $C_0(\Omega)$ and obtains finite signed Radon measures.
+
+\begin{remark}[Terminology]
+\begin{itemize}
+    \item A \emph{signed measure} $\mu$ on $\Omega$ is a countably additive set function (taking values in $\mathbb{R}$ or $\mathbb{C}$). It is \emph{finite} if its total variation satisfies $|\mu|(\Omega)<\infty$.
+    \item A (signed) \emph{Radon measure} on a locally compact Hausdorff space $\Omega$ is a Borel measure that is finite on compact sets and regular (measurable sets can be approximated from inside by compacts and from outside by opens).
+    \item \emph{Locally compact Hausdorff} means: $\Omega$ is Hausdorff, and every point has a neighborhood whose closure is compact.
+\end{itemize}
+\end{remark}
+
+\end{document}
