@@ -225,12 +225,23 @@ Thus the drift operator is continuous in this mixed weak/strong sense, while the
 Because we are now relying on compactness, specifically through Prokhorov's theorem, the Galerkin approximations will first yield only weak convergence of probability laws, that is, convergence in distribution.
 
 \subsection*{6.1. Detour: Prokhorov's Theorem and Weak Convergence of Probability Measures}
-Prokhorov's theorem is the result that connects tightness with compactness of probability measures. Roughly speaking, if a family of probability measures is tight, then it is relatively compact in the weak topology on probability measures.
+Prokhorov's theorem is the result that connects tightness with compactness of probability measures. In its standard general form, it is stated on a Polish space, that is, a complete separable metric space.
 
-Thus, if $(\mu_n)$ is tight, then there exists a subsequence $(\mu_{n_k})$ and a probability measure $\mu$ such that
+\begin{theorem}[Prokhorov's theorem]
+Let $S$ be a Polish space, and let $\mathcal M\subset \mathcal P(S)$ be a family of probability measures on $S$.
+If $\mathcal M$ is tight, meaning that for every $\varepsilon>0$ there exists a compact set $K_\varepsilon\subset S$ such that
+\[
+  \mu(K_\varepsilon)\ge 1-\varepsilon
+  \qquad \text{for all } \mu\in\mathcal M,
+\]
+then the family of probability measures $\mathcal M$ is relatively compact for the topology of weak convergence on $\mathcal P(S)$.
+\par
+In particular, if $(\mu_n)$ is a tight sequence of probability measures on $S$, then $(\mu_n)$ is relatively compact in the topology of weak convergence on $\mathcal P(S)$. Hence there exists a subsequence $(\mu_{n_k})$ and a probability measure $\mu$ on $S$ such that
 \[
   \mu_{n_k}\Rightarrow \mu.
 \]
+\end{theorem}
+
 Here the symbol
 \[
   \Rightarrow
@@ -254,7 +265,34 @@ then Prokhorov's theorem gives a subsequence of the laws of the Galerkin approxi
 
 However, convergence in the weak topology on probability measures is not enough to pass to the limit inside highly non-linear operators such as $A(\cdot)$ and $B(\cdot)$. To do that, one needs almost sure convergence of the random paths themselves.
 
-The theorem that bridges this gap is the Skorokhod representation theorem. In the simple one-dimensional case, suppose random variables $X_n$ converge weakly to $X$, so that their distribution functions satisfy
+\subsection*{6.2. Detour: Statement of the Skorokhod Representation Theorem}
+The theorem that bridges this gap is the \textbf{Skorokhod representation theorem}. In its standard general form, it is stated on a Polish space, that is, a complete separable metric space.
+
+\begin{theorem}[Skorokhod representation theorem]
+Let $S$ be a Polish space, and let $(\mu_n)_{n\ge 1}$ and $\mu$ be probability measures on $S$ such that
+\[
+  \mu_n \Rightarrow \mu.
+\]
+Then there exist a probability space $(\widetilde\Omega,\widetilde{\mathcal F},\widetilde P)$ and $S$-valued random variables
+\[
+  \widetilde X_n,\widetilde X:\widetilde\Omega\to S
+\]
+such that
+\[
+  \mathrm{Law}(\widetilde X_n)=\mu_n,
+  \qquad
+  \mathrm{Law}(\widetilde X)=\mu,
+\]
+and
+\[
+  \widetilde X_n \to \widetilde X
+  \qquad \text{almost surely on } \widetilde\Omega.
+\]
+\end{theorem}
+
+Equivalently, if $X_n$ converges in distribution to $X$ as $S$-valued random variables, then one can find copies of these random variables on a new probability space that converge almost surely while preserving exactly the same laws.
+
+In the simple one-dimensional case, suppose random variables $X_n$ converge weakly to $X$, so that their distribution functions satisfy
 \[
   F_{X_n}(x)\to F_X(x)
 \]
@@ -304,6 +342,23 @@ Moreover, this martingale must have the quadratic variation prescribed by the di
 \]
 Here $Q$ is the covariance operator on the noise space $U$, and $B(u(s))^*:H\to U$ denotes the adjoint operator.
 
+This is what is meant here by a \emph{weak probabilistic form}. In a \emph{strong probabilistic form}, one fixes the probability space and the Wiener process first, and then solves the equation on that fixed stochastic basis. In a \emph{weak probabilistic form}, one is allowed to change the probability space and construct a new Wiener process together with the solution.
+
+\subsection*{7.1. Detour: It\^o Representation Theorem}
+To recover a stochastic integral formulation from the martingale characterized above, one uses the \textbf{It\^o representation theorem} in the form appropriate for continuous square-integrable martingales.
+
+\begin{theorem}[It\^o representation theorem]
+Let $M=(M_t)_{t\in[0,T]}$ be a martingale with continuous sample paths and finite second moment. Denote by $\langle M\rangle_t$ its quadratic variation, that is, the process measuring the accumulated variance of $M$ up to time $t$. Suppose that
+\[
+  \langle M\rangle_t=\int_0^t G(s)\,Q\,G(s)^*\,ds,
+\]
+where $Q$ is the covariance operator of the noise on a Hilbert space $U$, and $G(s)$ describes how the noise acts on the system at time $s$. Then there exists a Wiener process $\widetilde W$ such that
+\[
+  M_t=\int_0^t G(s)\,d\widetilde W(s),
+  \qquad t\in[0,T].
+\]
+\end{theorem}
+
 Because $M_t$ is a continuous martingale with this specific quadratic variation, the It\^o representation theorem allows one to reconstruct a new Wiener process $\widetilde W$ on the new probability space such that
 \[
   M_t=\int_0^t B(u(s))\,d\widetilde W(s).
@@ -311,30 +366,471 @@ Because $M_t$ is a continuous martingale with this specific quadratic variation,
 So the SPDE is recovered in weak probabilistic form.
 
 \section*{8. The Equivalent Formulation via Test Functions}
-To prove that the limit of the Galerkin approximations satisfies this martingale property, one uses the equivalent scalar martingale formulation obtained by testing against basis vectors and smooth functions.
+To actually prove that the limit of the Galerkin approximations satisfies the martingale property, one uses the equivalent formulation written at the very bottom of the page. This is the classical Stroock--Varadhan martingale problem approach, projected down to one dimension by testing against the basis vectors of $H$.
 
 Fix a basis vector $e_k$ and a test function
 \[
   \varphi\in C_b^2(\mathbb{R}).
 \]
+Instead of working directly with the abstract $H$-valued martingale $M_t$, we apply $\varphi$ to the scalar Fourier coefficient $\langle u(t),e_k\rangle_H$.
+
 Define the scalar process
 \[
-  M_t^{\varphi}:=\varphi\bigl(\langle u(t),e_k\rangle_H\bigr)-\varphi\bigl(\langle u_0,e_k\rangle_H\bigr)
+  M_t^{k,\varphi}:=\varphi\bigl(\langle u(t),e_k\rangle_H\bigr)-\varphi\bigl(\langle u_0,e_k\rangle_H\bigr)
 \]
 \[
   \qquad -\int_0^t \varphi'\bigl(\langle u(s),e_k\rangle_H\bigr)\,\langle A(u(s)),e_k\rangle\,ds
 \]
 \[
-  \qquad -\frac12\int_0^t \varphi''\bigl(\langle u(s),e_k\rangle_H\bigr)\,\|B(u(s))^*e_k\|_U^2\,ds.
+  \qquad +\frac12\int_0^t \varphi''\bigl(\langle u(s),e_k\rangle_H\bigr)\,
+  \bigl\langle (B(u(s))\,Q\,B(u(s))^*)e_k,e_k\bigr\rangle_H\,ds.
 \]
-The martingale problem formulation says that $M_t^{\varphi}$ must be a martingale.
-
-Equivalently, for every $0\le s\le t\le T$ and every bounded $\mathcal F_s$-measurable test random variable $\Phi_s$ depending on the past up to time $s$, one must have
+This last term is the quadratic variation contribution of the diffusion, projected onto the basis vector $e_k$. The martingale problem formulation says that $M_t^{k,\varphi}$ is a martingale, equivalently,
 \[
-  \mathbb E_P\bigl[(M_t^{\varphi}-M_s^{\varphi})\Phi_s\bigr]=0.
+  \mathbb E_P\bigl[M_t^{k,\varphi}-M_s^{k,\varphi}\mid \mathcal F_s\bigr]=0
+  \qquad \text{for } 0\le s\le t\le T.
 \]
-By verifying this identity for all test functions $\varphi$, all basis vectors $e_k$, and all past-dependent bounded random variables $\Phi_s$, one proves that the law $P$ constructed through the compactness and Skorokhod argument is indeed a martingale solution to the SPDE.
+Equivalently, for every bounded continuous $\mathcal F_s$-measurable random variable $\Phi_s$,
+\[
+  \mathbb E_P\bigl[(M_t^{k,\varphi}-M_s^{k,\varphi})\Phi_s\bigr]=0.
+\]
+The same identity holds for the finite-dimensional laws $P_n$:
+\[
+  \mathbb E_{P_n}\bigl[(M_t^{k,\varphi}-M_s^{k,\varphi})\Phi_s\bigr]=0.
+\]
+Therefore, to prove that the limit law $P$ is a martingale solution, it is enough to verify these scalar identities for all $\varphi$, $e_k$, and $\Phi_s$. This is the point of the section: an abstract $H$-valued martingale statement is difficult to pass to the limit directly, while these scalar expectation identities are concrete and stable under weak convergence of the laws.
 
 This page marks the functional shift of the lecture: the Minty--Browder monotonicity trick is replaced by compact embedding, Prokhorov compactness, and the Skorokhod representation theorem.
+
+\section*{9. The Existence Proof via Tightness and Weak Convergence}
+We now continue to the next page of the notes, where the martingale problem formulation is completed and the topological proof of existence is finished. This page combines It\^o's formula, Galerkin approximation, tightness, Prokhorov compactness, and weak convergence of probability laws into one single argument.
+\subsection*{9.1. The Main Existence Theorem}
+We can now state the central existence result in the martingale formulation.
+
+\begin{theorem}[Theorem 3.13]
+Under assumptions (V.1), (V.3), and (V.5)--(V.7), there exists a solution $P$ to the martingale problem associated with
+\[
+  du(t)=A(u(t))\,dt+B(u(t))\,dW(t).
+\]
+\end{theorem}
+
+The decisive new ingredient is assumption (V.6), namely the compact embedding
+\[
+  V\hookrightarrow\hookrightarrow H.
+\]
+Because monotonicity has been dropped, one can no longer expect the previous variational argument to produce a unique strong solution on a fixed stochastic basis. What this theorem guarantees instead is the existence of a weak probabilistic solution, that is, a martingale solution.
+In other words, the martingale problem is to find a probability law $P$ on the path space such that the canonical process satisfies the initial condition and the associated drift-corrected test processes are martingales under $P$.
+
+\begin{proof}
+
+\subsection*{9.2. Laws of the Galerkin Approximations}
+To prove the theorem, we return to the Galerkin approximation, exactly as in the monotone case. We project the SPDE onto the finite-dimensional subspace
+\[
+  V_n=\mathrm{span}\{e_1,\dots,e_n\}.
+\]
+But now the focus shifts from the random variables themselves to their probability laws. Let
+\[
+  P_n=\mathrm{Law}(u_n)
+\]
+denote the law of the solution of the approximate finite-dimensional SDE.
+
+For each $n$, the measure $P_n$ satisfies the following three properties:
+\begin{enumerate}
+\item its support is contained in the continuous path space over the Galerkin subspace,
+\[
+  \mathrm{supp}(P_n)\subset C([0,T];V_n);
+\]
+\item it satisfies the projected initial condition almost surely,
+\[
+  P_n\bigl(u(0)=\pi_n u_0\bigr)=1;
+\]
+\item it solves the finite-dimensional martingale problem, meaning that for every basis vector $e_k$, every $\varphi\in C_b^2(\mathbb{R})$, and every bounded past-dependent test random variable $\Phi_s$,
+\[
+  \mathbb E_{P_n}\bigl[(M_t^{k,\varphi}-M_s^{k,\varphi})\Phi_s\bigr]=0.
+\]
+\end{enumerate}
+
+\subsection*{9.3. Tightness and the Role of Compact Embedding}
+To pass to the limit as $n\to\infty$, we need compactness at the level of laws. This is where Prokhorov's theorem enters: once tightness has been established, it gives relative compactness of the family $(P_n)$ in the topology of weak convergence. In particular, one may extract a subsequence, still denoted by $(P_n)$, and a probability measure $P$ such that
+\[
+  P_n\Rightarrow P.
+\]
+
+\begin{lemma}[Lemma 3.14]
+The sequence of probability measures $(P_n)_{n\ge 1}$ is tight on
+\[
+  \Omega:=C([0,T];V'_{\mathrm{weak}})\cap L^2([0,T];V)\cap L^2([0,T];H)
+\]
+with respect to the three topologies
+\[
+  \tau_1,\tau_2,\tau_3,
+\]
+where $\tau_1$ is the weak topology on $L^2([0,T];V)$, $\tau_2$ is the uniform topology on $C([0,T];V'_{\mathrm{weak}})$, and $\tau_3$ is the strong topology on $L^2([0,T];H)$.
+\end{lemma}
+
+The topology $\tau_1$ comes from the uniform a priori bounds in $L^2([0,T];V)$. The topology $\tau_2$ controls continuity of the trajectories in the dual space $V'$. The crucial point is $\tau_3$, the strong topology on $L^2([0,T];H)$, because strong compactness in $H$ is obtained precisely from the compact embedding
+\[
+  V\hookrightarrow\hookrightarrow H.
+\]
+Thus, control in the more regular space $V$ yields compactness in the stronger space $H$, and this is the key topological mechanism replacing monotonicity in the present lecture.
+
+\subsection*{9.4. Passing to the Limit}
+Once Lemma 3.14 is available, Prokhorov's theorem yields a subsequence, still denoted by $(P_n)$, and a probability measure $P$ such that
+\[
+  P_n\Rightarrow P.
+\]
+This measure $P$ is the candidate solution to the martingale problem.
+
+To finish the proof, one must pass to the limit in the scalar martingale identity
+\[
+  \mathbb E_{P_n}\bigl[(M_t^{k,\varphi}-M_s^{k,\varphi})\Phi_s\bigr]=0.
+\]
+Weak convergence of the laws alone is not enough for this step. One must first establish uniform integrability of the martingale increments, and this is the content of the final page of the argument.
+
+\section*{10. Final Step: Uniform Integrability of the Martingale Increments}
+Welcome back. Let us seamlessly continue our lecture by examining this final page of notes. We are now at the last hurdle in the existence proof for the martingale solution.
+
+Recall where we left off: via Prokhorov's theorem and the Skorokhod representation argument, we extracted a sequence of probability measures $P_n$ that converges weakly to a limit measure $P$. However, to prove that this limit measure $P$ is indeed a martingale solution, we must pass to the limit $n\to\infty$ inside the expectation of the martingale increments.
+
+Weak convergence alone is not enough for this passage to the limit. One also needs uniform integrability. To obtain uniform integrability, it is enough to prove that the $p$-th moments of the martingale increments are uniformly bounded for some $p>1$.
+
+\subsection*{10.1. The Goal: Bounding the Martingale Increments}
+At the top of the page, one writes again the explicit definition of the scalar martingale process $M_t^{k,\varphi}$ associated with the sequence $u_n(t)$. One also recalls the continuity assumption on the drift,
+\[
+  A:V_{\mathrm{weak}}\cap H\to V'_{\mathrm{weak}}.
+\]
+The strategy is to combine these assumptions on the behavior of the operators, namely (V.1), (V.3), and (V.5)--(V.7), with the a priori estimate
+\[
+  \sup_n \mathbb E_{P_n}\Bigl(\sup_{t\le T}\|u_n(t)\|_H^2+\int_0^T \|u_n(s)\|_V^2\,ds\Bigr)<\infty
+\]
+in order to prove that for some $p>1$,
+\[
+  \sup_n \mathbb E_{P_n}\bigl(|M_t^{k,\varphi}-M_s^{k,\varphi}|^p\bigr)<\infty.
+\]
+
+Recall that
+\[
+  M_t^{k,\varphi}
+  :=\varphi\bigl(\langle u(t),e_k\rangle_H\bigr)-\varphi\bigl(\langle u_0,e_k\rangle_H\bigr)
+\]
+\[
+  \qquad -\int_0^t \varphi'\bigl(\langle u(r),e_k\rangle_H\bigr)\,\langle A(u(r)),e_k\rangle\,dr
+\]
+\[
+  \qquad +\frac12\int_0^t \varphi''\bigl(\langle u(r),e_k\rangle_H\bigr)\,
+  \bigl\langle (B(u(r))Q B(u(r))^*)e_k,e_k\bigr\rangle_H\,dr.
+\]
+
+\subsection*{10.2. Decomposing the Increment}
+We break the increment $M_t^{k,\varphi}-M_s^{k,\varphi}$ into its three constituent parts.
+
+The first part is the test-function term
+\[
+  \varphi\bigl(\langle u(t),e_k\rangle_H\bigr)-\varphi\bigl(\langle u(s),e_k\rangle_H\bigr).
+\]
+Since $\varphi\in C_b^2(\mathbb R)$, this term is bounded.
+
+The second part is the drift integral
+\[
+  \int_s^t \varphi'\bigl(\langle u(r),e_k\rangle_H\bigr)\,\langle A(u(r)),e_k\rangle\,dr.
+\]
+Because $\varphi'$ is bounded and assumption (V.3) gives
+\[
+  \|A(u)\|_{V'}\le M(1+\|u\|_V),
+\]
+this term is controlled by a constant multiple of
+\[
+  \int_s^t (1+\|u(r)\|_V)\,dr.
+\]
+
+The third part is the second-order It\^o correction term
+\[
+  \frac12\int_s^t \varphi''\bigl(\langle u(r),e_k\rangle_H\bigr)\,
+  \bigl\langle (B(u(r))Q B(u(r))^*)e_k,e_k\bigr\rangle_H\,dr.
+\]
+Again $\varphi''$ is bounded. To control the diffusion, one uses assumption (V.5),
+\[
+  \|B(u)\circ \sqrt Q\|_{L_2(U,H)}\le M(1+\|u\|_V^{1-\delta})
+\]
+for some $\delta>0$. Since the It\^o correction involves the square of the diffusion, this term is bounded by a constant multiple of
+\[
+  \int_s^t \bigl(1+\|u(r)\|_V^{2(1-\delta)}\bigr)\,dr.
+\]
+
+\subsection*{10.3. The Role of Sub-linear Growth}
+Putting the three bounds together, one finds that the absolute increment is controlled by an expression of the form
+\[
+  |M_t^{k,\varphi}-M_s^{k,\varphi}|
+  \le C\Bigl(1+\int_s^t \|u(r)\|_V^2\,dr\Bigr)^{1-\delta}.
+\]
+Here one uses H\"older's inequality and the fact that $1-\delta<1$:
+\[
+  \int_s^t \|u(r)\|_V^{2(1-\delta)}\,dr \le C\Bigl(\int_s^t \|u(r)\|_V^2\,dr\Bigr)^{1-\delta}.
+\]
+The critical feature is that the exponent $1-\delta$ lies outside the integral.
+
+To obtain a uniform $L^p$-bound, choose
+\[
+  p=\frac{1}{1-\delta}>1.
+\]
+Then
+\[
+  p(1-\delta)=1.
+\]
+Therefore, taking the $p$-th power gives
+\[
+  |M_t^{k,\varphi}-M_s^{k,\varphi}|^p
+  \le
+  C\Bigl(1+\int_s^t \|u(r)\|_V^2\,dr\Bigr).
+\]
+Taking expectation under $P_n$ yields
+\[
+  \mathbb E_{P_n}\bigl(|M_t^{k,\varphi}-M_s^{k,\varphi}|^p\bigr)
+  \le
+  C\,\mathbb E_{P_n}\Bigl(1+\int_s^t \|u(r)\|_V^2\,dr\Bigr).
+\]
+Since
+\[
+  \int_s^t \|u(r)\|_V^2\,dr\le \int_0^T \|u(r)\|_V^2\,dr,
+\]
+the a priori estimate implies
+\[
+  \sup_n \mathbb E_{P_n}\bigl(|M_t^{k,\varphi}-M_s^{k,\varphi}|^p\bigr)<\infty.
+\]
+Hence the martingale increments are uniformly integrable.
+
+\subsection*{10.4. The Final Conclusion}
+This uniform integrability is the last ingredient needed to pass to the limit inside the expectation. Combined with the weak convergence obtained from Prokhorov's theorem, it yields
+\[
+  \lim_{n\to\infty}\mathbb E_{P_n}\bigl[(M_t^{k,\varphi}-M_s^{k,\varphi})\Phi_s\bigr]
+  =
+  \mathbb E_{P}\bigl[(M_t^{k,\varphi}-M_s^{k,\varphi})\Phi_s\bigr]
+  =0.
+\]
+Therefore, under the limit measure $P$, the martingale increments still have zero conditional expectation given the past. This proves that $P$ is indeed a martingale solution to the infinite-dimensional SPDE.
+
+The proof of Theorem 3.13 is complete.
+
+\end{proof}
+
+\section*{Appendix: Detailed Estimates for the Drift and Diffusion Terms}
+For completeness, we record the detailed estimates used in the proof when bounding the scalar martingale increment.
+
+\subsection*{A.1. Estimate for the Drift Term}
+Consider the drift term
+\[
+  \int_s^t \varphi'\bigl(\langle u(r),e_k\rangle_H\bigr)\,\langle A(u(r)),e_k\rangle\,dr.
+\]
+We estimate the pairing $\langle A(u(r)),e_k\rangle$ by the dual norm of $A(u(r))$.
+
+Since $\varphi\in C_b^2(\mathbb R)$, its derivative is bounded, so
+\[
+  \bigl|\varphi'\bigl(\langle u(r),e_k\rangle_H\bigr)\bigr|\le C_\varphi.
+\]
+Moreover, because $A(u(r))\in V'$ and $e_k\in V$, the duality estimate gives
+\[
+  |\langle A(u(r)),e_k\rangle|
+  \le \|A(u(r))\|_{V'}\,\|e_k\|_V.
+\]
+Assumption (V.3) implies
+\[
+  \|A(u(r))\|_{V'}\le M(1+\|u(r)\|_V).
+\]
+Combining these bounds, we obtain
+\[
+  \bigl|\varphi'\bigl(\langle u(r),e_k\rangle_H\bigr)\,\langle A(u(r)),e_k\rangle\bigr|
+  \le C_\varphi\,M\,\|e_k\|_V\,(1+\|u(r)\|_V).
+\]
+Since $C_\varphi$, $M$, and $\|e_k\|_V$ are constants, integration over $r\in[s,t]$ yields
+\[
+  \left|
+  \int_s^t \varphi'\bigl(\langle u(r),e_k\rangle_H\bigr)\,\langle A(u(r)),e_k\rangle\,dr
+  \right|
+  \le C\int_s^t (1+\|u(r)\|_V)\,dr.
+\]
+This is why the drift contribution is controlled by a constant multiple of
+\[
+  \int_s^t (1+\|u(r)\|_V)\,dr.
+\]
+
+\subsection*{A.2. Estimate for the Diffusion Term}
+Now consider the second-order It\^o correction term
+\[
+  \frac12\int_s^t \varphi''\bigl(\langle u(r),e_k\rangle_H\bigr)\,
+  \bigl\langle (B(u(r))Q B(u(r))^*)e_k,e_k\bigr\rangle_H\,dr.
+\]
+Again $\varphi''$ is bounded, since $\varphi\in C_b^2(\mathbb R)$. It therefore remains to estimate
+\[
+  \bigl|\bigl\langle (B(u)Q B(u)^*)e_k,e_k\bigr\rangle_H\bigr|.
+\]
+
+Write this using $\sqrt Q$ by setting
+\[
+  T=B(u)\circ \sqrt Q.
+\]
+Then
+\[
+  TT^*=(B(u)\sqrt Q)(B(u)\sqrt Q)^*=B(u)Q B(u)^*.
+\]
+Hence
+\[
+  \bigl\langle (B(u)Q B(u)^*)e_k,e_k\bigr\rangle_H
+  =
+  \langle TT^*e_k,e_k\rangle_H
+  =
+  \|T^*e_k\|_U^2
+  =
+  \|(B(u)\sqrt Q)^*e_k\|_U^2.
+\]
+Using the operator norm estimate by the Hilbert--Schmidt norm, we get
+\[
+  \|(B(u)\sqrt Q)^*e_k\|_U
+  \le \|B(u)\sqrt Q\|_{L_2(U,H)}\,\|e_k\|_H.
+\]
+Therefore
+\[
+  \bigl\langle (B(u)Q B(u)^*)e_k,e_k\bigr\rangle_H
+  \le \|B(u)\sqrt Q\|_{L_2(U,H)}^2\,\|e_k\|_H^2.
+\]
+Now apply assumption (V.5):
+\[
+  \|B(u)\circ \sqrt Q\|_{L_2(U,H)}
+  \le M(1+\|u\|_V^{1-\delta}).
+\]
+Squaring this inequality yields, after adjusting the constant,
+\[
+  \|B(u)\sqrt Q\|_{L_2(U,H)}^2
+  \le C\bigl(1+\|u\|_V^{2(1-\delta)}\bigr).
+\]
+Substituting back, we arrive at
+\[
+  \bigl|\varphi''\bigl(\langle u(r),e_k\rangle_H\bigr)\,
+  \langle (B(u(r))Q B(u(r))^*)e_k,e_k\rangle_H\bigr|
+  \le C\bigl(1+\|u(r)\|_V^{2(1-\delta)}\bigr).
+\]
+After integration over $[s,t]$, this gives
+\[
+  \left|
+  \frac12\int_s^t \varphi''\bigl(\langle u(r),e_k\rangle_H\bigr)\,
+  \langle (B(u(r))Q B(u(r))^*)e_k,e_k\rangle_H\,dr
+  \right|
+  \le C\int_s^t \bigl(1+\|u(r)\|_V^{2(1-\delta)}\bigr)\,dr.
+\]
+This is why the diffusion contribution is controlled by a constant multiple of
+\[
+  \int_s^t \bigl(1+\|u(r)\|_V^{2(1-\delta)}\bigr)\,dr.
+\]
+
+\section*{11. Final Passage to the Limit by Truncation}
+Excellent. Let us close the lecture by making explicit the final truncation argument that converts the uniform $L^p$-bound into convergence of the martingale expectations under the weakly convergent laws.
+
+At this stage we already know that $P_n\Rightarrow P$. The remaining task is to prove the second martingale-problem condition under the limit measure $P$, namely that the martingale increments still have zero conditional expectation.
+
+\subsection*{11.1. The Truncation Function}
+Weak convergence alone allows one to pass to the limit only for bounded continuous test functions. The increment
+\[
+  M_t^{k,\varphi}-M_s^{k,\varphi}
+\]
+is continuous, but not automatically bounded. To force boundedness, fix $K>0$ and define the truncation
+\[
+  \Psi_K:=(-K)\vee (M_t^{k,\varphi}-M_s^{k,\varphi})\wedge K.
+\]
+Equivalently,
+\[
+  \Psi_K=
+  \begin{cases}
+    K, & M_t^{k,\varphi}-M_s^{k,\varphi}>K,\\
+    M_t^{k,\varphi}-M_s^{k,\varphi}, & |M_t^{k,\varphi}-M_s^{k,\varphi}|\le K,\\
+    -K, & M_t^{k,\varphi}-M_s^{k,\varphi}<-K.
+  \end{cases}
+\]
+Thus $\Psi_K$ agrees with the martingale increment on $[-K,K]$ and is cut off outside this interval. In particular, $\Psi_K$ is bounded and continuous, and $\Psi_K\to M_t^{k,\varphi}-M_s^{k,\varphi}$ pointwise as $K\to\infty$.
+
+Since $\Psi_K$ is bounded and continuous, and $\Phi_s$ is also bounded and continuous, weak convergence gives
+\[
+  \mathbb E_{P_n}(\Psi_K\Phi_s)\to \mathbb E_P(\Psi_K\Phi_s)
+  \qquad \text{for every fixed } K.
+\]
+
+\subsection*{11.2. The Truncation Error}
+We now estimate the error introduced by replacing the true increment by its truncated version. One has
+\[
+  \left|
+  \mathbb E_{P_n}\Bigl[\bigl(\Psi_K-(M_t^{k,\varphi}-M_s^{k,\varphi})\bigr)\Phi_s\Bigr]
+  \right|
+  \le
+  \|\Phi_s\|_\infty\,
+  \mathbb E_{P_n}\Bigl(
+  \bigl|\Psi_K-(M_t^{k,\varphi}-M_s^{k,\varphi})\bigr|
+  \Bigr).
+\]
+This follows from the elementary inequalities $|\mathbb E[Y]|\le \mathbb E[|Y|]$ and $|Y\Phi_s|\le \|\Phi_s\|_\infty |Y|$.
+The difference is nonzero only on the tail event
+\[
+  \{|M_t^{k,\varphi}-M_s^{k,\varphi}|>K\}.
+\]
+Indeed, if
+\[
+  |M_t^{k,\varphi}-M_s^{k,\varphi}|\le K,
+\]
+then the truncation does nothing and the difference is zero. On the tail event
+\[
+  |M_t^{k,\varphi}-M_s^{k,\varphi}|>K,
+\]
+one has
+\[
+  \bigl|\Psi_K-(M_t^{k,\varphi}-M_s^{k,\varphi})\bigr|
+  \le
+  |M_t^{k,\varphi}-M_s^{k,\varphi}|.
+\]
+Therefore
+\[
+  \left|
+  \mathbb E_{P_n}\Bigl[\bigl(\Psi_K-(M_t^{k,\varphi}-M_s^{k,\varphi})\bigr)\Phi_s\Bigr]
+  \right|
+  \le
+  \|\Phi_s\|_\infty\,
+  \mathbb E_{P_n}\Bigl(
+  |M_t^{k,\varphi}-M_s^{k,\varphi}|
+  \mathbf 1_{\{|M_t^{k,\varphi}-M_s^{k,\varphi}|>K\}}
+  \Bigr).
+\]
+
+\subsection*{11.3. Using the Uniform $L^p$-Bound}
+Now use the $p$-th moment estimate proved in the previous section. On the event
+\[
+  |M_t^{k,\varphi}-M_s^{k,\varphi}|>K,
+\]
+we have
+\[
+  |M_t^{k,\varphi}-M_s^{k,\varphi}|
+  \le
+  \frac{|M_t^{k,\varphi}-M_s^{k,\varphi}|^p}{K^{p-1}}.
+\]
+Hence
+\[
+  \mathbb E_{P_n}\Bigl(
+  |M_t^{k,\varphi}-M_s^{k,\varphi}|
+  \mathbf 1_{\{|M_t^{k,\varphi}-M_s^{k,\varphi}|>K\}}
+  \Bigr)
+  \le
+  \frac{1}{K^{p-1}}
+  \mathbb E_{P_n}\bigl(|M_t^{k,\varphi}-M_s^{k,\varphi}|^p\bigr).
+\]
+Since $p>1$, the factor $K^{-(p-1)}$ tends to zero as $K\to\infty$. Because the $p$-th moments are uniformly bounded in $n$, the truncation error converges to zero uniformly in $n$, and this uniform control is exactly what allows one to pass from the truncated variables to the original martingale increment in the limit.
+
+\subsection*{11.4. Conclusion}
+As a consequence of Section 11.3, one may first pass to the limit for the truncated variables and then let $K\to\infty$ to recover the original increment. Hence
+\[
+  \lim_{n\to\infty}
+  \mathbb E_{P_n}\bigl[(M_t^{k,\varphi}-M_s^{k,\varphi})\Phi_s\bigr]
+  =
+  \mathbb E_P\bigl[(M_t^{k,\varphi}-M_s^{k,\varphi})\Phi_s\bigr].
+\]
+Since the left-hand side is zero for every $n$, it follows that
+\[
+  \mathbb E_P\bigl[(M_t^{k,\varphi}-M_s^{k,\varphi})\Phi_s\bigr]=0.
+\]
+This is exactly the desired martingale identity under the limit measure $P$.
 
 \end{document}
