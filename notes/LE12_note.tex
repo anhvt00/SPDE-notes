@@ -509,7 +509,11 @@ Look at the precise statement of Lemma 3.15. We are given a sequence $(u_n)_n$ s
 These are exactly the properties secured on the previous pages using the a priori estimates and the Arzel\`a--Ascoli theorem.
 
 \begin{lemma}[Aubin--Lions, Lemma 3.15]
-Let $(u_n)_n$ be a sequence such that
+Let $(u_n)_n$ be a sequence of functions
+\[
+  u_n:[0,T]\to V'
+\]
+such that
 \[
   (u_n)_n \text{ is bounded in } L^2([0,T];V)\cap L^\infty([0,T];H),
 \]
@@ -517,12 +521,14 @@ and suppose that $(u_n)_n$ is equicontinuous as $V'$-valued functions, with init
 \[
   u_n(0)\to u_0 \qquad \text{in } H.
 \]
-Then there exists a subsequence $(u_{n_k})_k$ and a limit $u$ such that
+Then $(u_n)_n$ is relatively compact in $L^2([0,T];H)$. In particular, there exists a subsequence $(u_{n_k})_k$ and a limit $u$ such that
 \[
   u_{n_k}\to u
   \qquad \text{strongly in } L^2([0,T];H).
 \]
 \end{lemma}
+
+Intuitively, this lemma says that if a sequence is uniformly bounded in $L^2([0,T];V)$ and $L^\infty([0,T];H)$, and its trajectories do not oscillate too much in the weaker space $V'$, then the family is precompact in the intermediate space $L^2([0,T];H)$.
 
 This lemma provides the exact bridge we need for $\tau_3$-tightness. The entire proof hinges on a brilliant interpolation inequality.
 
@@ -623,7 +629,7 @@ Thus the limit would have to be simultaneously $0$ and norm $1$, a contradiction
 
 \subsection*{6.4. Executing the Proof of Aubin--Lions}
 \begin{proof}
-Because we have equicontinuity in $V'$, there exists a subsequence $(u_{n_k})_k$ and some limit $u$ such that
+Because the sequence is pointwise relatively compact in $V'_{\mathrm{weak}}$ by the uniform $H$-bound, and equicontinuous as a family of $V'$-valued functions, the Arzel\`a--Ascoli theorem implies that $(u_n)_n$ is relatively compact in $C([0,T];V'_{\mathrm{weak}})$. This means that every sequence admits a subsequence that converges in $C([0,T];V'_{\mathrm{weak}})$. Hence there exists a subsequence $(u_{n_k})_k$ and some limit $u$ such that
 \[
   u_{n_k}\to u
   \qquad \text{in } C([0,T];V'_{\mathrm{weak}}).
@@ -638,7 +644,15 @@ C_\varepsilon \int_0^T \|u_{n_k}(t)-u(t)\|_{V'}^2\,dt.
 \]
 We now analyze the two terms on the right-hand side.
 
-For the $V$-term, we do not have strong convergence in $V$. However, the sequence is uniformly bounded in $L^2([0,T];V)$, so
+For the $V$-term, we do not have strong convergence in $V$. However, recall that we already proved the uniform a priori bound
+\[
+  \sup_{n\ge 1}\int_0^T \|u_n(t)\|_V^2\,dt<\infty.
+\]
+Using
+\[
+  \|a-b\|_V^2\le 2\|a\|_V^2+2\|b\|_V^2,
+\]
+we obtain
 \[
   \int_0^T \|u_{n_k}(t)-u(t)\|_V^2\,dt
   \le
@@ -646,7 +660,18 @@ For the $V$-term, we do not have strong convergence in $V$. However, the sequenc
   +
   2\int_0^T \|u(t)\|_V^2\,dt.
 \]
-Thus the first term is bounded by a finite constant times $\varepsilon$.
+Hence
+\[
+  \varepsilon\int_0^T \|u_{n_k}(t)-u(t)\|_V^2\,dt
+  \le
+  2\varepsilon\int_0^T \|u_{n_k}(t)\|_V^2\,dt
+  +
+  2\varepsilon\int_0^T \|u(t)\|_V^2\,dt.
+\]
+Since $(u_{n_k})_k$ inherits the uniform $L^2([0,T];V)$ bound from $(u_n)_n$, and since $u\in L^2([0,T];V)$, there exists a constant $C<\infty$ such that
+\[
+  \varepsilon\int_0^T \|u_{n_k}(t)-u(t)\|_V^2\,dt\le C\varepsilon.
+\]
 
 For the $V'$-term, the convergence in the dual space implies that
 \[
@@ -654,13 +679,27 @@ For the $V'$-term, the convergence in the dual space implies that
   \qquad \text{as } k\to\infty.
 \]
 
-Therefore
+Therefore, taking $\limsup_{k\to\infty}$ in
 \[
+\int_0^T \|u_{n_k}(t)-u(t)\|_H^2\,dt
+\le
+\varepsilon \int_0^T \|u_{n_k}(t)-u(t)\|_V^2\,dt
++
+C_\varepsilon \int_0^T \|u_{n_k}(t)-u(t)\|_{V'}^2\,dt,
+\]
+we obtain
+\begin{align*}
   \limsup_{k\to\infty}
   \int_0^T \|u_{n_k}(t)-u(t)\|_H^2\,dt
-  \le
+  &\le
+  \limsup_{k\to\infty}
+  \varepsilon \int_0^T \|u_{n_k}(t)-u(t)\|_V^2\,dt \\
+  &\quad+
+  \limsup_{k\to\infty}
+  C_\varepsilon \int_0^T \|u_{n_k}(t)-u(t)\|_{V'}^2\,dt \\
+  &\le
   C\varepsilon.
-\]
+\end{align*}
 Since $\varepsilon>0$ is arbitrary, it follows that
 \[
   u_{n_k}\to u
@@ -929,6 +968,40 @@ A topological space $X$ is called Hausdorff if for every pair of distinct points
 
 In a Hausdorff space, limits are unique. In particular, all normed spaces and Banach spaces are Hausdorff, so a sequence cannot converge to two different limits in the same topology.
 
+\subsection*{A.5d. Why One Uses $\limsup$}
+Suppose $(a_k)_k$, $(b_k)_k$, and $(c_k)_k$ are real sequences such that
+\[
+  a_k\le \varepsilon b_k+c_k
+  \qquad \text{for all } k,
+\]
+where $(b_k)_k$ is uniformly bounded and $c_k\to 0$. In this situation one should pass to the limit superior:
+\[
+  \limsup_{k\to\infty} a_k
+  \le
+  \varepsilon \limsup_{k\to\infty} b_k
+  +
+  \limsup_{k\to\infty} c_k.
+\]
+Since $(b_k)_k$ is bounded, $\limsup_{k\to\infty} b_k<\infty$, and since $c_k\to 0$, one obtains
+\[
+  \limsup_{k\to\infty} a_k\le C\varepsilon
+\]
+for some finite constant $C$.
+
+The reason for using $\limsup$ instead of an ordinary limit is that the estimate does not by itself show that $(a_k)_k$ has a limit. A bounded sequence may oscillate, so one can control its asymptotic upper bound without yet knowing convergence. If in addition $a_k\ge 0$ and
+\[
+  \limsup_{k\to\infty} a_k\le C\varepsilon
+  \qquad \text{for every } \varepsilon>0,
+\]
+then
+\[
+  \limsup_{k\to\infty} a_k\le 0.
+\]
+Because also $a_k\ge 0$, this forces
+\[
+  a_k\to 0.
+\]
+
 \subsection*{A.6. H\"older Inequality and $1/2$-H\"older Continuity}
 The time-regularity estimate for the drift term comes from the elementary inequality
 \[
@@ -1016,5 +1089,65 @@ In Section 5.4, this is applied to the stochastic integral
   M_r:=\int_s^r \langle h,B_n(u(\rho))\,dW_n(\rho)\rangle,
 \]
 so that the supremum of the stochastic increment is controlled by the corresponding quadratic variation.
+
+\subsection*{A.8. How Aubin--Lions Yields $\tau_3$-Tightness}
+We now explain how the Aubin--Lions compactness statement gives the actual tightness for the strong topology $\tau_3$ on $L^2([0,T];H)$.
+
+Fix $R\ge 1$ and define
+\[
+  K_3(R)
+  :=
+  \left\{
+    u:
+    \int_0^T \|u(t)\|_V^2\,dt\le R,\;
+    \sup_{0\le t\le T}\|u(t)\|_H\le R,\;
+    [u]_{C^\beta([0,T];V')}\le R
+  \right\},
+\]
+where
+\[
+  [u]_{C^\beta([0,T];V')}
+  :=
+  \sup_{0\le s<t\le T}\frac{\|u(t)-u(s)\|_{V'}}{|t-s|^\beta}.
+\]
+Recall that the Aubin--Lions lemma says that a family bounded in $L^2([0,T];V)\cap L^\infty([0,T];H)$ and equicontinuous as a family of $V'$-valued functions is relatively compact in $L^2([0,T];H)$. On $K_3(R)$, these hypotheses are satisfied by definition. Hence, by Aubin--Lions, $K_3(R)$ is relatively compact in $L^2([0,T];H)$.
+
+Next, note that
+\[
+  K_3(R)^c
+  \subset
+  \left\{
+    u:
+    \int_0^T \|u(t)\|_V^2\,dt>R
+  \right\}
+  \cup
+  K_2(R)^c,
+\]
+where $K_2(R)$ is the compact set used in the proof of $\tau_2$-tightness. Therefore
+\begin{align*}
+  P_n\bigl(K_3(R)^c\bigr)
+  &\le
+  P_n\Bigl(
+    \int_0^T \|u(t)\|_V^2\,dt>R
+  \Bigr)
+  +
+  P_n\bigl(K_2(R)^c\bigr) \\
+  &\le
+  \frac{C}{R}
+  +
+  \frac{C}{R}
+  \qquad \text{(by the estimates for $\tau_1$ and $\tau_2$)} \\
+  &\le
+  \frac{C}{R}.
+\end{align*}
+We conclude that
+\[
+  \sup_n
+  P_n\bigl(K_3(R)^c\bigr)
+  \le
+  \frac{C}{R}\to 0
+  \qquad \text{as } R\to\infty.
+\]
+Thus the sequence $(P_n)_n$ is tight in the strong topology $\tau_3$ on $L^2([0,T];H)$.
 
 \end{document}
