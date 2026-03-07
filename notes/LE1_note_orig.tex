@@ -88,6 +88,89 @@ To build a physical intuition for the heat equation, consider the relationship b
 
 We will stop here for this step of the derivation. Are there any questions on the transition from the empirical average to the heat equation?
 
+\section*{5. Microscopic Fluctuations and the Macroscopic Limit}
+\subsection*{5.1. Setup and Empirical Average}
+We have already introduced the microscopic particle system, defined the empirical average, and identified the corresponding macroscopic heat equation. We now continue by making that passage more rigorous: we analyze the fluctuations around the Law of Large Numbers using It\^o's formula and show how the stochastic part disappears as the number of particles grows.
+
+To do this, we return to the empirical measure for $N$ independent Brownian motions $B_t^i$, all starting at an initial position $x_0$, and evaluate it against a test function $f$. This gives the empirical average
+\[
+\eta_t^N(f)=\frac{1}{N}\sum_{i=1}^N f(B_t^i+x_0).
+\]
+
+\subsection*{5.2. It\^o Formula and the Drift-Martingale Decomposition}
+To observe the time evolution of this empirical measure, we compute its stochastic differential. Applying It\^o's formula, the differential is expressed as:
+\[
+d\!\left(
+\frac{1}{N}\sum_{i=1}^N f(B_t^i+x_0)
+\right)
+=
+\frac{1}{N}\sum_{i=1}^N df(B_t^i+x_0).
+\]
+
+When we expand $df(B_t^i+x_0)$ using the standard rules of stochastic calculus, we decompose the dynamic into two fundamentally distinct components: an It\^o integral and a correction term (the drift). The expansion gives us:
+\[
+=
+\frac{1}{N}\sum_{i=1}^N f'(B_t^i+x_0)\,dB_t^i
++
+\frac{1}{N}\sum_{i=1}^N \frac{1}{2}f''(B_t^i+x_0)\,dt.
+\]
+
+Let us analyze these two terms closely. The second term is our correction term, which can be written compactly using our empirical measure notation as $\eta_t^N\!\left(\frac{1}{2}f''\right)$. This term captures the expected diffusion, effectively mapping to the Laplacian operator in our emerging macroscopic PDE.
+
+The first term is a local Martingale, which we will denote as $M_t^N(f)$. This term represents the microscopic stochastic fluctuations of the system. To understand the macroscopic limit, we must determine the asymptotic behavior of this It\^o integral as $N\to\infty$. Specifically, we need to prove that
+\[
+M_t^N(f)\xrightarrow[N\to\infty]{}0.
+\]
+
+\subsection*{5.3. Vanishing of the Martingale via It\^o Isometry}
+To prove that the fluctuations vanish, we compute the expected value of the squared martingale, $\mathbb E[(M_t^N(f))^2]$. We do this by applying It\^o isometry, which allows us to equate the expectation of a squared stochastic integral to the expectation of the standard integral of the squared integrand. Because the Brownian motions are independent, the cross-terms in the squared sum take an expectation of zero, leaving us with:
+\[
+\mathbb E[(M_t^N(f))^2]
+=
+\frac{1}{N^2}\sum_{i=1}^N
+\mathbb E\!\left[
+\left(\int_0^t f'(B_s^i+x_0)\,dB_s^i\right)^2
+\right].
+\]
+
+By It\^o isometry, we transform the stochastic integral into a Riemann integral:
+\[
+=
+\frac{1}{N^2}\sum_{i=1}^N
+\mathbb E\!\left[
+\int_0^t f'(B_s^i+x_0)^2\,ds
+\right].
+\]
+
+Since the $N$ Brownian motions are identically distributed, the expectation is the same for every particle $i$. This allows us to simplify the sum completely:
+\[
+=
+\frac{1}{N}
+\mathbb E\!\left[
+\int_0^t f'(B_s+x_0)^2\,ds
+\right].
+\]
+
+\subsection*{5.4. Quadratic Variation}
+We can apply the exact same logic to compute the quadratic variation of the martingale, $\langle M^N(f)\rangle_t$. Evaluating the quadratic variation yields:
+\[
+\langle M^N(f)\rangle_t
+=
+\frac{1}{N^2}\sum_{i=1}^N
+\int_0^t f'(B_s^i+x_0)^2\,ds.
+\]
+
+This expression can be rewritten by pulling the $\frac{1}{N}$ factor out and recognizing the remaining sum as the empirical measure applied to $(f')^2$. Thus, we obtain:
+\[
+=
+\frac{1}{N}\int_0^t \eta_s^N((f')^2)\,ds.
+\]
+
+The critical insight here is that the quadratic variation is of order $O\!\left(\frac{1}{N}\right)$. Because the variance of the martingale term scales by $\frac{1}{N}$, it completely vanishes in the limit as the number of molecules $N$ approaches infinity.
+
+\subsection*{5.5. Conclusion}
+This demonstrates the Law of Large Numbers for our empirical measure. The stochastic noise that characterizes the microscopic gas molecules dissipates entirely, leaving only the deterministic correction term. This remaining term dictates the macroscopic description of the system, effectively deriving the governing PDE from the underlying stochastic particle dynamics.
+
 \section*{Appendix}
 \subsection*{A.1. Brownian Motion}
 \begin{definition}[Brownian motion]
@@ -103,25 +186,37 @@ In this lecture, the particle position is modeled by $X_t^i=B_t^i+x_0$, where ea
 
 \subsection*{A.2. Empirical Average}
 \begin{definition}[General empirical average]
-Let $E$ be a measurable space, let $Y^1,\dots,Y^N$ be $E$-valued random variables, and let $f:E\to\mathbb R$ be bounded measurable. The empirical average is
+Let $E$ be a measurable space, let $Y^1,\dots,Y^N$ be $E$-valued random variables, and let $f:E\to\mathbb R$ be bounded measurable. The empirical average is the random variable
+\[
+\eta^N(f):=\frac{1}{N}\sum_{i=1}^N f(Y^i).
+\]
+For a fixed realization $\omega$, this becomes the realized empirical average
 \[
 \eta^N(f)(\omega):=\frac{1}{N}\sum_{i=1}^N f\bigl(Y^i(\omega)\bigr).
 \]
-This quantity is the sample mean of the observable $f$ evaluated on the $N$ particles.
+This quantity is the sample mean of the observable $f$ evaluated on the $N$ particles. Thus, when we simply say ``empirical average,'' we usually mean the random variable $\eta^N(f)$, while $\eta^N(f)(\omega)$ denotes the realized average for one sample $\omega$.
 In this lecture, we take
 \[
 Y^i=X_t^i:=B_t^i+x_0,
 \]
 so
 \[
+\eta_t^N(f)=\frac{1}{N}\sum_{i=1}^N f(B_t^i+x_0),
+\]
+and for a fixed sample $\omega$,
+\[
 \eta_t^N(f)(\omega)=\frac{1}{N}\sum_{i=1}^N f\bigl(B_t^i+x_0\bigr)(\omega).
 \]
-Thus $\eta_t^N(f)$ is the particle-system average of $f$ at time $t$.
+Thus $\eta_t^N(f)$ is the particle-system empirical average of $f$ at time $t$.
 \end{definition}
 
-\subsection*{A.3. Empirical}
+\subsection*{A.3. Empirical Measure}
 \begin{definition}[Empirical measure]
-For $Y^1,\dots,Y^N$ as above, define
+For $Y^1,\dots,Y^N$ as above, the empirical measure is the random measure
+\[
+\mu^N:=\frac{1}{N}\sum_{i=1}^N \delta_{Y^i}.
+\]
+For a fixed realization $\omega$, this becomes the realized empirical measure
 \[
 \mu^N(\omega):=\frac{1}{N}\sum_{i=1}^N \delta_{Y^i(\omega)}.
 \]
@@ -129,16 +224,18 @@ Then
 \[
 \eta^N(f)(\omega)=\int_E f(y)\,\mu^N(\omega)(dy).
 \]
-This identity says that taking an empirical average is equivalent to integrating against the empirical measure.
-In this lecture, at time $t$,
+Thus, the empirical average is obtained by testing the empirical measure against the function $f$. In this lecture, at time $t$,
+\[
+\mu_t^N:=\frac{1}{N}\sum_{i=1}^N \delta_{B_t^i+x_0},
+\]
+and for a fixed sample $\omega$,
 \[
 \mu_t^N(\omega):=\frac{1}{N}\sum_{i=1}^N \delta_{B_t^i(\omega)+x_0}.
 \]
-Hence
+Then
 \[
 \eta_t^N(f)(\omega)=\int_{\mathbb R} f(x)\,\mu_t^N(\omega)(dx).
 \]
-So the random measure $\mu_t^N$ stores particle locations, and testing it with $f$ gives the empirical average.
 \end{definition}
 
 \subsection*{A.4. Strong Law of Large Numbers (SLLN)}

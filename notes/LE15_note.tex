@@ -1,0 +1,1070 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\title{Lecture 15: Continuous-Time Nonlinear Filtering - Zakai, Kushner-Stratonovich, and Kalman-Bucy}
+\date{February 05, 2026}
+\author{Tien Anh Vu}
+
+\begin{document}
+\maketitle
+
+These notes introduce continuous-time nonlinear filtering for a hidden signal observed through noise. We begin with the signal-observation model, derive the Kallianpur-Striebel formula and the Zakai equation, and then turn to the Kushner-Stratonovich equation, the Kalman-Bucy filter, and ensemble approximations.
+
+\section*{1. The Signal and Observation Model}
+In any filtering problem, we start with a system comprised of two parts: the hidden state we want to track (the signal), and the noisy measurements we actually receive (the observation).
+
+\subsection*{1.1. The Signal Equation (S)}
+We assume our hidden signal, denoted as $X_t$, evolves in a $d$-dimensional space $(\mathbb R^d)$ according to a stochastic differential equation (SDE):
+\[
+dX_t = B(X_t)\,dt + C(X_t)\,dW_t.
+\]
+Here, $B(X_t)$ represents the drift (the deterministic trend of the system), $C(X_t)$ is the diffusion coefficient, and $W_t$ is a standard Brownian motion driving the noise in the signal.
+
+\subsection*{1.2. The Observation Equation (O)}
+Since we cannot see $X_t$ directly, we rely on an observation process $Y_t$, which lives in a $p$-dimensional space $(\mathbb R^p)$:
+\[
+dY_t = H(X_t)\,dt + P\,dV_t.
+\]
+In this equation, $H(X_t)$ is our sensor or observation function, telling us how the hidden state maps to our measurement. The measurement is corrupted by another noise source, $V_t$, scaled by a matrix $P$.
+
+A critical detail here is the covariance matrix of our observation noise. We define
+\[
+R = PP^\top
+\]
+and require that
+\[
+R>0,
+\]
+meaning the covariance matrix must be strictly positive definite. This ensures that our noise is non-degenerate and we don't have perfectly clean observations in any direction.
+
+\section*{2. The Conditional Distribution and Kallianpur-Striebel}
+Our primary goal in filtering is to compute the conditional probability of the state $X_t$ given all the information we have gathered from our observations up to time $t$.
+
+\subsection*{2.1. The Observation Filtration}
+We denote the history of our observations as a filtration
+\[
+\mathcal Y_t = \sigma(Y_s:s\le t).
+\]
+
+\subsection*{2.2. The Normalized Conditional Distribution}
+The normalized conditional distribution is written as
+\[
+\eta_t(A)=P(X_t\in A\mid \mathcal Y_t).
+\]
+In other words, $\eta_t(A)$ is the probability, conditioned on all observations up to time $t$, that the hidden state $X_t$ lies in the set $A$.
+
+\subsection*{2.3. The Kallianpur-Striebel Formula}
+To compute this, we use the famous Kallianpur-Striebel formula, which is essentially Bayes' rule for stochastic processes. It allows us to express this conditional probability as a ratio of expectations using a change of measure:
+\[
+\eta_t(A)=
+\frac{
+E_X\!\left(
+1_A(X_t)\exp\left(
+\int_0^t \left\langle R^{-1}H(X_s),dY_s\right\rangle
+-\frac12\int_0^t \left\langle R^{-1}H(X_s),H(X_s)\right\rangle ds
+\right)
+\right)
+}{
+E_X\!\left(
+\exp\left(
+\int_0^t \left\langle R^{-1}H(X_s),dY_s\right\rangle
+-\frac12\int_0^t \left\langle R^{-1}H(X_s),H(X_s)\right\rangle ds
+\right)
+\right)
+}.
+\]
+In the numerator, the expectation $E_X$ is taken with respect to the signal process $X$, while the observation path $Y_s$ is regarded as fixed data appearing inside the exponential weight.
+This exponential factor assigns larger weight to signal paths that are more compatible with the observed data, so the numerator favors trajectories for which $X_t\in A$ and that better explain the observations. The denominator is the corresponding normalizing constant, ensuring that $\eta_t$ is a genuine probability distribution.
+
+\section*{3. Numerical Challenges and Rough Paths}
+
+\subsection*{3.1. The Practical Difficulty}
+While the Kallianpur-Striebel formula is mathematically beautiful, it presents a practical difficulty: for numerical approximation, it is not a continuous functional of the data stream. Here the filter means the conditional distribution of the hidden state given the observations up to time $t$. As a result, even a small approximation error in the observed path can produce a disproportionately large error in the computed filter.
+
+\subsection*{3.2. Why Rough Path Theory Appears}
+Because the stochastic integral
+\[
+\int_0^t \left\langle R^{-1}H(X_s),dY_s\right\rangle
+\]
+depends on the standard It\^o calculus, small variations in the observation path $Y_t$ can lead to massive jumps in the computed filter. To solve this, modern mathematics turns to rough path theory, which provides a robust representation of this functional. The origin of this rough path necessity lies in the handling of the ``second-order variation'' of the driving noise.
+
+\section*{4. Deriving the Zakai Equation}
+
+\subsection*{4.1. The Unnormalized Conditional Distribution}
+Because dealing with the denominator of the Kallianpur-Striebel formula is cumbersome, we often prefer to track the unnormalized conditional distribution, denoted as $\tilde \eta_t(A)$. This represents the evolution of the numerator alone:
+\[
+\tilde \eta_t(A)=E_X\!\left(
+1_A(\tilde X_t)\exp\left(
+\int_0^t \left\langle R^{-1}H(\tilde X_s),dY_s\right\rangle
+-\frac12\int_0^t \left\langle R^{-1}H(\tilde X_s),H(\tilde X_s)\right\rangle ds
+\right)
+\right).
+\]
+To find a dynamic equation for how this unnormalized distribution evolves over time, we use It\^o's formula. This resulting evolution equation is called the Zakai equation.
+
+\subsection*{4.2. The Derivation}
+Let's define a test function
+\[
+f\in C_b^2(\mathbb R^d)
+\]
+(a twice continuously differentiable function with bounded derivatives). We also denote the likelihood weight, equivalently the exponential martingale or likelihood ratio, by $Z_t(\bar X,Y)$.
+
+When we simulate this, we don't necessarily use the original process from (S); instead, we use a simulated copy, denoted as $\bar X_t$. This lets us take expectations with respect to the signal law while treating the observed path $Y$ as fixed data. We apply the It\^o product rule to the product of our test function and the weight:
+\[
+d\bigl(f(\bar X_t)\cdot Z_t(\bar X,Y)\bigr).
+\]
+Using the product rule, we expand this into
+\[
+d\bigl(f(\bar X_t)\cdot Z_t\bigr)=Z_t(\bar X,Y)\,df(\bar X_t)+f(\bar X_t)\,dZ_t(\bar X,Y).
+\]
+Here one uses
+\[
+df(\bar X_t)=Lf(\bar X_t)\,dt+\nabla f(\bar X_t)\,C(\bar X_t)\,dW_t
+\]
+and
+\[
+dZ_t(\bar X,Y)=Z_t(\bar X,Y)\left\langle R^{-1}H(\bar X_t),dY_t\right\rangle.
+\]
+The first identity comes from It\^o's formula applied to $f(\bar X_t)$, while the second comes from It\^o calculus for the likelihood weight $Z_t(\bar X,Y)$. These are exactly the two differentials that enter It\^o's product rule for $f(\bar X_t)Z_t(\bar X,Y)$.
+By substituting these differentials and grouping the terms, we arrive at the core components of the Zakai equation:
+\[
+d\bigl(f(\bar X_t)\cdot Z_t\bigr)
+=
+Z_t(\bar X,Y)Lf(\bar X_t)\,dt
++Z_t(\bar X,Y)\nabla f(\bar X_t)\,C(\bar X_t)\,dW_t
++f(\bar X_t)Z_t(\bar X,Y)\left\langle R^{-1}H(\bar X_t),dY_t\right\rangle.
+\]
+
+\subsection*{4.3. Interpreting the Terms}
+Let's interpret these terms:
+
+\[
+Lf(\bar X_t):
+\]
+This is the generator of the signal. It captures how the state expectedly evolves according to the drift and diffusion of the original state equation.
+
+The $dY_t$ term: The term
+\[
+f(\bar X_t)Z_t(\bar X,Y)\left\langle R^{-1}H(\bar X_t),dY_t\right\rangle
+\]
+acts as the ``innovation'' or the correction step. It incorporates the incoming data $dY_t$ weighted by the observation function $H$ and the inverse covariance $R^{-1}$.
+
+This gives you a linear stochastic partial differential equation (the Zakai equation) for the unnormalized filter, which is fundamentally easier to solve and analyze than the non-linear Kushner-Stratonovich equation you would get if you tried to take the differential of the normalized filter $\eta_t(A)$.
+
+\section*{5. The Weak Form of the Zakai Equation}
+We have already applied the It\^o product rule to the product $f(\bar X_t)Z_t(\bar X,Y)$ and obtained its differential. We now take expectation with respect to the signal copy $\bar X$ in order to derive the weak form of the Zakai equation.
+
+\subsection*{5.1. Taking Expectation}
+To find the dynamics of the unnormalized conditional distribution $\tilde \eta_t$, we must take the expectation $E_{\bar X}$ of the differential we just expanded.
+
+When we take the expectation, we are integrating over our simulated signal process $\bar X$. The left-hand side, $dE_{\bar X}(f(\bar X_t)Z_t(\bar X,Y))$, becomes the differential of our unnormalized measure acting on the test function, written compactly as $d\tilde \eta_t(f)$.
+
+\subsection*{5.2. The Weak Zakai Equation}
+Applying the expectation to the differential obtained above gives
+\[
+\begin{aligned}
+dE_{\bar X}\bigl(f(\bar X_t)Z_t(\bar X,Y)\bigr)
+= {} & E_{\bar X}\bigl(Z_t(\bar X,Y)Lf(\bar X_t)\bigr)\,dt \\
+& + E_{\bar X}\bigl(Z_t(\bar X,Y)\nabla f(\bar X_t)C(\bar X_t)\,dW_t\bigr) \\
+& + E_{\bar X}\bigl(f(\bar X_t)Z_t(\bar X,Y)\langle R^{-1}H(\bar X_t),dY_t\rangle\bigr).
+\end{aligned}
+\]
+The left-hand side is, by definition,
+\[
+d\tilde \eta_t(f).
+\]
+The middle term vanishes after taking expectation with respect to $\bar X$, so we obtain
+\[
+\begin{aligned}
+d\tilde \eta_t(f)
+= {} & E_{\bar X}\bigl(Z_t(\bar X,Y)Lf(\bar X_t)\bigr)\,dt \\
+& + E_{\bar X}\bigl(f(\bar X_t)H(\bar X_t)Z_t(\bar X,Y)\bigr)R^{-1}\,dY_t.
+\end{aligned}
+\]
+By definition,
+\[
+\tilde \eta_t(g)=E_{\bar X}[g(\bar X_t)\,Z_t(\bar X,Y)]
+\]
+for any test function $g$.
+\[
+E_{\bar X}[Lf(\bar X_t)\,Z_t(\bar X,Y)]=\tilde \eta_t(Lf),
+\qquad
+E_{\bar X}[f(\bar X_t)H(\bar X_t)Z_t(\bar X,Y)]=\tilde \eta_t(fH).
+\]
+Therefore,
+\[
+d\tilde \eta_t(f)=\tilde \eta_t(Lf)\,dt+\tilde \eta_t(fH)R^{-1}\,dY_t.
+\]
+This is exactly the standard semimartingale form: drift term times $dt$ plus noise term times $dY_t$.
+This is the weak form of the Zakai equation. It is called ``weak'' because it is expressed through its action on each sufficiently smooth test function $f$, rather than directly as an equation for the density itself. Equivalently, for every smooth test function $f$, it describes how the unnormalized conditional expectation of $f(X_t)$ evolves under the combined effect of the signal dynamics and the incoming observations.
+
+\section*{6. The Density Form (Strong Form) of the Zakai Equation}
+
+\subsection*{6.1. Passing to a Density}
+While the weak form is mathematically rigorous and highly useful for proofs, we often want to track the actual probability density function in practice.
+
+Assume that our unnormalized measure $\tilde \eta_t(dx)$ actually possesses a density, such that $\tilde \eta_t(dx)=\tilde \eta_t(x)\,dx$. Here $dx$ denotes Lebesgue measure on the state space. If this is the case, we want to strip away the test function $f$ to see how the density $\tilde \eta_t(x)$ itself evolves.
+
+\subsection*{6.2. The Strong Form}
+We do this via integration by parts, moving the spatial derivatives from the test function onto the density itself. Equivalently,
+\[
+\int_{\mathbb R^d} Lf(x)\tilde \eta_t(x)\,dx
+=
+\int_{\mathbb R^d} f(x)L^*\tilde \eta_t(x)\,dx,
+\]
+where $L^*$ is the adjoint of the generator $L$ and acts on the density $\tilde \eta_t(x)$ rather than on the test function $f$. The intermediate integration-by-parts steps are written out in Appendix A.3.
+
+Removing the test function yields the density form of the Zakai equation:
+\[
+d\tilde \eta_t(x)=L^*\tilde \eta_t(x)\,dt+\tilde \eta_t(x)H(x)R^{-1}\,dY_t.
+\]
+This is a linear Stochastic Partial Differential Equation (SPDE) describing the exact evolution of the unnormalized filter density over time.
+In this form, the filter is represented pointwise as a density, which is often more convenient for analysis and numerical approximation.
+
+\section*{7. Transitioning to the Kushner--Stratonovich Equation}
+
+\subsection*{7.1. Normalizing the Filter}
+Now, what if we want the true, normalized conditional probability? As noted, the Kushner-Stratonovich equation (KS) is the counterpart to the Zakai equation for the normalized conditional process.
+The point of this step is to turn the unnormalized filter into a genuine probability measure.
+
+To find it, we must normalize our measure $\tilde \eta_t(f)$ by dividing it by the total mass, which is simply the unnormalized measure evaluated at the constant function $1$, or $\tilde \eta_t(1)$. We define the normalized measure as:
+\[
+\eta_t(f)=\frac{\tilde \eta_t(f)}{\tilde \eta_t(1)}.
+\]
+
+\section*{8. Applying It\^o Calculus to the Ratio}
+
+\subsection*{8.1. The Ratio Function}
+To derive the KS equation, we cannot simply use standard calculus quotient rules because $\tilde \eta_t(f)$ and $\tilde \eta_t(1)$ are stochastic processes driven by Brownian noise. Instead, we must view the pair $(\tilde \eta_t(f),\tilde \eta_t(1))$ as a two-dimensional semimartingale and apply the multidimensional It\^o formula to derive the dynamics.
+More precisely, $\tilde \eta_t(f)$ and $\tilde \eta_t(1)$ are semimartingales, so It\^o calculus applies to their ratio and automatically captures the quadratic variation terms.
+
+Let us define a function for our ratio:
+\[
+h(x,y)=\frac{x}{y}.
+\]
+Here, we substitute $x=\tilde \eta_t(f)$ and $y=\tilde \eta_t(1)$, giving us $\eta_t(f)=h(\tilde \eta_t(f),\tilde \eta_t(1))$.
+
+\subsection*{8.2. It\^o's Formula for the Ratio}
+Applying the multidimensional It\^o formula to the two-dimensional semimartingale $(\tilde \eta_t(f),\tilde \eta_t(1))$ gives
+\[
+d\eta_t(f)=dh(\tilde \eta_t(f),\tilde \eta_t(1)).
+\]
+Therefore the differential depends not only on the first-order partial derivatives of $h$, but also on the second-order partial derivatives interacting with the quadratic variations and covariations of the processes:
+\[
+d\eta_t(f)=h_x(\cdots)\,d\tilde \eta_t(f)+h_y(\cdots)\,d\tilde \eta_t(1)+\frac12 h_{xx}(\cdots)\,d\langle \tilde \eta(f)\rangle_t+h_{xy}(\cdots)\,d\langle \tilde \eta(f),\tilde \eta(1)\rangle_t+\frac12 h_{yy}(\cdots)\,d\langle \tilde \eta(1)\rangle_t.
+\]
+$h_x$ and $h_y$ are the first derivatives with respect to the numerator and denominator.
+
+$h_{xx}$, $h_{xy}$, and $h_{yy}$ are the second derivatives.
+
+The terms in the angle brackets, like $\langle \tilde \eta(f)\rangle_t$, represent the quadratic variation (or covariation) of these semi-martingales.
+
+\subsection*{8.3. Consequence for the KS Equation}
+This expansion is the crucial stepping stone. If you compute these partial derivatives of $h(x,y)=x/y$ and plug in the Zakai differentials we found earlier for $d\tilde \eta_t(f)$ and $d\tilde \eta_t(1)$, you will explicitly derive the Kushner-Stratonovich equation. Because of the quotient rule and the quadratic variation terms, the resulting KS equation is highly non-linear, which is precisely why we often prefer to work with the linear Zakai equation when solving these problems.
+
+\section*{9. Interpreting the Kushner Equation and the Kalman--Bucy Case}
+We have already derived the normalized filtering equation. We now walk through this part of the notes from top to bottom, first summarizing the structure of the Kushner-Stratonovich equation and then specializing it to the linear-Gaussian setting, where the filter closes in finite dimensions.
+
+\subsection*{9.1. The Kushner Equation for Non-Linear Filtering}
+We have just completed the normalization step. We now use it to write the final continuous-time filtering equation for the normalized conditional measure. In that normalization step, terms of the form
+\[
+\frac{1}{\tilde \eta_t(1)}\,\tilde \eta_t(Lf)\,dt
+\qquad\text{and}\qquad
+\frac{1}{\tilde \eta_t(1)}\,\tilde \eta_t(fH)R^{-1}\,dY_t
+\]
+appear naturally. After normalization, these become $\eta_t(Lf)\,dt$ and $\eta_t(fH)R^{-1}\,dY_t$, which is exactly the structure that leads to the Kushner-Stratonovich equation.
+
+We now rewrite that result in a clean final form. Denoting the normalized posterior measure by $\eta_t$, and testing it against a smooth function $f$, we obtain
+\[
+d\eta_t(f)=\underbrace{\eta_t(Lf)\,dt}_{\text{Fokker-Planck term}}+\underbrace{\operatorname{Cov}_{\eta_t}(f,H)R^{-1}}_{\text{gain}}\underbrace{\bigl(dY_t-\eta_t(H)\,dt\bigr)}_{\text{innovation}}.
+\]
+So we have now reached the fundamental Kushner-Stratonovich equation describing the evolution of the normalized conditional distribution over time. Next, we identify the role played by each term:
+
+\paragraph{The Fokker-Planck Term.}
+We begin with the deterministic part of the evolution. The first term, $\eta_t(Lf)\,dt$, corresponds to the Fokker-Planck operator. This represents the natural, unconditioned evolution of the system's state over time driven by the system dynamics, before taking any new observations into account.
+
+\paragraph{The Innovation Term.}
+We have identified the baseline evolution. We now isolate the genuinely new information entering from the data. The term $dY_t-\eta_t(H)\,dt$ is called the innovation. It is the difference between the actual incoming noisy observation $dY_t$ and the predicted observation based on the current posterior belief, namely $\eta_t(H)\,dt$.
+
+\paragraph{The Gain Term.}
+We have identified the innovation term. We now determine how strongly it should change the filter. The factor $\operatorname{Cov}_{\eta_t}(f,H)R^{-1}$ is the gain. It tells us how much the posterior expectation of $f$ should be adjusted in response to the new observation, with the adjustment weighted by the covariance between $f$ and the observation function $H$, and scaled by the inverse observation noise covariance.
+
+\subsection*{9.2. Transitioning to the Kalman--Bucy Filter}
+We have understood the general nonlinear filtering equation. We now move to the most important tractable special case, the Kalman--Bucy filter, which is the continuous-time analogue of the discrete Kalman filter. To do this, we restrict the model to a linear Gaussian setting by assuming $B(x)=Bx$, $H(x)=Hx$, and $C(x)=C$, so the drift and observation are linear in the state, while the diffusion coefficient is constant. We also assume that the initial state is Gaussian: $X_0\sim \mathcal N(m_0,P_0)$. Under these assumptions, the hidden signal becomes an Ornstein-Uhlenbeck process satisfying
+\[
+dX_t=BX_t\,dt+C\,dW_t.
+\]
+
+We have now specified the linear signal and observation model. Next, we write the joint dynamics of $(X_t,Y_t)$ in matrix form:
+\[
+d
+\begin{bmatrix}
+X_t\\
+Y_t
+\end{bmatrix}
+=
+\begin{bmatrix}
+B&0\\
+H&0
+\end{bmatrix}
+\begin{bmatrix}
+X_t\\
+Y_t
+\end{bmatrix}dt
++
+\begin{bmatrix}
+C&0\\
+0&R
+\end{bmatrix}
+\begin{bmatrix}
+dW_t\\
+dV_t
+\end{bmatrix}.
+\]
+The initial joint state is Gaussian as well:
+\[
+\begin{bmatrix}
+X_0\\
+Y_0
+\end{bmatrix}
+\sim
+N\left(
+\begin{bmatrix}
+m_0\\
+0
+\end{bmatrix},
+\begin{bmatrix}
+P_0&0\\
+0&0
+\end{bmatrix}
+\right).
+\]
+Because everything is linear and all noise is Gaussian, the combined signal-observation process $(X_t,Y_t)$ is Gaussian. So we have reduced the problem to a jointly Gaussian system whose law on the path space $C([0,T],\mathbb R^d\times\mathbb R^p)$ is determined by a Gaussian measure. In particular, this path space viewpoint fits naturally with the associated $L^2([0,T])$ framework used to analyze Gaussian processes.
+
+\subsection*{9.3. The Power of Joint Gaussianity}
+We have shown that the joint system is Gaussian. We now use the key structural property of joint Gaussianity: the conditional expectation simplifies dramatically, so $E(X\mid Y)$ is no longer a nonlinear function of $Y$, but an affine function of the form $aY+b$.
+
+As a consequence, the conditional distribution $P(X\in A\mid Y)$ remains Gaussian. It is therefore completely determined by its conditional mean and conditional variance, that is, by a normal law of the form $\mathcal N(E(X\mid Y),\operatorname{Var}(X\mid Y))$.
+In other words, this is the conditional distribution of the hidden variable $X$ once the observation $Y$ is given.
+
+\subsection*{9.4. Synthesizing the Theory}
+We have the two ingredients we need: the general Kushner equation and the joint Gaussian structure. We now combine them. Since in this linear case the filter $\eta_t$ remains Gaussian, the infinite-dimensional filter $\eta_t$ collapses to a finite-dimensional object: $\eta_t=\mathcal N(m_t,P_t)$. So instead of tracking the full posterior distribution $\eta_t$ directly, we only need to track the conditional mean $m_t$ and conditional covariance matrix $P_t$ of the hidden state $X_t$.
+
+We have therefore reduced the filtering problem to tracking only $m_t$ and $P_t$. The final step is to derive their equations. Even though we do not prove it here in full detail, this means that the evolving mean $m_t$ and covariance matrix $P_t$ satisfy the deterministic Kalman--Bucy filter equations. Those equations are obtained by identifying the corresponding terms in the general Kushner equation we derived at the start of this discussion.
+
+\section*{10. Deriving the Kalman--Bucy Equations}
+We now continue directly from where we left off. We have already established the general Kushner--Stratonovich equation and observed that in the linear Gaussian setting the filter $\eta_t$ remains Gaussian. We now derive the explicit deterministic equations that govern this evolving Gaussian law.
+
+\subsection*{10.1. Conditional Mean}
+We begin with the conditional mean of the state, $m_t=E(\operatorname{id}_{\mathbb R^d}\mid Y_{0:t})$. This means that $m_t$ is the conditional expectation of the state $X_t$ given the observation history up to time $t$. Since the filter $\eta_t$ is Gaussian, the pair $(m_t,P_t)$ completely determines $\eta_t$.
+
+We now write down the evolution equation for the mean:
+\[
+dm_t
+=
+Bm_t\,dt
++P_tH^\top R^{-1}(dY_t-Hm_t\,dt).
+\]
+This has the same structure as the Kushner--Stratonovich equation. The term $Bm_t\,dt$ is the natural drift coming from the signal dynamics, while $dY_t-Hm_t\,dt$ is the innovation, namely the actual observation increment minus the predicted one. The factor $P_tH^\top R^{-1}$ is the Kalman gain in continuous time.
+
+\subsection*{10.2. Conditional Covariance}
+Having obtained the mean equation, we now derive the covariance equation. The conditional covariance matrix $P_t$ satisfies the continuous-time Riccati equation
+\[
+dP_t=(BP_t+P_tB^\top+CC^\top)\,dt-P_tH^\top R^{-1}HP_t\,dt.
+\]
+The first group of terms, $BP_t+P_tB^\top+CC^\top$, describes the growth of uncertainty: the terms $BP_t+P_tB^\top$ show how the linear dynamics transform the covariance, while the term $CC^\top$ injects additional uncertainty through the system noise. The second term, $-P_tH^\top R^{-1}HP_t$, describes the reduction of uncertainty due to the observations.
+
+An important point is that this Riccati equation is deterministic. It depends only on the model matrices $(B,C,H,R)$ and not on the realized observation path. So the covariance evolution can be computed in advance, independently of the incoming data.
+
+\subsection*{10.3. Mean Squared Error}
+We next evaluate the performance of the filter $\eta_t$ through the mean squared error $E(\|X_t-m_t\|^2)$.
+Since $m_t=E(X_t\mid Y_{0:t})$, we first have
+\[
+E(\|X_t-m_t\|^2)=E(\|X_t-E(X_t\mid Y_{0:t})\|^2).
+\]
+Using the tower property of conditional expectation, this can be written as
+\[
+E\bigl(E(\|X_t-E(X_t\mid Y_{0:t})\|^2\mid Y_{0:t})\bigr).
+\]
+Since $m_t=E(X_t\mid Y_{0:t})$, the inner conditional expectation is $\operatorname{tr}(P_t)$; see Appendix A.9.
+Therefore the mean squared error is
+\[
+E(\operatorname{tr}(P_t)).
+\]
+Since $P_t$ is deterministic in the Kalman--Bucy setting, this simplifies further to
+\[
+\operatorname{tr}(P_t).
+\]
+
+\subsection*{10.4. Why the Filter Stays Gaussian}
+We finally sketch why the filtering distribution $\eta_t$ remains Gaussian. To prove this, it is natural to study the characteristic function of $\eta_t$. So we test the filter $\eta_t$ against
+\[
+f(x)=e^{i\langle u,x\rangle}.
+\]
+Recall that in the linear case the generator is
+\[
+Lf(x)=\sum_{i=1}^d (Bx)_i\,\partial_i f(x)+\frac12\sum_{i,j=1}^d (CC^\top)_{ij}\,\partial_{ij}f(x).
+\]
+Equivalently, in compact matrix notation,
+\[
+Lf(x)=\langle Bx,\nabla f(x)\rangle+\frac12\operatorname{tr}(CC^\top D^2f(x)),
+\]
+where $D^2f(x)$ denotes the Hessian matrix of $f$ at $x$.
+Applying this generator $L$ to the function $f(x)=e^{i\langle u,x\rangle}$ gives, as shown in Appendix A.10,
+\begin{align*}
+Le^{i\langle u,x\rangle}
+&=
+-\frac12\|C^\top u\|^2 e^{i\langle u,x\rangle}
++i\langle Bx,u\rangle e^{i\langle u,x\rangle}.
+\end{align*}
+The first term comes from the second-order part of the generator, and the second comes from the drift part. Equivalently,
+\begin{align*}
+\langle Bx,u\rangle&=\langle x,B^\top u\rangle.
+\end{align*}
+
+If this test function is inserted into the Kushner--Stratonovich equation, we obtain the characteristic function of $\eta_t$:
+\begin{align*}
+\eta_t\bigl(e^{i\langle u,x\rangle}\bigr)
+&=
+\exp\left(i\langle m_t,u\rangle-\frac12\langle P_tu,u\rangle\right).
+\end{align*}
+This is exactly the characteristic function of the Gaussian law $\mathcal N(m_t,P_t)$, since if $X\sim\mathcal N(m,P)$, then
+\begin{align*}
+E\bigl(e^{i\langle u,X\rangle}\bigr)
+&=
+\exp\left(i\langle m,u\rangle-\frac12\langle Pu,u\rangle\right).
+\end{align*}
+So this closes the argument: the filter $\eta_t$ remains Gaussian, and the equations for $m_t$ and $P_t$ are sufficient to describe its full evolution.
+
+\section*{11. From Exact Filtering to Ensemble Approximations}
+We have already established the theoretical foundation of the Kushner-Stratonovich equation and its exact linear solution - the Kalman-Bucy filter. We now turn to the nonlinear setting, where exact solutions are typically intractable, and move from pure theory to practical, computationally viable approximations.
+
+\subsection*{11.1. The Ensemble Kalman Bucy Algorithm}
+We introduce the ensemble Kalman Bucy algorithm. Its purpose is to approximate the conditional expectation $E(X_t\mid Y_{0:t})$ and the conditional variance $\operatorname{Var}(X_t\mid Y_{0:t})$ in the nonlinear setting.
+In the notation of the previous section, these are precisely the conditional mean $m_t$ and the conditional covariance matrix $P_t$.
+
+To do this, we use a particle-based approach. We approximate the conditional mean by simulating an ensemble of $N$ interacting particles and taking their empirical mean:
+\begin{align*}
+E(X_t\mid Y_{0:t})
+&\approx \frac{1}{N}\sum_{i=1}^N X_t^i
+ =: m_t^N.
+\end{align*}
+We similarly approximate the conditional variance using the empirical covariance of this ensemble:
+\begin{align*}
+\operatorname{Var}(X_t\mid Y_{0:t})
+&\approx \frac{1}{N-1}\sum_{i=1}^N (X_t^i-m_t^N)\otimes (X_t^i-m_t^N).
+\end{align*}
+
+\subsection*{11.2. Particle Dynamics}
+We now write the specific stochastic differential equation (SDE) that each individual particle $X_t^i$ in our ensemble must solve. The dynamics of the $i$-th particle are governed by
+\begin{align*}
+dX_t^i
+&=B(X_t^i)\,dt+C(X_t^i)\,dW_t^i \\
+&\quad + \frac{1}{N-1}\sum_{j=1}^N (X_t^j-m_t^N)\otimes\bigl[H(X_t^j)-H(\mathbb X_t^N)\bigr] \cdot R^{-1}
+\left(dY_t-\frac{H(\mathbb X_t^N)+H(X_t^i)}{2}\,dt\right).
+\end{align*}
+Let us break down this rather massive equation. The first two terms, $B(X_t^i)\,dt+C(X_t^i)\,dW_t^i$, simply mean that each particle follows the original underlying system dynamics. The complex term that follows is our ensemble-based update. The summation term
+\begin{align*}
+\frac{1}{N-1}\sum_{j=1}^N (X_t^j-m_t^N)\otimes\bigl[H(X_t^j)-H(\mathbb X_t^N)\bigr]
+\end{align*}
+acts as our empirical Kalman gain, estimating the cross-covariance between the state and the observation purely from the ensemble particles. Here $H(\mathbb X_t^N)$ is simply the empirical mean of the observation function applied to the ensemble:
+\begin{align*}
+H(\mathbb X_t^N)
+&=
+\frac{1}{N}\sum_{i=1}^N H(X_t^i).
+\end{align*}
+Finally, this gain is multiplied by the inverse observation noise covariance $R^{-1}$ and the specific innovation term for this particle, weighting how much the particle should be ``pulled'' by the actual observation $dY_t$.
+
+\subsection*{11.3. Mean Field Representation of the Optimal Filter}
+We now pass from the finite-particle algorithm to a mean-field representation of the optimal filter. The goal is to minimize the mean squared error.
+
+As the number of particles $N$ approaches infinity, the ensemble behavior can be described by a continuous distribution $\eta_t$, and we define a limiting state $\bar X_t\sim \eta_t$. To find the SDE for this continuous mean-field process, we introduce an Ansatz. We posit that
+\begin{align*}
+d\bar X_t=B(\bar X_t)\,dt+C(\bar X_t)\,dV_t,
+\end{align*}
+which is a copy of the signal. To this signal copy, we add terms that account for the filtering update based on the continuous flow of observations: a drift correction $+a(t,\bar X_t,\bar\eta_t)\,dt$ and a diffusion correction $+K(t,\bar X_t,\bar\eta_t)\,dY_t$.
+\begin{align*}
+d\bar X_t
+&=B(\bar X_t)\,dt+C(\bar X_t)\,dV_t+a(t,\bar X_t,\bar\eta_t)\,dt+K(t,\bar X_t,\bar\eta_t)\,dY_t.
+\end{align*}
+
+The evolution of this mean-field process depends on both $\bar X_t$ and its law $\bar\eta_t=\mathcal L(\bar X_t)$. For that reason the process is non Markovian: its future evolution is not determined by the current state $\bar X_t$ alone, but also by the current law $\bar\eta_t$. We choose the correction functions $a$ and $K$ so that the macroscopic behavior matches the nonlinear Kushner-Stratonovich equation.
+
+\subsection*{11.4. Matching the Fokker-Planck and Kushner-Stratonovich Equations}
+Finally, we prove this correspondence. Applying It\^o's formula and then taking expectation gives the Fokker-Planck equation for the density $\bar\eta_t$.
+
+Applying It\^o's formula to a test function $f$ under this mean-field process gives us:
+\begin{align*}
+d\bar\eta_t(f)
+&=\bar\eta_t(Lf)\,dt+\bar\eta_t(\nabla f\cdot a)\,dt+\bar\eta_t(\nabla f\cdot K(t,\bar\eta_t))R^{-1}\,dY_t \\
+&\quad +\frac12\,\bar\eta_t\bigl(\operatorname{tr}((\nabla^2 f)K(t,\bar\eta_t)RK(t,\bar\eta_t)^\top)\bigr)\,dt.
+\end{align*}
+The first term $\bar\eta_t(Lf)\,dt$ is the standard infinitesimal generator $L$ acting on our system, representing the natural diffusion. The remaining terms are generated by our carefully chosen Ansatz functions $a$ and $K$. By equating this resulting equation with the actual Kushner-Stratonovich equation from our previous lecture, we can explicitly solve for the exact forms that $a$ and $K$ must take to make our mean-field representation an exact match for the optimal nonlinear filter.
+
+\section*{12. Identifying the Gain Equation}
+We have just applied It\^o's formula to the mean-field Ansatz and obtained the evolution of its distribution $\bar\eta_t$. We now compare this evolution with the optimal nonlinear filter defined by the Kushner-Stratonovich equation in order to determine the correction term $K$.
+
+\subsection*{12.1. The Target Kushner-Stratonovich Equation}
+The target equation is the Kushner-Stratonovich equation applied to a test function $f$:
+\begin{align*}
+d\eta_t(f)
+&=\eta_t(Lf)\,dt+\underbrace{\bigl(\eta_t(fH)-\eta_t(f)\eta_t(H)\bigr)}_{\operatorname{Cov}_{\eta_t}(f,H)}R^{-1}\bigl(dY_t-\eta_t(H)\,dt\bigr).
+\end{align*}
+Its structure is the same as before: the Fokker-Planck drift term $\eta_t(Lf)\,dt$ is followed by the observation update, where the covariance between the state and the observation appears as $\operatorname{Cov}_{\eta_t}(f,H)$.
+
+\subsection*{12.2. Matching the Mean-Field Law with the True Filter}
+Because the goal is for the mean-field particle system to reproduce the true filtering distribution, we impose the requirement
+\begin{align*}
+\bar\eta_t=\eta_t.
+\end{align*}
+This means that the law of the mean-field process $\bar X_t$ is required to coincide with the true filter $\eta_t$ at each time $t$.
+Recall that the mean-field equation contains the term
+\begin{align*}
+\bar\eta_t(\nabla f\cdot K(t,\bar\eta_t))R^{-1}\,dY_t,
+\end{align*}
+while the Kushner-Stratonovich equation contains the observation term
+\begin{align*}
+\bigl(\eta_t(fH)-\eta_t(f)\eta_t(H)\bigr)R^{-1}\,dY_t.
+\end{align*}
+We compare these $dY_t$ terms because this is the part that contains the unknown gain $K$. Matching them gives
+\begin{align*}
+\eta_t(\nabla f\cdot K)=\eta_t\bigl(f(H-\eta_t(H))\bigr).
+\end{align*}
+This identity is required to hold for every test function $f$.
+
+\subsection*{12.3. Deriving the PDE for $K$}
+We now isolate the unknown gain function $K$. Using integration by parts to move the gradient away from the test function $f$ yields the PDE
+\begin{align*}
+-\nabla\cdot(\eta_t K)=(H-\eta_t(H))\eta_t.
+\end{align*}
+See Appendix A.11 for the derivation. So the gain field $K$ is determined by a divergence equation.
+
+\subsection*{12.4. Non-Uniqueness of the Gain}
+This PDE does not determine a unique vector field $K$. Indeed, if $U:\mathbb R^d\to\mathbb R^d$ satisfies
+\begin{align*}
+\nabla\cdot(\eta_t U)=0,
+\end{align*}
+then $K+U$ is again a solution of the same PDE. The gain is therefore determined only up to the addition of such divergence-free fields.
+
+\subsection*{12.5. Measure-Preserving Flows}
+To interpret this non-uniqueness, consider the flow generated by $U$:
+\begin{align*}
+\dot \xi_t(x)=U(\xi_t(x)).
+\end{align*}
+This is the flow map generated by the vector field $U$, that is, a continuous map $x\mapsto \xi_t(x)$ of the state space into itself. Moving along this flow means that a point starting at $x$ evolves in time according to the ODE above and is transported to $\xi_t(x)$. Because $\nabla\cdot(\eta_t U)=0$, moving particles along this flow preserves the density $\eta_t$. In other words, the microscopic particle trajectories change, but the macroscopic filtering distribution does not. This shows that there are infinitely many particle dynamics that lead to the same optimal macroscopic filter.
+
+\appendix
+\section*{Appendix A}
+
+\subsection*{A.1. Meaning of the Filter}
+The filter is the evolving estimate of the hidden state based on the observations seen so far. More precisely, it is the conditional law of the signal given the observation history:
+\[
+\eta_t(A)=P(X_t\in A\mid \mathcal Y_t).
+\]
+So ``filter'' means that one observes noisy data over time, uses that data to infer the current hidden state, and encodes this inference in the conditional distribution above.
+
+The word ``filter'' is used because the observation stream contains both information and noise. The filtering problem is to extract the information about the hidden state from that noisy stream.
+
+There are two common versions: $\eta_t$, the normalized filter, which is the actual conditional probability measure, and $\tilde \eta_t$, the unnormalized filter, which is easier to evolve mathematically and is normalized afterward.
+
+\subsection*{A.2. Meaning of the Kallianpur--Striebel Formula}
+The Kallianpur--Striebel formula is Bayes' rule for continuous-time filtering. It says that one starts from the prior law of the hidden signal, weights each candidate path by how well it matches the observed data, and then normalizes.
+
+In this sense, the formula expresses the filter as
+\[
+\eta_t(A)
+=
+\frac{\text{weighted prior mass of }A}{\text{total weighted mass}}.
+\]
+The numerator selects those paths whose state at time $t$ lies in $A$ and weights them by the likelihood, while the denominator normalizes the result so that one obtains a probability measure. Conceptually, it is the rule that updates prior information into the posterior conditional law of the hidden state given the observations.
+
+\subsection*{A.3. Derivation of the Density Form of the Zakai Equation}
+Start from the weak form of the Zakai equation:
+\[
+d\tilde \eta_t(f)=\tilde \eta_t(Lf)\,dt+\tilde \eta_t(fH)R^{-1}\,dY_t.
+\]
+Assume now that the measure $\tilde \eta_t$ has a density with respect to Lebesgue measure, so that
+\[
+\tilde \eta_t(dx)=\tilde \eta_t(x)\,dx.
+\]
+Then the action of the measure on a test function can be written as
+\[
+\tilde \eta_t(f)=\int_{\mathbb R^d} f(x)\tilde \eta_t(x)\,dx.
+\]
+Substituting this into the weak Zakai equation gives
+\[
+d\int_{\mathbb R^d} f(x)\tilde \eta_t(x)\,dx
+=
+\int_{\mathbb R^d} Lf(x)\tilde \eta_t(x)\,dx\,dt
++
+\int_{\mathbb R^d} f(x)H(x)\tilde \eta_t(x)\,dx\,R^{-1}dY_t.
+\]
+
+To make the density itself evolve, one has to move the derivatives in $Lf$ from the test function onto the density. Write the generator in coordinates as
+\[
+Lf(x)=\sum_{i=1}^d b_i(x)\partial_i f(x)+\frac12\sum_{i,j=1}^d a_{ij}(x)\partial_{ij}f(x),
+\qquad a(x)=C(x)C(x)^\top.
+\]
+Then
+\[
+\int_{\mathbb R^d} Lf(x)\tilde \eta_t(x)\,dx
+=
+\int_{\mathbb R^d}\sum_{i=1}^d b_i(x)\partial_i f(x)\tilde \eta_t(x)\,dx
++
+\frac12\int_{\mathbb R^d}\sum_{i,j=1}^d a_{ij}(x)\partial_{ij}f(x)\tilde \eta_t(x)\,dx.
+\]
+For the first-order term, use integration by parts in the form $\int u\,dv=uv-\int v\,du$ with
+\[
+u=b_i(x)\tilde \eta_t(x),
+\qquad
+dv=\partial_i f(x)\,dx,
+\qquad
+v=f(x),
+\qquad
+du=\partial_i\bigl(b_i(x)\tilde \eta_t(x)\bigr)\,dx.
+\]
+Assuming the boundary terms vanish, this gives
+\[
+\int_{\mathbb R^d}\sum_{i=1}^d b_i(x)\partial_i f(x)\tilde \eta_t(x)\,dx
+=
+-\int_{\mathbb R^d} f(x)\sum_{i=1}^d \partial_i\bigl(b_i(x)\tilde \eta_t(x)\bigr)\,dx,
+\]
+while the second-order term becomes
+\[
+\frac12\int_{\mathbb R^d}\sum_{i,j=1}^d a_{ij}(x)\partial_{ij}f(x)\tilde \eta_t(x)\,dx
+=
+\frac12\int_{\mathbb R^d} f(x)\sum_{i,j=1}^d \partial_{ij}\bigl(a_{ij}(x)\tilde \eta_t(x)\bigr)\,dx.
+\]
+Hence
+\[
+\int_{\mathbb R^d} Lf(x)\tilde \eta_t(x)\,dx
+=
+\int_{\mathbb R^d} f(x)\,L^*\tilde \eta_t(x)\,dx,
+\]
+where the adjoint operator is
+\[
+L^*\rho
+=
+-\sum_{i=1}^d \partial_i(b_i\rho)+\frac12\sum_{i,j=1}^d \partial_{ij}(a_{ij}\rho).
+\]
+The observation term already has the test function in the correct position:
+\[
+\int_{\mathbb R^d} f(x)H(x)\tilde \eta_t(x)\,dx\,R^{-1}dY_t.
+\]
+Putting everything together,
+\[
+d\int_{\mathbb R^d} f(x)\tilde \eta_t(x)\,dx
+=
+\int_{\mathbb R^d} f(x)L^*\tilde \eta_t(x)\,dx\,dt
++
+\int_{\mathbb R^d} f(x)\tilde \eta_t(x)H(x)\,dx\,R^{-1}dY_t.
+\]
+Since this identity holds for every smooth test function $f$, one removes the test function and obtains the density form of the Zakai equation:
+\[
+d\tilde \eta_t(x)=L^*\tilde \eta_t(x)\,dt+\tilde \eta_t(x)H(x)R^{-1}\,dY_t.
+\]
+
+\subsection*{A.4. Derivation of the Weak Form of the Zakai Equation}
+The weak Zakai equation is obtained directly from the It\^o product expansion for the weighted test function. Starting from
+\[
+d\bigl(f(\bar X_t)Z_t(\bar X,Y)\bigr)
+=
+Z_t(\bar X,Y)Lf(\bar X_t)\,dt
++Z_t(\bar X,Y)\nabla f(\bar X_t)C(\bar X_t)\,dW_t
++f(\bar X_t)Z_t(\bar X,Y)\left\langle R^{-1}H(\bar X_t),dY_t\right\rangle,
+\]
+take expectation with respect to the simulated signal copy $\bar X$. This gives
+\[
+dE_{\bar X}\bigl(f(\bar X_t)Z_t(\bar X,Y)\bigr)
+=
+E_{\bar X}\bigl(Z_t(\bar X,Y)Lf(\bar X_t)\bigr)\,dt
++E_{\bar X}\bigl(Z_t(\bar X,Y)\nabla f(\bar X_t)C(\bar X_t)\,dW_t\bigr)
++E_{\bar X}\bigl(f(\bar X_t)Z_t(\bar X,Y)\left\langle R^{-1}H(\bar X_t),dY_t\right\rangle\bigr).
+\]
+The left-hand side is, by definition,
+\[
+d\tilde \eta_t(f).
+\]
+The middle term drops out after taking expectation, because it is a martingale term with respect to the signal Brownian motion. Therefore one obtains
+\[
+d\tilde \eta_t(f)
+=
+E_{\bar X}\bigl(Lf(\bar X_t)Z_t(\bar X,Y)\bigr)\,dt
++E_{\bar X}\bigl(f(\bar X_t)H(\bar X_t)Z_t(\bar X,Y)\bigr)R^{-1}\,dY_t.
+\]
+Now use the definition
+\[
+\tilde \eta_t(g)=E_{\bar X}\bigl(g(\bar X_t)Z_t(\bar X,Y)\bigr)
+\]
+for test functions $g$. Applying this once with $g=Lf$ and once with $g=fH$ yields
+\[
+d\tilde \eta_t(f)=\tilde \eta_t(Lf)\,dt+\tilde \eta_t(fH)R^{-1}\,dY_t.
+\]
+This is the weak form of the Zakai equation. It is called weak because it is expressed through the action of the measure-valued process $\tilde \eta_t$ on test functions rather than directly through a pointwise density.
+
+\subsection*{A.5. Full Multidimensional It\^o Formula for $\eta_t(f)$}
+To derive the Kushner--Stratonovich equation, write the normalized filter as a ratio of two semimartingales:
+\[
+\eta_t(f)=\frac{\tilde \eta_t(f)}{\tilde \eta_t(1)}.
+\]
+Set
+\[
+U_t=\tilde \eta_t(f),
+\qquad
+V_t=\tilde \eta_t(1),
+\]
+and define
+\[
+h(x,y)=\frac{x}{y}.
+\]
+Then
+\[
+\eta_t(f)=h(U_t,V_t).
+\]
+Since $(U_t,V_t)$ is a two-dimensional semimartingale, It\^o's formula gives
+\[
+dh(U_t,V_t)
+=
+h_x(U_t,V_t)\,dU_t
++
+h_y(U_t,V_t)\,dV_t
++
+\frac12 h_{xx}(U_t,V_t)\,d\langle U\rangle_t
++
+h_{xy}(U_t,V_t)\,d\langle U,V\rangle_t
++
+\frac12 h_{yy}(U_t,V_t)\,d\langle V\rangle_t.
+\]
+For the specific function $h(x,y)=x/y$, the derivatives are
+\[
+h_x(x,y)=\frac1y,
+\qquad
+h_y(x,y)=-\frac{x}{y^2},
+\]
+\[
+h_{xx}(x,y)=0,
+\qquad
+h_{xy}(x,y)=-\frac1{y^2},
+\qquad
+h_{yy}(x,y)=\frac{2x}{y^3}.
+\]
+Substituting these derivatives yields
+\[
+d\eta_t(f)
+=
+\frac{1}{V_t}\,dU_t
+-\frac{U_t}{V_t^2}\,dV_t
+-\frac{1}{V_t^2}\,d\langle U,V\rangle_t
++\frac{U_t}{V_t^3}\,d\langle V\rangle_t.
+\]
+Since
+\[
+U_t=\tilde \eta_t(f),
+\qquad
+V_t=\tilde \eta_t(1),
+\]
+this becomes
+\[
+d\eta_t(f)
+=
+\frac{1}{\tilde \eta_t(1)}\,d\tilde \eta_t(f)
+-\frac{\tilde \eta_t(f)}{\tilde \eta_t(1)^2}\,d\tilde \eta_t(1)
+-\frac{1}{\tilde \eta_t(1)^2}\,d\langle \tilde \eta(f),\tilde \eta(1)\rangle_t
++\frac{\tilde \eta_t(f)}{\tilde \eta_t(1)^3}\,d\langle \tilde \eta(1)\rangle_t.
+\]
+Now insert the weak Zakai dynamics
+\[
+d\tilde \eta_t(f)=\tilde \eta_t(Lf)\,dt+\tilde \eta_t(fH)R^{-1}\,dY_t
+\]
+and
+\[
+d\tilde \eta_t(1)=\tilde \eta_t(H)R^{-1}\,dY_t,
+\]
+since $L1=0$.
+
+The quadratic variation terms come from the $dY_t$-parts. Writing only the martingale parts,
+\[
+dU_t^{\,m}=\tilde \eta_t(fH)R^{-1}\,dY_t,
+\qquad
+dV_t^{\,m}=\tilde \eta_t(H)R^{-1}\,dY_t.
+\]
+Therefore,
+\[
+d\langle U,V\rangle_t
+=
+\tilde \eta_t(fH)R^{-1}R(R^{-1})^\top \tilde \eta_t(H)^\top\,dt,
+\]
+and similarly
+\[
+d\langle V\rangle_t
+=
+\tilde \eta_t(H)R^{-1}R(R^{-1})^\top \tilde \eta_t(H)^\top\,dt.
+\]
+In the symmetric case this simplifies to
+\[
+d\langle U,V\rangle_t
+=
+\tilde \eta_t(fH)R^{-1}\tilde \eta_t(H)^\top\,dt,
+\]
+\[
+d\langle V\rangle_t
+=
+\tilde \eta_t(H)R^{-1}\tilde \eta_t(H)^\top\,dt.
+\]
+Substituting these terms into the It\^o expansion yields the Kushner--Stratonovich equation. The key point is that the normalization step introduces the quadratic variation and covariation terms, which is why the resulting equation is nonlinear.
+
+\subsection*{A.6. Derivation of the Differential for the Likelihood Weight}
+The likelihood weight $Z_t(\bar X,Y)$ is defined by the stochastic exponential
+\[
+Z_t(\bar X,Y)
+=
+\exp\left(
+\int_0^t \left\langle R^{-1}H(\bar X_s),dY_s\right\rangle
+-\frac12\int_0^t \left\langle R^{-1}H(\bar X_s),H(\bar X_s)\right\rangle ds
+\right).
+\]
+To derive its differential, set
+\[
+M_t=\int_0^t \left\langle R^{-1}H(\bar X_s),dY_s\right\rangle.
+\]
+Then
+\[
+Z_t(\bar X,Y)=\exp\left(M_t-\frac12\langle M\rangle_t\right).
+\]
+This is the Dol\'eans--Dade exponential of the semimartingale $M_t$. A standard result from It\^o calculus says that if
+\[
+\mathcal E(M)_t=\exp\left(M_t-\frac12\langle M\rangle_t\right),
+\]
+then
+\[
+d\mathcal E(M)_t=\mathcal E(M)_t\,dM_t.
+\]
+Applying this identity here gives
+\[
+dZ_t(\bar X,Y)=Z_t(\bar X,Y)\,dM_t.
+\]
+Since
+\[
+dM_t=\left\langle R^{-1}H(\bar X_t),dY_t\right\rangle,
+\]
+we obtain
+\[
+dZ_t(\bar X,Y)=Z_t(\bar X,Y)\left\langle R^{-1}H(\bar X_t),dY_t\right\rangle.
+\]
+This is the differential used in the product rule calculation in Section 4.2.
+
+\subsection*{A.7. Kalman, Kalman--Bucy, and Ensemble Kalman Filters}
+These three filters are closely related, but they apply in different settings. In each case, a filter means the evolving conditional estimate of the hidden state based on the observations collected so far.
+
+\paragraph{Kalman Filter.}
+The Kalman filter is the discrete-time filter for linear Gaussian state-space models. A standard model is
+\[
+X_{k+1}=AX_k+\xi_k,
+\qquad
+Y_k=HX_k+\zeta_k,
+\]
+where $\xi_k$ and $\zeta_k$ are Gaussian noises. Here the filter is the conditional distribution of $X_k$ given the observations up to step $k$. In this setting, the posterior distribution remains Gaussian at each step, so it is enough to update the mean and covariance recursively.
+
+\paragraph{Kalman--Bucy Filter.}
+The Kalman--Bucy filter is the continuous-time analogue of the Kalman filter. In the linear Gaussian case considered in Section 9, the signal and observation satisfy
+\[
+dX_t=BX_t\,dt+C\,dW_t,
+\qquad
+dY_t=HX_t\,dt+R^{1/2}dV_t.
+\]
+Here the filter is the conditional distribution of $X_t$ given the observation path up to time $t$. Again the conditional law remains Gaussian, so the filter is fully determined by its mean $m_t$ and covariance $P_t$, which satisfy differential equations rather than discrete recursions.
+
+\paragraph{Ensemble Kalman Filter.}
+The ensemble Kalman filter is a particle-based approximation inspired by the Kalman filter. Here the filter is approximated by an ensemble of particles whose empirical mean and covariance are used in place of the exact ones. It is especially useful in high-dimensional applications where evolving the full covariance matrix directly is too expensive.
+
+\paragraph{Summary.}
+The Kalman filter is discrete-time and exact for linear Gaussian models. The Kalman--Bucy filter is the continuous-time version, also exact in the linear Gaussian case. The ensemble Kalman filter is an approximate Monte Carlo method that uses a finite ensemble to mimic the same update mechanism.
+
+\subsection*{A.8. Meaning of $E(\operatorname{id}\mid Y_{0:t})$}
+The notation $E(\operatorname{id}_{\mathbb R^d}(X_t)\mid Y_{0:t})$ means that we apply conditional expectation to the identity function evaluated at the state. Since the identity function simply returns its input, this is just a formal way of writing the conditional mean of the state itself:
+\[
+E(\operatorname{id}_{\mathbb R^d}(X_t)\mid Y_{0:t})=E(X_t\mid Y_{0:t}).
+\]
+
+It is sometimes written this way because the filter acts on test functions $f$, and the choice $f(x)=x$ extracts the first moment.
+
+In one dimension, if $\operatorname{id}_{\mathbb R}(x)=x$, then
+\[
+E(\operatorname{id}_{\mathbb R}(X_t)\mid Y_{0:t})=E(X_t\mid Y_{0:t}).
+\]
+
+In higher dimension, if $X_t=(X_t^1,\dots,X_t^d)\in\mathbb R^d$ and $\operatorname{id}_{\mathbb R^d}(x)=x$, then
+\[
+E(\operatorname{id}_{\mathbb R^d}(X_t)\mid Y_{0:t})
+=
+E(X_t\mid Y_{0:t})
+=
+\begin{pmatrix}
+E(X_t^1\mid Y_{0:t})\\
+\vdots\\
+E(X_t^d\mid Y_{0:t})
+\end{pmatrix}.
+\]
+
+For example, if $d=2$ and $X_t=(X_t^1,X_t^2)$, then
+\[
+E(\operatorname{id}_{\mathbb R^2}(X_t)\mid Y_{0:t})
+=
+\bigl(E(X_t^1\mid Y_{0:t}),\,E(X_t^2\mid Y_{0:t})\bigr).
+\]
+So this notation simply gives the conditional mean vector.
+
+\subsection*{A.9. Why the Conditional Mean Squared Error Equals $\operatorname{tr}(P_t)$}
+\begin{lemma}
+Let
+\[
+m_t=E(X_t\mid Y_{0:t})
+\qquad\text{and}\qquad
+P_t=E\bigl((X_t-m_t)(X_t-m_t)^\top\mid Y_{0:t}\bigr).
+\]
+Then
+\[
+E(\|X_t-E(X_t\mid Y_{0:t})\|^2\mid Y_{0:t})=\operatorname{tr}(P_t).
+\]
+\end{lemma}
+
+\begin{proof}
+Since $m_t=E(X_t\mid Y_{0:t})$, we have
+\[
+E(\|X_t-E(X_t\mid Y_{0:t})\|^2\mid Y_{0:t})
+=E(\|X_t-m_t\|^2\mid Y_{0:t}).
+\]
+Now
+\[
+\|X_t-m_t\|^2=(X_t-m_t)^\top(X_t-m_t)
+=\operatorname{tr}\bigl((X_t-m_t)(X_t-m_t)^\top\bigr).
+\]
+Taking conditional expectation and using the definition of $P_t$ yields
+\[
+E(\|X_t-m_t\|^2\mid Y_{0:t})
+=\operatorname{tr}\Big(E\bigl((X_t-m_t)(X_t-m_t)^\top\mid Y_{0:t}\bigr)\Big)
+=\operatorname{tr}(P_t).
+\]
+Here we use that $\operatorname{tr}$ is a linear map, so it commutes with conditional expectation.
+\end{proof}
+
+\subsection*{A.10. Why $L e^{i\langle u,x\rangle}$ Has This Form}
+\begin{lemma}
+Let
+\[
+f(x)=e^{i\langle u,x\rangle}.
+\]
+Then
+\[
+Le^{i\langle u,x\rangle}
+=-\frac12\|C^\top u\|^2 e^{i\langle u,x\rangle}
++i\langle Bx,u\rangle e^{i\langle u,x\rangle}.
+\]
+\end{lemma}
+
+\begin{proof}
+We compute the first and second derivatives explicitly. For each $i=1,\dots,d$,
+\[
+\partial_i f(x)=iu_i e^{i\langle u,x\rangle}.
+\]
+Differentiating once more gives
+\[
+\partial_{ij}f(x)=-u_i u_j e^{i\langle u,x\rangle}.
+\]
+Now insert these derivatives into the coordinate form of the generator:
+\[
+Lf(x)=\sum_{i=1}^d (Bx)_i\,\partial_i f(x)+\frac12\sum_{i,j=1}^d (CC^\top)_{ij}\,\partial_{ij}f(x).
+\]
+For the drift part, we obtain
+\[
+\sum_{i=1}^d (Bx)_i\,\partial_i f(x)
+=\sum_{i=1}^d (Bx)_i\,iu_i e^{i\langle u,x\rangle}
+=i\langle Bx,u\rangle e^{i\langle u,x\rangle}.
+\]
+For the second-order part, we obtain
+\[
+\frac12\sum_{i,j=1}^d (CC^\top)_{ij}\,\partial_{ij}f(x)
+=-\frac12\sum_{i,j=1}^d (CC^\top)_{ij}u_i u_j\, e^{i\langle u,x\rangle}.
+\]
+Since
+\[
+\sum_{i,j=1}^d (CC^\top)_{ij}u_i u_j
+=u^\top CC^\top u
+=\|C^\top u\|^2,
+\]
+this becomes
+\[
+-\frac12\|C^\top u\|^2 e^{i\langle u,x\rangle}.
+\]
+Combining the drift and second-order terms gives
+\[
+Le^{i\langle u,x\rangle}
+=-\frac12\|C^\top u\|^2 e^{i\langle u,x\rangle}
++i\langle Bx,u\rangle e^{i\langle u,x\rangle}.
+\]
+\end{proof}
+
+\subsection*{A.11. Deriving the PDE for the Gain}
+\begin{lemma}
+Assume that $\eta_t$ admits a density, still denoted by $\eta_t(x)$. If
+\[
+\eta_t(\nabla f\cdot K)=\eta_t\bigl(f(H-\eta_t(H))\bigr)
+\]
+for every smooth test function $f$, then
+\[
+-\nabla\cdot(\eta_t K)=(H-\eta_t(H))\eta_t.
+\]
+\end{lemma}
+
+\begin{proof}
+Write the identity in integral form:
+\[
+\int_{\mathbb R^d} \nabla f(x)\cdot K(x)\,\eta_t(x)\,dx
+=
+\int_{\mathbb R^d} f(x)\bigl(H(x)-\eta_t(H)\bigr)\eta_t(x)\,dx.
+\]
+Since
+\[
+\nabla f(x)\cdot K(x)=\sum_{i=1}^d \partial_i f(x)\,K_i(x),
+\]
+the left-hand side becomes
+\[
+\sum_{i=1}^d \int_{\mathbb R^d} \partial_i f(x)\,K_i(x)\eta_t(x)\,dx.
+\]
+We now integrate by parts in each coordinate and assume the boundary terms vanish at infinity. This gives
+\[
+\int_{\mathbb R^d} \partial_i f(x)\,K_i(x)\eta_t(x)\,dx
+=
+-\int_{\mathbb R^d} f(x)\,\partial_i\bigl(K_i(x)\eta_t(x)\bigr)\,dx.
+\]
+Summing over $i$ yields
+\[
+\int_{\mathbb R^d} \nabla f(x)\cdot K(x)\,\eta_t(x)\,dx
+=
+-\int_{\mathbb R^d} f(x)\,\nabla\cdot(\eta_t K)(x)\,dx.
+\]
+Comparing this with the right-hand side,
+\[
+\int_{\mathbb R^d} f(x)\bigl(H(x)-\eta_t(H)\bigr)\eta_t(x)\,dx,
+\]
+we obtain
+\[
+\int_{\mathbb R^d} f(x)\Bigl[-\nabla\cdot(\eta_t K)(x)-\bigl(H(x)-\eta_t(H)\bigr)\eta_t(x)\Bigr]\,dx=0
+\]
+for every test function $f$. Therefore
+\[
+-\nabla\cdot(\eta_t K)=(H-\eta_t(H))\eta_t.
+\]
+\end{proof}
+
+\end{document}
