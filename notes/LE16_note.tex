@@ -22,7 +22,7 @@ These notes introduce stochastic reaction-diffusion systems. We begin with the b
 
 \section*{1. Diffusion and Reaction}
 These systems are driven by two fundamental mechanisms: diffusion and reaction.
-Here $v(t,x)$ denotes the scalar state variable, that is, the quantity evolving in time and space; depending on the model, it could represent, for example, a temperature, a concentration, or a population density.
+Here $v(t,x)\in\mathbb R$ denotes the scalar state variable, that is, the quantity evolving in time and space; depending on the model, it could represent, for example, a temperature, a concentration, or a population density.
 
 \subsection*{1.1. The Diffusion Component}
 First, let us examine the Diffusion component. In our equations, this typically manifests as a term containing the Laplacian, denoted as $\Delta v$. The coefficients $a_{ij}(x)$ describe how diffusion acts in each pair of coordinate directions, and together they form the diffusion matrix
@@ -33,7 +33,7 @@ Here $d$ is the spatial dimension. So if the state variable is $x=(x_1,\dots,x_d
 \[
 \sum_{i,j=1}^d a_{ij}(x)\partial_{ij}v(x).
 \]
-For this to represent true diffusion, the operator must be strictly elliptic, which means that the quadratic form $\sum_{i,j=1}^d a_{ij}(x)h_i h_j$ is bounded below by $\kappa|h|^2>0$. If we simply set $a_{ij}=\delta_{ij}$ (the Kronecker delta), we beautifully recover the standard, isotropic Laplacian. However, by allowing $a_{ij}$ to depend on the spatial variable $x$, the diffusion may have preferred directions depending on location. This allows us to model heterogeneous environments where particles might diffuse faster in certain directions.
+For this to represent true diffusion, the operator must be strictly elliptic, which means that the quadratic form $\sum_{i,j=1}^d a_{ij}(x)h_i h_j$ is bounded below by $\kappa\|h\|^2>0$. If we simply set $a_{ij}=\delta_{ij}$ (the Kronecker delta), we beautifully recover the standard, isotropic Laplacian. However, by allowing $a_{ij}$ to depend on the spatial variable $x$, the diffusion may have preferred directions depending on location. This allows us to model heterogeneous environments where particles might diffuse faster in certain directions.
 
 \subsection*{1.2. The Reaction Component}
 Next, we look at the Reaction component. Unlike diffusion, which involves spatial derivatives, the reaction equation contains a zero-order term of the form $f(v(x))$, which is typically nonlinear. This term describes how the quantity $v$ interacts with itself locally at a specific point in space, independent of its neighbors.
@@ -114,20 +114,20 @@ The first major example is the Fisher or KPP equation, where the reaction functi
 \[
 f(v)=v(1-v).
 \]
-In this case the coercivity condition is not fulfilled in the same way as for an odd polynomial. The graph of $f(v)$ is a downward-facing parabola with zeros at $0$ and $1$. The equilibrium $0$ is unstable, while $1$ is stable, so the dynamics tend to evolve away from $0$ and toward the state $1$.
+In this case the coercivity condition is not fulfilled in the same way as for an odd polynomial. The graph of $f(v)$ is a downward-facing parabola with zeros at $0$ and $1$. The fixed point $0$ is unstable, while $1$ is stable, so the dynamics tend to evolve away from $0$ and toward the state $1$.
 
 \subsection*{4.2. The Nagumo Equation}
 The second special case is the Nagumo equation, where
 \[
 f(v)=v(1-v)(v-a).
 \]
-This is a cubic reaction term. The function crosses the axis at three points, namely $0$, $a$, and $1$. In this bistable system, both $0$ and $1$ are stable equilibria, while the intermediate state $a$ is unstable.
+Here the parameter $a$ satisfies $0<a<1$. This is a cubic reaction term. The function crosses the axis at three points, namely $0$, $a$, and $1$. In this bistable system, both $0$ and $1$ are stable fixed points, while the intermediate state $a$ is unstable.
 
 \section*{5. Traveling Waves}
 We next study traveling waves, which provide a mathematical description of the wave fronts seen in numerical simulations. These coherent structures connect stable states and may propagate either to the left or to the right. They are used, for example, in models of synchronization of neural activity and signal propagation along nerve fibers.
 
 \subsection*{5.1. The Traveling Wave Ansatz}
-To study stability, we look for traveling waves, that is, particular solutions of the reaction-diffusion equation of the form
+To study the stability of a traveling-wave solution, we introduce the traveling-wave ansatz and look for particular solutions of the reaction-diffusion equation of the form
 \[
 v(t,x)=\hat v(x+ct),
 \]
@@ -135,14 +135,30 @@ where $c$ is the constant wave speed. In higher dimensions, this becomes
 \[
 v(t,x)=\hat v(x\cdot n+ct),
 \]
-where $n\in\mathbb R^d$ is a unit vector, so that $|n|=1$. This means that $n$ specifies the direction of propagation, and the profile depends only on the scalar variable $x\cdot n+ct$.
+where $n\in\mathbb R^d$ is a unit vector with $\|n\|=1$. Here $\hat v$ is called the traveling-wave profile, that is, the fixed wave shape in the moving frame. The vector $n$ specifies the direction of propagation, and the solution depends only on the scalar variable $x\cdot n+ct$. More concretely, stability means asking whether a solution that starts close to this traveling wave stays close to it, possibly up to a spatial shift.
 
 \subsection*{5.2. Reduction to an ODE}
-Inserting this ansatz into the reaction-diffusion equation yields
+Recall that the ansatz is
 \[
-c\hat v'(x\cdot n+ct)
+v(t,x)=\hat v(x\cdot n+ct).
+\]
+The chain rule gives
+\[
+\partial_t v(t,x)=c\hat v_x(x\cdot n+ct),
+\qquad
+\partial_{x_i}v(t,x)=n_i\hat v_x(x\cdot n+ct),
+\qquad
+\partial_{x_ix_i}v(t,x)=n_i^2\hat v_{xx}(x\cdot n+ct).
+\]
+We then insert these identities into the reaction-diffusion equation
+\[
+\partial_t v(t,x)=\nu \Delta v(t,x)+f(v(t,x)).
+\]
+Substituting these identities into the reaction-diffusion equation yields
+\[
+c\hat v_x(x\cdot n+ct)
 =
-\nu\sum_{i=1}^d n_i^2 \hat v''(x\cdot n+ct)+f(\hat v(x\cdot n+ct)).
+\nu\sum_{i=1}^d n_i^2 \hat v_{xx}(x\cdot n+ct)+f(\hat v(x\cdot n+ct)).
 \]
 Because $n$ is a unit vector, we have
 \[
@@ -150,20 +166,26 @@ Because $n$ is a unit vector, we have
 \]
 Therefore the PDE collapses to the one-dimensional ODE
 \[
-c\hat v'=\nu\hat v''+f(\hat v).
+c\hat v_x=\nu\hat v_{xx}+f(\hat v).
 \]
 This is now a deterministic second-order ODE for the profile function $\hat v:\mathbb R\to\mathbb R$.
 
 \subsection*{5.3. Boundary Conditions}
-To determine the traveling wave uniquely, one must also specify boundary conditions. For instance, one often requires the profile to approach one equilibrium at negative infinity and another at positive infinity. These conditions determine the shape of the wave front together with its speed $c$.
+To determine the traveling wave uniquely, one must also specify boundary conditions. In general, one requires
+\[
+\lim_{x\to-\infty}\hat v(x)=v_-,
+\qquad
+\lim_{x\to+\infty}\hat v(x)=v_+,
+\]
+where $v_-$ and $v_+$ are fixed points of the reaction term. These conditions determine the shape of the wave front together with its speed $c$. If $v_-\neq v_+$, the traveling wave is a front, whereas if the two limits agree, one typically obtains a pulse.
 
 \section*{6. Explicit Nagumo Waves and Stability}
 We now turn to a more specific analysis of the traveling-wave ODE for the Nagumo nonlinearity and then study the stability of the resulting wave.
 
 \subsection*{6.1. The Nagumo Traveling-Wave Equation}
-For the Nagumo reaction term, the traveling-wave profile solves
+For the Nagumo reaction term, the traveling-wave profile $\hat v$ solves
 \[
-c\hat v'=\nu\hat v''+b\hat v(1-\hat v)(\hat v-a).
+c\hat v_x=\nu\hat v_{xx}+b\hat v(1-\hat v)(\hat v-a).
 \]
 Here $c$ is the wave speed, $\nu$ is the diffusion coefficient, and $b$ is the scaling factor in front of the cubic reaction term.
 
@@ -178,11 +200,11 @@ This profile is a smooth logistic curve connecting $0$ at negative infinity to $
 \subsection*{6.3. Derivatives of the Profile}
 Differentiating the ansatz gives
 \[
-\hat v'(x)=\frac{ke^{-kx}}{(1+e^{-kx})^2}=k\hat v(x)(1-\hat v(x)).
+\hat v_x(x)=\frac{ke^{-kx}}{(1+e^{-kx})^2}=k\hat v(x)(1-\hat v(x)).
 \]
 Differentiating once more and using the first derivative again yields
 \[
-\hat v''(x)=k(1-2\hat v(x))\hat v'(x)
+\hat v_{xx}(x)=k(1-2\hat v(x))\hat v_x(x)
 =
 k^2\hat v(x)(1-\hat v(x))(1-2\hat v(x)).
 \]
@@ -194,29 +216,40 @@ ck\hat v(1-\hat v)
 =
 \nu k^2\hat v(1-\hat v)(1-2\hat v)+b\hat v(1-\hat v)(\hat v-a).
 \]
-Matching coefficients shows that the ansatz is an exact solution provided
+Since $\hat v(1-\hat v)\neq 0$ along the front, we divide by this factor and obtain
+\[
+ck=\nu k^2(1-2\hat v)+b(\hat v-a).
+\]
+Matching the coefficients of $\hat v$ and the constant term shows that the ansatz is an exact solution provided
 \[
 k=\sqrt{\frac{b}{2\nu}}
 \qquad\text{and}\qquad
 c=\sqrt{2\nu b}\left(\frac12-a\right).
 \]
-In particular, if $a=\frac12$, then $c=0$, so the wave becomes stationary.
+Thus the wave speed is determined entirely by the parameters of the model. In particular, if $a=\frac12$, then $c=0$, so the wave becomes stationary.
 
-\subsection*{6.5. Boundary Conditions}
+\subsection*{6.5. Physical Interpretation and Applications}
+This explicit front describes a coherent structure propagating through space and connecting the two stable states $0$ and $1$. Such traveling fronts appear in models of morphogenesis, spatial growth, and signal propagation. In multicomponent settings, analogous mechanisms can also lead to more complicated pattern formation such as Turing-type instabilities.
+
+\subsection*{6.6. Boundary Conditions}
 For this explicit wave, the natural boundary conditions are
 \[
 \lim_{x\to-\infty}\hat v(x)=0,
 \qquad
 \lim_{x\to+\infty}\hat v(x)=1.
 \]
-These conditions identify the profile as a front connecting the two equilibria.
+These conditions identify the profile as a front connecting the two fixed points.
 
-\subsection*{6.6. Stability of the Traveling Wave}
-To study stability, we write the full solution as a traveling wave plus a perturbation:
+\subsection*{6.7. Stability of the Traveling Wave}
+The next question is whether the wave recovers its shape after a small perturbation. To study this, we write the full solution as the traveling-wave solution plus a perturbation:
 \[
 v(t,x)=\hat v(x+ct)+u(t,x).
 \]
-Here $u(t,x)$ is the perturbation. Substituting this into the reaction-diffusion equation shows that $u$ satisfies
+Here $\hat v$ is the traveling-wave profile, while $\hat v(x+ct)$ is the corresponding traveling-wave solution moving through space with speed $c$. The term $u(t,x)$ is the perturbation. We substitute this into the reaction-diffusion equation
+\[
+\partial_t v(t,x)=\nu\partial_{xx}v(t,x)+b\,f(v(t,x)),
+\]
+which shows that $u$ satisfies
 \[
 \partial_t u(t,x)
 =
@@ -225,20 +258,34 @@ Here $u(t,x)$ is the perturbation. Substituting this into the reaction-diffusion
 b\bigl(f(u(t,x)+\hat v(x+ct))-f(\hat v(x+ct))\bigr).
 \]
 
-\subsection*{6.7. Taylor Expansion of the Nonlinearity}
-To understand the perturbation equation, we expand the nonlinear term around the wave profile:
+\subsection*{6.8. Taylor Expansion of the Nonlinearity}
+Recall that the perturbation equation is
 \[
 \partial_t u(t,x)
 =
-\nu\partial_{xx}u(t,x)+bf'(\hat v(x+ct))u(t,x)+R_f(x),
+\nu\partial_{xx}u(t,x)
++
+b\bigl(f(u(t,x)+\hat v(x+ct))-f(\hat v(x+ct))\bigr).
 \]
-where the remainder is
+To understand this equation, we expand the nonlinear term around the wave profile:
+\[
+f(u(t,x)+\hat v(x+ct))
+=
+f(\hat v(x+ct))+f'(\hat v(x+ct))u(t,x)+\frac{1}{b}R_f(x).
+\]
+The remainder is
 \[
 R_f(x)
 =
 \frac{b}{2}f''(\hat v(x+ct))u^2(t,x)
 +
 \frac{b}{6}f^{(3)}(\hat v(x+ct))u^3(t,x).
+\]
+Substituting this expansion back into the perturbation equation gives
+\[
+\partial_t u(t,x)
+=
+\nu\partial_{xx}u(t,x)+bf'(\hat v(x+ct))u(t,x)+R_f(x),
 \]
 For the cubic Nagumo nonlinearity, this becomes
 \[
@@ -250,13 +297,15 @@ Hence the remainder satisfies the bound
 \[
 |R_f(x)|\leq C\,u^2(t,x)\bigl(1+|u(t,x)|\bigr)
 \]
-for some constant $C$. This shows that when the perturbation $u$ is small, the nonlinear remainder is of higher order and the linearized dynamics dominate.
+for some constant $C$. When $u$ is small, the $u^2$ term is larger than the $u^3$ term, so the remainder is said to be of quadratic order. Thus the nonlinear remainder is of higher order and vanishes faster than the linear term, so the linearized dynamics dominate.
+Therefore, the stability problem is reduced to understanding the linearized equation together with a small controlled remainder, which is the starting point for the energy estimates in the next section.
 
 \section*{7. Orbital Stability and Phase Correction}
-We have just seen that the nonlinear remainder is quadratic in the perturbation. The key consequence is that, for sufficiently small perturbations, this remainder is negligible compared with the linearized dynamics. This is the starting point for the stability theory of traveling waves.
+We have just seen that the nonlinear remainder is quadratic in the perturbation. The key consequence is that, for sufficiently small perturbations, this remainder decays faster than the linear term and is therefore negligible compared with the linearized dynamics. This local dominance of the linearized equation is the starting point for the stability theory of traveling waves.
 
 \subsection*{7.1. Stability Theorem}
-The basic stability statement is that there exists $\delta_0>0$ such that, if
+\begin{theorem}
+There exists $\delta_0>0$ such that, if
 \[
 \|u(0,\cdot)\|_{L^2(\mathbb R)}<\delta_0,
 \]
@@ -267,46 +316,102 @@ then the solution stays close to a shifted traveling wave and satisfies an estim
 e^{-\nu_0 t}\|u(0,\cdot)\|_{L^2(\mathbb R)}.
 \]
 Here $C(t)$ is a time-dependent phase shift.
+\end{theorem}
+
+Thus small initial perturbations decay exponentially, but only after one allows the wave to adjust its position in space.
+In other words, the solution converges exponentially fast to a translated traveling wave, although the location of that wave may drift in time because of the phase shift $C(t)$.
 
 \subsection*{7.2. Why a Phase Shift Is Necessary}
-The additional shift $C(t)$ is essential because traveling waves form a family under spatial translations. If a perturbation merely shifts the wave slightly to the left or to the right, then the profile keeps its shape but no longer matches the original unshifted wave. For that reason one cannot expect strict convergence to a fixed profile in $L^2$; instead one proves orbital stability, meaning convergence to the family of translates of the wave.
+The additional shift $C(t)$ is essential because traveling waves form a family under spatial translations. If a perturbation merely shifts the wave slightly to the left or to the right, then the profile keeps its shape but no longer matches the original unshifted wave.
+
+In that situation the $L^2$ distance to the unshifted profile need not decay, because two identical waves moving with the same speed but with different spatial shifts can stay a fixed distance apart. For that reason one cannot expect strict convergence to a fixed profile in $L^2$; instead one proves orbital stability, meaning convergence to the family of translates of the wave.
+
+Thus a perturbed solution typically does not return to the original wave at the original position, but instead converges to a new translated copy of the same traveling wave.
+The difficulty is that this phase shift is not known in advance, so one must determine it dynamically from the solution itself.
 
 \subsection*{7.3. Choosing the Optimal Shift}
 To determine the correct phase, we minimize the distance between the current state and the translated wave profile. Introduce
 \[
-\mathcal V(\theta)=\|v(t,\cdot)-\hat v(\cdot+\theta)\|_{L^2}^2.
+v(\theta):=\|v(t,\cdot)-\hat v(\cdot+\theta)\|_{L^2}^2.
 \]
-Differentiating with respect to $\theta$ and setting the derivative equal to zero gives the orthogonality condition
+Differentiating with respect to $\theta$ gives
+\begin{align*}
+v'(\theta)
+&=
+\frac{d}{d\theta}\langle v(t,\cdot)-\hat v(\cdot+\theta),\,v(t,\cdot)-\hat v(\cdot+\theta)\rangle_{L^2} \\
+&=
+-2\langle \hat v_x(\cdot+\theta),\,v(t,\cdot)-\hat v(\cdot+\theta)\rangle_{L^2}.
+\end{align*}
+The optimal phase shift is chosen so that this distance is as small as possible. For a differentiable function, a necessary condition for a minimizer is that its derivative vanishes. So at the optimal shift, we impose
+\[
+v'(\theta)=0
+\]
+gives the orthogonality condition
 \[
 \langle \hat v_x(\cdot+\theta),\,v(t,\cdot)-\hat v(\cdot+\theta)\rangle_{L^2}=0.
 \]
-Thus the perturbation is required to be orthogonal to the spatial derivative of the wave profile.
+Here $v(t,\cdot)$ is the current solution at time $t$, while $\hat v(\cdot+\theta)$ is a translated traveling wave. Their difference $v(t,\cdot)-\hat v(\cdot+\theta)$ measures how far the current solution is from that shifted wave. Over time, one expects the current solution to approach a suitable translated traveling wave, so this difference decays. It is called an orthogonality condition because this difference is required to have no component, in the $L^2$ inner product, in the direction corresponding to shifting the wave in space.
 
 \subsection*{7.4. Evolution of the Phase}
-Differentiating this orthogonality condition in time leads to an ordinary differential equation for the phase shift:
+In Section 7.3, $\theta$ was the abstract shift parameter used to minimize the distance to the translated wave. We now let this shift evolve in time and write it in the form $ct+C(t)$. Recall that along the solution we impose the time-dependent orthogonality condition
+\[
+\left\langle \hat v_x(\cdot+ct+C(t)),\,v(t,\cdot)-\hat v(\cdot+ct+C(t))\right\rangle_{L^2(\mathbb R)}=0.
+\]
+If we denote the left-hand side by
+\[
+G(t):=\left\langle \hat v_x(\cdot+ct+C(t)),\,v(t,\cdot)-\hat v(\cdot+ct+C(t))\right\rangle_{L^2(\mathbb R)},
+\]
+then the condition is $G(t)=0$ for all $t$, so $G$ is the constant zero function. Differentiating in time therefore gives
+\[
+G'(t)=0.
+\]
+Applying the product rule for the $L^2$ inner product and the chain rule gives an explicit formula for $G'(t)$; see Appendix A.8 for the calculation.
+Setting $G'(t)=0$ and choosing the phase shift to damp the translation mode leads to an ordinary differential equation for $C(t)$. In these notes, it is taken in the form
 \[
 C'(t)
 =
 -m\langle \hat v_x(\cdot+ct+C(t)),\,v(t,\cdot)-\hat v(\cdot+ct+C(t))\rangle_{L^2(\mathbb R)}
 \]
-for $m$ sufficiently large. This equation provides the mechanism for tracking the drifting wave.
+with initial condition
+\[
+C(0)=0,
+\]
+for $m$ sufficiently large. This equation is used to track the position of the traveling wave over time while keeping the same wave profile. However, the phase adaptation is not trivial: one must show that the phase shift can be defined consistently from the solution, with suitable existence, uniqueness, and regularity properties.
 
 \subsection*{7.5. Why the State Space Is Affine}
-There is one final subtlety concerning the function space. The traveling wave profile $\hat v$ itself is not in $L^2(\mathbb R)$, because it approaches different nonzero limits at $\pm\infty$. However, the difference between two states with the same asymptotic limits can belong to $L^2(\mathbb R)$. Since
+There is one final subtlety concerning the function space. The traveling wave profile $\hat v$ itself is not in $L^2(\mathbb R)$, because it approaches different nonzero limits at $\pm\infty$. Physically, this means that the wave is a front connecting two persistent states rather than a localized bump that decays to zero at infinity. However, the difference between two states with the same asymptotic limits can belong to $L^2(\mathbb R)$, since the nondecaying tails cancel. In that case the difference tends to zero as $x\to\pm\infty$, so it can be square-integrable even though neither state is square-integrable on its own. Since
 \[
 v(t,x)=\hat v(x+ct)+u(t,x)
 \]
-and the perturbation $u$ lies in $L^2(\mathbb R)$, the natural state space is not a linear space of the form $L^2(\mathbb R)$ itself. Instead, it has an affine structure: the dynamics evolve near the base trajectory given by the traveling wave, with perturbations living in the corresponding $L^2$ tangent directions.
+and the perturbation $u$ lies in $L^2(\mathbb R)$, the natural state space is not a linear space of the form $L^2(\mathbb R)$ itself. Instead, it has an affine structure: the dynamics evolve near the base trajectory given by the traveling wave, with perturbations living in the corresponding $L^2$ tangent directions. In other words, the full state is described by $\hat v(\cdot+ct)+u(t,\cdot)$, where only the deviation $u(t,\cdot)$ is required to lie in $L^2(\mathbb R)$.
 
 \section*{8. Sketch of the Stability Proof}
-We now sketch the proof that sufficiently small perturbations of the traveling wave decay in time. The argument uses an energy method together with the spectral gap of the linearized operator and a Sobolev bound on the nonlinear term.
+We now sketch the proof of the stability statement from Section 7, namely that if the initial perturbation is sufficiently small, then the solution stays close to a translated traveling wave and the perturbation decays after one shifts by the correct phase. The argument uses an energy method together with the spectral gap of the linearized operator and a Sobolev bound on the nonlinear term.
 
 \subsection*{8.1. The Energy Derivative}
-We begin with the time derivative of the squared $L^2$ norm of the perturbation:
+Recall that the perturbation satisfies
+\[
+\partial_t u(t,x)
+=
+\nu\partial_{xx}u(t,x)+bf'(\hat v(x+ct))u(t,x)+R_f(x).
+\]
+We now begin with the time derivative of the squared $L^2$ norm of the perturbation:
 \[
 \frac12\frac{d}{dt}\|u(t)\|_{L^2}^2.
 \]
-Substituting the perturbation equation gives
+Using the $L^2$ inner product, this can be written as
+\[
+\frac12\frac{d}{dt}\|u(t)\|_{L^2}^2
+=
+\langle \partial_t u(t),u(t)\rangle.
+\]
+Substituting the perturbation equation then gives
+\[
+\frac12\frac{d}{dt}\|u(t)\|_{L^2}^2
+=
+\left\langle \nu\partial_{xx}u(t)+bf'(\hat v)u(t)+R_f(x),u(t)\right\rangle.
+\]
+Splitting the right-hand side yields
 \[
 \frac12\frac{d}{dt}\|u(t)\|_{L^2}^2
 =
@@ -317,13 +422,19 @@ Substituting the perturbation equation gives
 The first inner product contains the linearized dynamics, while the second contains the nonlinear remainder.
 
 \subsection*{8.2. Bounding the Remainder}
-From the Taylor expansion on the previous page, the remainder term is of higher order in $u$. In particular, one obtains a bound of the form
+Recall that for the Nagumo nonlinearity the remainder is
+\[
+R_f(x)
+=
+\frac{b}{2}\bigl(-6\hat v(x+ct)+2(1+a)\bigr)u^2(t,x)-bu^3(t,x).
+\]
+From the Taylor expansion on the previous page, this term is of higher order in $u$. In particular, one obtains a bound of the form
 \[
 \langle R_f(x),u(t)\rangle
 \leq
-\frac{b}{2}(4+a)\int_{\mathbb R} u^3(t,x)\,dx.
+b(4+a)\int_{\mathbb R} u^3(t,x)\,dx.
 \]
-Thus the nonlinear contribution is at least quadratic, and in fact cubic at the level of the energy estimate.
+Thus the nonlinear contribution is at least quadratic, and in fact cubic at the level of the energy estimate. When $u$ is small, this remainder therefore decays faster than the linear term and becomes negligible in comparison.
 
 \subsection*{8.3. The Linear Contribution}
 For the diffusion part, integration by parts yields
@@ -334,135 +445,211 @@ For the diffusion part, integration by parts yields
 \]
 The linear reaction term becomes
 \[
+\langle b f'(\hat v)u(t),u(t)\rangle
+=
 b\int_{\mathbb R} f'(\hat v(x+ct))u^2(t,x)\,dx.
 \]
-At first sight one might try to bound this only in terms of the $L^2$ norm, but that is not sufficient. The correct estimate uses the stronger Sobolev norm and the spectral gap of the linearized operator:
+At first sight one might try the crude bound
+\[
+\langle b f'(\hat v)u(t),u(t)\rangle
+=
+b\int_{\mathbb R} f'(\hat v(x+ct))u^2(t,x)\,dx
+\leq
+b\sup_{r\in\mathbb R} f'(r)\int_{\mathbb R} u^2(t,x)\,dx,
+\]
+but that is not sufficient. The catch is that one cannot close the estimate using only the $L^2$ norm. The correct path is to use the stronger $H^{1,2}(\mathbb R)$ Sobolev norm, which controls both the size of $u$ and its spatial derivative. The proper bound uses the spectral gap of the linearized operator and takes the form
 \[
 \langle \nu\partial_{xx}u(t)+bf'(\hat v)u(t),u(t)\rangle
 \leq
 -k_r\|u\|_{H^{1,2}(\mathbb R)}^2.
 \]
+Here $-k_r$ is the strict stabilizing contribution coming from the linearized operator.
 
 \subsection*{8.4. A Sobolev Bound for the Cubic Term}
 To control the cubic term, we use the one-dimensional Sobolev embedding. The key point is that the $L^\infty$ norm can be controlled by the $H^{1,2}(\mathbb R)$ norm. Indeed, by the fundamental theorem of calculus one may write
 \[
 u^2(x)=2\int_{-\infty}^x u_x(y)u(y)\,dy,
 \]
-and this leads to the bound
+and we recall the arithmetic-geometric mean inequality in the form
+\[
+2ab\le a^2+b^2.
+\]
+Applying it to $u_x(y)u(y)$ gives
+\[
+u^2(x)
+\leq
+\int_{-\infty}^x \bigl(u_x(y)^2+u(y)^2\bigr)\,dy
+\leq
+\|u\|_{H^{1,2}(\mathbb R)}^2.
+\]
+Since this holds for every $x$, taking the supremum over $x$ gives
 \[
 \|u\|_{L^\infty}^2 \leq \|u\|_{H^{1,2}(\mathbb R)}^2.
 \]
-Consequently,
+Pointwise,
 \[
-\int_{\mathbb R} u^3(t,x)\,dx
+|u(t,x)|^3
+=
+|u(t,x)|\cdot |u(t,x)|^2
 \leq
+\|u\|_{L^\infty}|u(t,x)|^2.
+\]
+Integrating over $\mathbb R$ gives
+\[
+\int_{\mathbb R}|u(t,x)|^3\,dx
+\leq
+\|u\|_{L^\infty}\int_{\mathbb R}|u(t,x)|^2\,dx
+\;=\;
 \|u\|_{L^\infty}\|u\|_{L^2}^2
 \leq
 \|u\|_{H^{1,2}(\mathbb R)}\|u\|_{L^2}^2.
 \]
 
 \subsection*{8.5. Closing the Estimate}
-Combining the linear estimate with the cubic bound gives
+Recall from Section 8.1 that
+\[
+\frac12\frac{d}{dt}\|u(t)\|_{L^2}^2
+=
+\langle \nu\partial_{xx}u(t)+bf'(\hat v)u(t),u(t)\rangle
++
+\langle R_f(x),u(t)\rangle.
+\]
+Section 8.2 gave the remainder estimate
+\[
+\langle R_f(x),u(t)\rangle
+\leq
+b(4+a)\int_{\mathbb R}|u(t,x)|^3\,dx,
+\]
+while Section 8.3 gave the linear estimate
+\[
+\langle \nu\partial_{xx}u(t)+bf'(\hat v)u(t),u(t)\rangle
+\leq
+-k_r\|u\|_{H^{1,2}(\mathbb R)}^2,
+\]
+and Section 8.4 showed that
+\[
+\int_{\mathbb R}|u(t,x)|^3\,dx
+\leq
+\|u\|_{H^{1,2}(\mathbb R)}\|u\|_{L^2}^2.
+\]
+Combining these estimates gives
 \[
 \frac12\frac{d}{dt}\|u(t)\|_{L^2}^2
 \leq
 -k_r\|u\|_{H^{1,2}(\mathbb R)}^2
 +
-\frac{b}{2}(4+a)\|u\|_{H^{1,2}(\mathbb R)}\|u\|_{L^2}^2.
+b(4+a)\|u\|_{H^{1,2}(\mathbb R)}\|u\|_{L^2}^2.
 \]
 Factoring out the common Sobolev norm yields the structural estimate
 \[
 \frac12\frac{d}{dt}\|u(t)\|_{L^2}^2
 \leq
--\left(k_r-\frac{b}{2}(4+a)\|u\|_{L^2}\right)\|u\|_{H^{1,2}(\mathbb R)}^2.
+-\left(k_r-b(4+a)\|u\|_{L^2}\right)\|u\|_{H^{1,2}(\mathbb R)}^2.
 \]
-Therefore, if $\|u\|_{L^2}$ is sufficiently small, the factor in parentheses stays positive, and the time derivative becomes negative. In that regime the perturbation decreases.
+Therefore, if $\|u\|_{L^2}$ is sufficiently small, the factor in parentheses stays positive, and the time derivative becomes negative. For example, it is enough to have
+\[
+\|u\|_{L^2(\mathbb R)}<\frac{k_r}{b(4+a)}.
+\]
+In that regime the perturbation decreases. Thus, whenever the perturbation lies below this threshold, the PDE evolution makes it smaller rather than larger.
 
 \subsection*{8.6. Forward Invariance}
-This implies that a sufficiently small ball in $L^2(\mathbb R)$ is forward invariant for the perturbation equation. In other words, if the initial perturbation is small enough, then it remains small for all later times and the traveling wave is stable under the evolution.
+This implies that a sufficiently small ball in $L^2(\mathbb R)$ is forward invariant for the perturbation equation. Here forward invariant means that, once the perturbation starts inside the set, the evolution keeps it there for all later times. In particular, one may take
+\[
+B_{\frac{k_r}{b(4+a)}}=\left\{u\in L^2(\mathbb R):\|u\|_{L^2(\mathbb R)}\leq \frac{k_r}{b(4+a)}\right\}.
+\]
+If the perturbation starts inside this ball, then the energy estimate keeps it there for all later times. In other words, if the initial perturbation is small enough, then it remains small for all later times and the traveling wave is stable under the evolution.
 
 \section*{9. Translation Invariance and Phase Adaptation}
-The previous estimate captures the basic energy mechanism, but it is not the full stability statement. A traveling wave is translation invariant, so perturbations in the direction of spatial shifts are not strictly contracted by the linearized operator.
+The previous estimate appears to give a strictly negative bound, but it is not yet the correct linear stability statement. The reason is translation invariance: if a perturbation only shifts the wave slightly to the left or right, then it does not deform the shape of the profile, and the diffusion and reaction terms do not force it back to one fixed spatial position.
 
 \subsection*{9.1. Why the Previous Bound Must Be Corrected}
-If a perturbation only shifts the wave slightly to the left or right, then it does not change the shape of the profile. For that reason, the diffusion and reaction terms do not force the solution back to one fixed spatial position. Thus the naive estimate from Section 8 must be corrected by isolating the translation mode.
+Thus the naive estimate from Section 8 must be corrected by isolating the translation mode. In our earlier simplified picture, we effectively treated the linearized operator as if it contracted every small perturbation, but this ignores the neutral direction generated by spatial shifts of the wave.
 
 \subsection*{9.2. The Correct Linear Estimate}
-We therefore introduce the constants
+\begin{theorem}
+Define
 \[
 k_r=\frac{2}{5}\frac{\sqrt{\nu b}}{\nu+b}a(1-a),
 \qquad
 C_r=6(\nu+b).
 \]
-The correct bound for the linearized operator is
+Then the linearized operator satisfies
 \[
 \langle \nu \partial_{xx}u+b f'(\hat v)u,u\rangle
 \leq
 -k_r\|u\|_{H^{1,2}(\mathbb R)}^2
 +C_r\langle u,\hat v_x\rangle_{L^2(\mathbb R)}^2.
 \]
-The first term gives the desired decay, while the second is a positive tangential contribution coming from the translation direction.
+\end{theorem}
+The first term gives the strict decay we want. The second term is positive and corresponds to the nontrivial tangential direction generated by translations of the wave. More precisely, $\langle u,\hat v_x\rangle_{L^2(\mathbb R)}$ measures how much of the perturbation points in the translation direction, so this term records the part of the perturbation that tends to shift the wave rather than change its shape. If this term is zero, then $u$ has no translation component. If it is large, then a significant part of the perturbation is trying to shift the wave to the left or right.
 
 \subsection*{9.3. The Manifold of Shifted Waves}
 The natural orbit of the traveling wave is
 \[
 \mathcal M=\{\hat v(\cdot+\theta):\theta\in\mathbb R\}.
 \]
-Its tangent direction is spanned by $\hat v_x$. Geometrically, the dynamics contract in directions normal to this manifold, while perturbations parallel to $\hat v_x$ simply move the solution along the orbit of shifted profiles.
+This is the manifold of all shifted copies of the same wave profile. Its tangent direction is spanned by $\hat v_x$, which corresponds to the tangential direction of motion of the traveling wave. Geometrically, the theorem from Section 9.2 shows that the dynamics contract only in the normal direction to this manifold.
 
 \subsection*{9.4. The Moving Phase Frame}
-To capture this drift correctly, we compare the solution with a phase-shifted profile and write
+The last theorem therefore shows what to do: we introduce a moving phase shift and compare the solution with a phase-shifted profile. Thus we write
 \[
 v(t,x)=\hat v(x+ct+C(t))+u(t,x).
 \]
+Here the additional term $C(t)$ records the unknown time-dependent phase shift. The wave keeps its shape, but its position may drift, so we must allow this extra motion in the comparison profile.
 We then study
 \[
 \frac12\frac{d}{dt}\|v(t,\cdot)-\hat v(\cdot+ct+C(t))\|_{L^2(\mathbb R)}^2.
 \]
-When this derivative is expanded, one obtains the linear diffusion term, the linear reaction term, the nonlinear remainder $\langle R_f(x),v-\hat v\rangle$, and the extra chain-rule term
+For brevity, write
 \[
-C'(t)\langle \hat v_x(\cdot+ct+C(t)),v(t,\cdot)-\hat v(\cdot+ct+C(t))\rangle_{L^2(\mathbb R)}.
+\hat v=\hat v(\cdot+ct+C(t)).
 \]
+Expanding this derivative gives the inequality
+\[
+\begin{aligned}
+\frac12\frac{d}{dt}\|v(t,\cdot)-\hat v\|_{L^2(\mathbb R)}^2
+\leq{}&-\nu\int_{\mathbb R}\bigl(\partial_x(v(t,x)-\hat v(x))\bigr)^2\,dx \\
+&+b\int_{\mathbb R} f'(\hat v(x))(v(t,x)-\hat v(x))^2\,dx \\
+&+\langle R_f(x),v(t,\cdot)-\hat v\rangle \\
+&+C'(t)\langle \hat v_x,\hat v-v(t,\cdot)\rangle_{L^2(\mathbb R)}.
+\end{aligned}
+\]
+See Appendix A.12 for the derivation.
 
 \subsection*{9.5. Choosing the Phase Shift}
-Using the corrected linear estimate, the energy inequality takes the form
+We now bound the first two terms on the right-hand side of the inequality from Section 9.4 by the theorem from Section 9.2, and then choose the phase shift to neutralize the tangential growth. We set
+\[
+C'(t)=-m\langle \hat v_x,v-\hat v\rangle_{L^2(\mathbb R)}.
+\]
+Substituting both the theorem bound and this phase choice into the energy inequality gives
 \[
 \frac12\frac{d}{dt}\|v-\hat v\|_{L^2(\mathbb R)}^2
 \leq
 -k_r\|v-\hat v\|_{H^{1,2}(\mathbb R)}^2
-+C_r\langle \hat v_x,v-\hat v\rangle_{L^2(\mathbb R)}^2
-+\langle R_f(x),v-\hat v\rangle
-+C'(t)\langle \hat v_x,v-\hat v\rangle_{L^2(\mathbb R)}.
++(C_r-m)\langle \hat v_x,v-\hat v\rangle_{L^2(\mathbb R)}^2
++\langle R_f(x),v-\hat v\rangle.
 \]
-We choose the phase adaptation by
-\[
-C'(t)=-m\langle \hat v_x,v-\hat v\rangle_{L^2(\mathbb R)}.
-\]
-Then the tangential contribution becomes
-\[
-(C_r-m)\langle \hat v_x,v-\hat v\rangle_{L^2(\mathbb R)}^2.
-\]
-If $m>C_r$, this term is negative. The moving phase frame therefore removes the neutral translation mode and restores decay in the remaining directions.
+Thus, if $m>C_r$, the tangential contribution is no longer an obstruction to decay, because the phase correction is strong enough to control the part of the perturbation that only shifts the wave rather than changing its shape.
 
 \subsection*{9.6. Stability Up to Phase Shift}
-Once the initial perturbation is small enough, the nonlinear remainder can be absorbed exactly as in Section 8. This yields a strictly negative energy derivative in the phase-adapted frame. Consequently, the traveling wave is asymptotically stable up to a phase shift.
+Provided the initial perturbation is below the threshold from Section 8, the nonlinear remainder is absorbed, the time derivative is strictly negative, and the traveling wave profile is rigorously asymptotically stable up to a phase shift.
 
 \section*{10. Stochastic Stability}
 We now turn from deterministic stability to stochastic stability. The traveling wave is subjected to continuous random forcing, and the main question is whether the wave profile still remains stable over long time intervals.
 
 \subsection*{10.1. The Stochastic Reaction-Diffusion Equation}
-The stochastic equation takes the form
+The governing SPDE is
 \[
-dV(t,x)=\bigl[\nu\partial_{xx}V(t,x)+bf(V(t,x))\bigr]\,dt+\varepsilon\,dW_t.
+dv(t,x)=\bigl[\nu\partial_{xx}v(t,x)+bf(v(t,x))\bigr]\,dt+\varepsilon\,dW_t.
 \]
-The bracketed term is the deterministic reaction-diffusion operator, while $\varepsilon\,dW_t$ represents spacetime noise of amplitude $\varepsilon$. If $\varepsilon=0$, this reduces to the deterministic PDE studied above.
+The bracketed term is the standard deterministic reaction-diffusion system, while the critical term $\varepsilon\,dW_t$ injects infinite-dimensional white noise scaled by the small amplitude parameter $\varepsilon$. If $\varepsilon=0$, this collapses right back to the deterministic PDE studied above.
 
 \subsection*{10.2. A Noisy Perturbation of the Wave}
-We again decompose the solution into a traveling wave and a perturbation,
+To analyze the noisy wave, we again decompose the solution into a traveling wave and a perturbation,
 \[
-V(t,x)=\hat v(x+ct+C(t))+u(t,x).
+v(t,x)=\hat v(x+ct+C(t))+u(t,x).
 \]
-The difference from the deterministic case is that the phase shift $C(t)$ is now random and is driven by the noise. The perturbation $u$ is no longer expected to converge to zero, because the system is continuously forced by random shocks. Instead, the stability result gives an upper bound on its size.
+The difference from the deterministic case is that the phase shift $C(t)$ is now a random process satisfying a random ODE determined by the noise. The perturbation $u$ does not go to zero because of the noise: the system is continuously kicked by random shocks. However, because of the strict spectral gap proved above, one still expects an upper bound on how large this noise can grow.
 
 \subsection*{10.3. The Leading-Order Approximation}
 For small noise amplitude $\varepsilon$, we expect the perturbation to be of size $\varepsilon$, and we write
@@ -471,21 +658,25 @@ u(t,x)\approx \varepsilon Z(t,x).
 \]
 The first-order approximation $Z_t$ satisfies the linear SPDE
 \[
-dZ_t=\bigl(\nu\partial_{xx}+bf'(\hat v(\cdot+ct+C(t)))\bigr)Z_t\,dt+dW_t.
+dZ_t=\bigl(\nu\partial_{xx}+bf'(\hat v(\cdot+ct+C(t)))\bigr)Z_t\,dt+\varepsilon\,dW_t.
 \]
-This is the linearized stochastic dynamics around the traveling wave.
+This is the linearized stochastic dynamics around the traveling wave. Because the higher-order nonlinear terms have been dropped, the equation is strictly linear.
 
-\subsection*{10.4. The Mild Form and the Ornstein-Uhlenbeck Picture}
-If $L$ denotes the linearized operator, then the mild form is
+\subsection*{10.4. The Mild Form and the Linear Approximation}
+Here $L$ denotes the linearized spatial operator
 \[
-Z_t=e^{tL}Z_0+\int_0^t e^{(t-s)L}\,dW_s.
+L=\nu\partial_{xx}+bf'(\hat v(\cdot+ct+C(t))).
 \]
-Thus the leading-order fluctuation behaves like an infinite-dimensional Ornstein-Uhlenbeck process. The nonlinear stochastic dynamics are therefore approximated, to first order in $\varepsilon$, by a linear Gaussian process around the stable wave profile.
+Then the mild form is
+\[
+Z_t=e^{tL}Z_0+\varepsilon\int_0^t e^{(t-s)L}\,dW_s.
+\]
+The first term evolves the initial fluctuation under the linearized dynamics. The second term accumulates the noise over time after it has been propagated through the same linearized operator.
 
 \subsection*{10.5. A Stopping Time}
 To control the error between the true perturbation and its linear approximation, we introduce the stopping time
 \[
-\tau=\inf\left\{t>0:
+T=\inf\left\{t\geq 0:
 \|u_t\|_{L^2(\mathbb R)}
 \vee
 \left(\int_0^t \|u_s\|_{H^{1,2}(\mathbb R)}^2\,ds\right)^{1/2}
@@ -493,19 +684,19 @@ To control the error between the true perturbation and its linear approximation,
 \varepsilon^{-q}
 \right\}.
 \]
-This monitors both the instantaneous size of the perturbation in $L^2(\mathbb R)$ and its accumulated $H^{1,2}(\mathbb R)$ energy. We stop the argument when either quantity reaches the threshold $\varepsilon^{-q}$.
+This continuously monitors both the instantaneous size of the perturbation in $L^2(\mathbb R)$ and its accumulated $H^{1,2}(\mathbb R)$ energy. We stop the argument as soon as the maximum of these quantities reaches the threshold $\varepsilon^{-q}$.
 
 \subsection*{10.6. Accuracy of the Linear Approximation}
-Up to the stopping time $\tau$, one obtains the bound
+Up to the stopping time $T$, one obtains the bound
 \[
-\sup_{t\leq\tau}\|u_t-\varepsilon Z_t\|_{L^2(\mathbb R)}
+\sup_{t\leq T}\|u_t-\varepsilon Z_t\|_{L^2(\mathbb R)}
 \leq
 C\varepsilon^{1-2q}.
 \]
-This shows that the true perturbation is well approximated by the linear Ornstein-Uhlenbeck fluctuation, with an error of higher order in $\varepsilon$.
+This shows that the difference between the true nonlinear perturbation $u_t$ and the linear approximation $\varepsilon Z_t$ is bounded by a higher power of $\varepsilon$, so the approximation remains valid up to the stopping time.
 
 \subsection*{10.7. Long-Time Stochastic Stability}
-As $\varepsilon\downarrow 0$, the threshold $\varepsilon^{-q}$ becomes very large, so the stopping time is pushed far into the future. Consequently, the traveling wave remains stable for very long times under small stochastic forcing. The noise produces an Ornstein-Uhlenbeck-type fluctuation and a random phase shift, but it does not destroy the underlying wave profile.
+If $\varepsilon\downarrow 0$ with $q>0$, then the threshold $\varepsilon^{-q}$ becomes very large, so the stopping time is pushed far into the future. Consequently, the traveling wave remains stable for extremely long periods under small stochastic forcing.
 
 \section*{11. Limits of the Scalar Theory and the Gradient Structure}
 The stochastic stability result for the scalar wave is strong, but several mathematical difficulties remain when one tries to push the theory further. The first issue is the rigorous treatment of the random phase, and the second is the extension to multivariate systems.
@@ -513,13 +704,40 @@ The stochastic stability result for the scalar wave is strong, but several mathe
 \subsection*{11.1. The Random Phase Shift}
 We again start from the moving-frame decomposition
 \[
-V(t,x)=\hat v(x+\theta_0)+u(t,x),
+v(t,x)=\hat v(x+\theta_0)+u(t,x),
 \]
 where the phase shift is chosen by the minimization problem
 \[
-\theta_0=\operatorname*{argmin}_{\theta\in\mathbb R}\|V(t,\cdot)-\hat v(\cdot+\theta)\|_{L^2}^2.
+\theta_0=\operatorname*{argmin}_{\theta\in\mathbb R}\|v(t,\cdot)-\hat v(\cdot+\theta)\|_{L^2}^2.
 \]
-In the stochastic setting, however, this definition is delicate. The phase shift is a random functional of the solution, and the noise is unbounded. For that reason, the map $\theta_0$ is not automatically well defined as an It\^o functional.
+Equivalently, one may write
+\[
+\theta_0(t)=\Phi(v(t,\cdot)),
+\qquad
+\Phi(w):=\operatorname*{argmin}_{\theta\in\mathbb R}\|w-\hat v(\cdot+\theta)\|_{L^2}^2.
+\]
+Here $w$ is a generic spatial profile, while $v(t,\cdot)$ is the actual random solution profile at time $t$. Thus $\theta_0(t)$ is obtained by applying the map $\Phi$ to the current random solution $v(t,\cdot)$. To regard $\theta_0(t)$ as an It\^o functional, one would need the map $\Phi$ to be regular enough that It\^o calculus applies to
+\[
+\theta_0(t)=\Phi(v_t).
+\]
+Formally, if $v_t$ were a semimartingale in a function space and $\Phi$ were sufficiently smooth, one would hope for an identity of the form
+\[
+d\theta_0(t)=D\Phi(v_t)[\,dv_t\,]+\frac12 D^2\Phi(v_t)[\,dv_t,dv_t\,].
+\]
+This is the infinite-dimensional It\^o formula applied to the functional $\Phi$.
+This is not automatic, because
+\[
+dv(t,x)=\bigl[\nu\partial_{xx}v(t,x)+bf(v(t,x))\bigr]dt+\varepsilon\,dW_t
+\]
+contains unbounded noise, while the minimizer map
+\[
+w\mapsto \operatorname*{argmin}_{\theta\in\mathbb R}\|w-\hat v(\cdot+\theta)\|_{L^2}^2
+\]
+need not be obviously well defined, unique, measurable, or smooth. So the problem is not the definition
+\[
+\theta_0(t)=\Phi(v_t)
+\]
+itself, but proving that $\Phi$ is regular enough and that $\theta_0(t)$ is a well-defined adapted process before applying It\^o calculus to it.
 
 \subsection*{11.2. Why the Front Is Sensitive to Noise}
 The main difficulty is concentrated near the steep part of the wave front, where $\hat v_x$ is largest. Random perturbations projected onto the tangential direction are amplified there, so the location of the front becomes difficult to identify sharply. The noise does not merely perturb the amplitude - it also smears the position of the interface.
@@ -545,10 +763,10 @@ v\\
 w
 \end{bmatrix}.
 \]
-The spectral analysis is much more complicated because the interaction of the two components can produce many different eigenvalue configurations. In addition, explicit traveling-wave profiles are usually not available in closed form, unlike in the scalar Nagumo case. Multivariate systems may also exhibit other long-time behaviors, such as oscillations and limit cycles, rather than convergence to one stable traveling wave.
+The mathematical difficulty lies in the many possible combinations of eigenvalues and dynamics this matrix can produce. In addition, for the actual traveling-wave profile itself there is often no closed-form solution like the one available in the scalar Nagumo case. Even worse, multivariate systems may exhibit other long-term behavior, such as oscillations and limit cycles, rather than convergence to one stable traveling wave.
 
 \subsection*{11.5. The Gradient-Flow Viewpoint}
-A useful structural idea is to view the deterministic equation as a gradient flow. In general, a gradient system has the form
+A useful structural idea is to view the deterministic equation as a gradient flow. This is the breakthrough for the Optimal Phase Frame in the scalar setting. In general, a gradient system has the form
 \[
 \dot V=-\nabla\Phi(V),
 \]
@@ -556,7 +774,7 @@ and then the energy satisfies
 \[
 \frac{d}{dt}\Phi(V_t)=-\|\nabla\Phi(V_t)\|^2\leq 0.
 \]
-Thus $\Phi$ is a Lyapunov functional, and the dynamics always move downhill in energy.
+Thus $\Phi$ is a strict built-in Lyapunov function, and the dynamics always move downhill in energy toward lower-energy states.
 
 \subsection*{11.6. The Energy Functional for the Scalar Equation}
 For the scalar reaction-diffusion equation, the operator can be written in the form
@@ -569,7 +787,7 @@ The corresponding energy functional is
 \qquad
 F'=f.
 \]
-This shows that the energy consists of a Dirichlet term, which penalizes sharp gradients, and a potential term generated by the reaction kinetics. This gradient structure is the key tool for formulating the optimal phase frame in a rigorous way and for controlling the effect of noise.
+The first term is the Dirichlet energy, which penalizes sharp, jagged gradients, while the second term is the potential energy generated by the reaction kinetics. Thus the total energy is the integral of a diffusion part minus a reaction potential.
 
 \section*{12. The Variational Derivative of the Energy}
 We now compute the gradient of the energy functional by using the calculus of variations. This makes precise why the scalar reaction-diffusion equation can be written as a gradient flow.
@@ -585,6 +803,14 @@ This measures the first-order change in the energy when the state $v$ is perturb
 
 \subsection*{12.2. The Dirichlet Part}
 We first look at the Dirichlet part of the functional:
+\[
+\Phi_D(v)=\frac{\nu}{2}\int v_x^2\,dx.
+\]
+Replacing $v$ by $v+\varepsilon h$ gives
+\[
+\Phi_D(v+\varepsilon h)=\frac{\nu}{2}\int (v_x+\varepsilon h_x)^2\,dx.
+\]
+Therefore,
 \[
 \left.\frac{d}{d\varepsilon}
 \frac{\nu}{2}\int (v_x+\varepsilon h_x)^2\,dx
@@ -628,13 +854,13 @@ For the operator
 \]
 this means there exists a constant $\kappa>0$ such that for every vector $h\in\mathbb R^d$,
 \[
-\sum_{i,j=1}^d a_{ij}(x)h_i h_j \ge \kappa|h|^2.
+\sum_{i,j=1}^d a_{ij}(x)h_i h_j \ge \kappa\|h\|^2.
 \]
 So the matrix $a(x)=(a_{ij}(x))$ is uniformly positive definite. Intuitively, this rules out degenerate directions where diffusion disappears. It guarantees that the operator really smooths in all spatial directions, not just some of them.
 
 Equivalently, in matrix form this can be written as
 \[
-\langle a(x)h,h\rangle \ge \kappa|h|^2
+\langle a(x)h,h\rangle \ge \kappa\|h\|^2
 \qquad\text{for all } h\in\mathbb R^d.
 \]
 
@@ -696,6 +922,263 @@ This is exactly the $L^2(D)$ inner product
 \[
 \langle\nu\partial_{xx}v(t,\cdot)+f(v(t,\cdot)),v(t,\cdot)\rangle_{L^2(D)}.
 \]
+\end{proof}
+
+\subsection*{A.4. Traveling-Wave Terminology}
+Several closely related terms appear throughout these notes.
+
+A \emph{traveling wave} is a solution of the form
+\[
+v(t,x)=\hat v(x\cdot n+ct),
+\]
+where $\hat v$ is a fixed shape, $n$ is the direction of propagation, and $c$ is the wave speed.
+
+The function $\hat v$ is called the \emph{profile}. It is the stationary shape seen in the moving coordinate frame.
+
+A \emph{wave front} usually refers to a traveling wave that connects two different asymptotic states, for example one stable state at $-\infty$ and another at $+\infty$. In the scalar Nagumo equation, the front connects the states $0$ and $1$.
+
+A \emph{pulse} is a localized traveling structure that rises and then returns to the same background state, rather than connecting two different limiting states. This is more typical in multivariate systems such as FitzHugh-Nagumo.
+
+The \emph{phase shift} is the translation parameter in expressions such as $\hat v(\cdot+\theta)$ or $\hat v(\cdot+ct+C(t))$. It records where the wave is located in space.
+
+\subsection*{A.5. The Manifold of Shifted Waves}
+More generally, a \emph{manifold} is a set that can be described locally by a small number of smooth parameters, even if it sits inside a much larger space. In the present setting,
+\[
+\mathcal M=\{\hat v(\cdot+\theta):\theta\in\mathbb R\}
+\]
+is called a manifold because it is a smooth one-parameter family of functions, with $\theta$ as its coordinate. One may think of it as a one-dimensional curve inside the infinite-dimensional space of spatial profiles.
+
+The \emph{tangent direction} is taken with respect to the manifold of shifted waves
+\[
+\mathcal M=\{\hat v(\cdot+\theta):\theta\in\mathbb R\}.
+\]
+Differentiating $\hat v(\cdot+\theta)$ with respect to $\theta$ gives $\hat v_x(\cdot+\theta)$, so this is the tangent direction to the orbit of translated waves.
+By contrast, a \emph{normal direction} means moving away from this family by changing the shape of the wave rather than merely shifting it.
+
+\subsection*{A.6. The Notation $v(t,\cdot)$ and $u(t,\cdot)$}
+The symbol `$\cdot$' is a placeholder for the spatial variable. Thus
+\[
+v(t,\cdot)
+\]
+means the spatial function
+\[
+x\mapsto v(t,x)
+\]
+at the fixed time $t$. Likewise,
+\[
+u(t,\cdot)
+\]
+means the function
+\[
+x\mapsto u(t,x).
+\]
+This notation is convenient when one wants to take norms or inner products of the entire spatial profile at time $t$, for example
+\[
+\|v(t,\cdot)\|_{L^2(D)}
+\qquad\text{or}\qquad
+\langle u(t,\cdot),v(t,\cdot)\rangle_{L^2(D)}.
+\]
+
+\subsection*{A.7. Why Fronts Connect Stable Fixed Points}
+The \emph{asymptotic states} of a traveling-wave profile $\hat v$ are the limiting values
+\[
+\lim_{x\to-\infty}\hat v(x)
+\qquad\text{and}\qquad
+\lim_{x\to+\infty}\hat v(x).
+\]
+They describe the background states that the wave approaches far to the left and far to the right.
+
+The reaction term determines the preferred local states of the system. If one ignores diffusion for a moment and looks only at the local equation
+\[
+\partial_t v=f(v),
+\]
+then the stable fixed points of $f$ are precisely the values toward which the dynamics are attracted.
+
+In the full reaction-diffusion equation
+\[
+\partial_t v=\nu\partial_{xx}v+f(v),
+\]
+the diffusion term smooths the solution in space, while the reaction term still drives each spatial point toward stable fixed points of $f$. For that reason, a traveling front typically connects two stable fixed points: these are the asymptotic states that remain dynamically preferred far away from the transition region.
+
+The unstable fixed points play a different role. They may appear inside the reaction polynomial and influence the shape and speed of the front, but they are not robust end states because small perturbations push the dynamics away from them.
+
+\subsection*{A.8. What It Means for a Function to Be in $L^2$}
+A function $g$ belongs to $L^2(\mathbb R)$ if
+\[
+\int_{\mathbb R}|g(x)|^2\,dx<\infty.
+\]
+So the square of the function must be integrable over the whole line.
+
+In terms of shape, an $L^2$ function must be small enough on large spatial regions so that its total squared mass stays finite. It may have peaks, but those peaks cannot be too large over too much of the domain. In particular, a function that stays close to a nonzero constant as $x\to\pm\infty$ is not in $L^2(\mathbb R)$.
+
+For traveling-wave problems, this is why a front profile $\hat v$ is usually not in $L^2(\mathbb R)$: it connects two nonzero limiting states. By contrast, the perturbation $u(t,\cdot)$ is required to lie in $L^2(\mathbb R)$, which means that the deviation from the wave must become small far away from the front.
+
+\subsection*{A.9. Differentiating the Orthogonality Condition}
+In Section 7.4 we introduced
+\[
+G(t):=\left\langle \hat v_x(\cdot+ct+C(t)),\,v(t,\cdot)-\hat v(\cdot+ct+C(t))\right\rangle_{L^2(\mathbb R)}.
+\]
+To compute $G'(t)$, we first apply the product rule for the $L^2$ inner product:
+\begin{align*}
+G'(t)
+&=
+\left\langle \frac{d}{dt}\hat v_x(\cdot+ct+C(t)),\,v(t,\cdot)-\hat v(\cdot+ct+C(t))\right\rangle_{L^2(\mathbb R)} \\
+&\quad +
+\left\langle \hat v_x(\cdot+ct+C(t)),\,\frac{d}{dt}\bigl(v(t,\cdot)-\hat v(\cdot+ct+C(t))\bigr)\right\rangle_{L^2(\mathbb R)} \\
+ \end{align*}
+We then apply the chain rule to each time-dependent factor:
+\begin{align*}
+\frac{d}{dt}\hat v_x(\cdot+ct+C(t))
+&=
+(c+C'(t))\hat v_{xx}(\cdot+ct+C(t)), \\
+\frac{d}{dt}\bigl(v(t,\cdot)-\hat v(\cdot+ct+C(t))\bigr)
+&=
+\partial_t v(t,\cdot)-(c+C'(t))\hat v_x(\cdot+ct+C(t)).
+\end{align*}
+Substituting these identities back into the product rule yields
+\begin{align*}
+G'(t)
+&=
+\left\langle \frac{d}{dt}\hat v_x(\cdot+ct+C(t)),\,v(t,\cdot)-\hat v(\cdot+ct+C(t))\right\rangle_{L^2(\mathbb R)} \\
+&\quad +
+\left\langle \hat v_x(\cdot+ct+C(t)),\,\frac{d}{dt}\bigl(v(t,\cdot)-\hat v(\cdot+ct+C(t))\bigr)\right\rangle_{L^2(\mathbb R)} \\
+&=
+\left\langle (c+C'(t))\hat v_{xx}(\cdot+ct+C(t)),\,v(t,\cdot)-\hat v(\cdot+ct+C(t))\right\rangle_{L^2(\mathbb R)} \\
+&\quad +
+\left\langle \hat v_x(\cdot+ct+C(t)),\,\partial_t v(t,\cdot)-(c+C'(t))\hat v_x(\cdot+ct+C(t))\right\rangle_{L^2(\mathbb R)}.
+\end{align*}
+Since the orthogonality condition is imposed for all $t$, one has $G(t)\equiv 0$, hence $G'(t)=0$.
+
+\subsection*{A.10. The Spectral Gap of the Linearized Operator}
+It means the linearized operator has a strictly negative coercive bound away from the neutral modes.
+
+In Section 8.3, this is expressed by
+\[
+\langle \nu\partial_{xx}u+b f'(\hat v)u,u\rangle
+\leq
+-k_r\|u\|_{H^{1,2}(\mathbb R)}^2.
+\]
+with $k_r>0$.
+
+So the spectral gap is the positive constant $k_r$. It measures how strongly the linearized dynamics damp perturbations. Intuitively:
+\begin{itemize}
+\item if there were no gap, perturbations could persist without decay;
+\item a positive gap means the linear part pushes perturbations back toward the wave at a definite rate.
+\end{itemize}
+
+This interpretation must be used with care in the presence of translation invariance. Later in the notes, one sees that the tangential direction generated by shifts of the wave is neutral, so the naive coercive estimate has to be corrected by separating the translation mode from the genuinely decaying directions.
+
+\subsection*{A.11. Decay in the Orthogonal Direction}
+\begin{lemma}
+Let
+\[
+Lu:=\nu\partial_{xx}u+b f'(\hat v)u.
+\]
+Assume the estimate from Section 9.2:
+\[
+\langle Lu,u\rangle
+\le
+-k_r\|u\|_{H^{1,2}(\mathbb R)}^2
++C_r\langle u,\hat v_x\rangle_{L^2(\mathbb R)}^2.
+\]
+If $u$ is orthogonal to the translation direction, that is,
+\[
+\langle u,\hat v_x\rangle_{L^2(\mathbb R)}=0,
+\]
+then
+\[
+\langle Lu,u\rangle
+\le
+-k_r\|u\|_{H^{1,2}(\mathbb R)}^2.
+\]
+\end{lemma}
+
+\begin{proof}
+If $\langle u,\hat v_x\rangle_{L^2(\mathbb R)}=0$, then the positive tangential term in the estimate from Section 9.2 vanishes. Therefore
+\[
+\langle Lu,u\rangle
+\le
+-k_r\|u\|_{H^{1,2}(\mathbb R)}^2.
+\]
+Since $k_r>0$, this shows strict decay on the subspace orthogonal to $\hat v_x$.
+\end{proof}
+
+\subsection*{A.12. Deriving the Moving-Frame Energy Inequality}
+\begin{lemma}
+Let
+\[
+\hat v=\hat v(\cdot+ct+C(t))
+\]
+and suppose
+\[
+v(t,x)=\hat v(x+ct+C(t))+u(t,x).
+\]
+Then
+\[
+\begin{aligned}
+\frac12\frac{d}{dt}\|v(t,\cdot)-\hat v\|_{L^2(\mathbb R)}^2
+\leq{}&-\nu\int_{\mathbb R}\bigl(\partial_x(v(t,x)-\hat v(x))\bigr)^2\,dx \\
+&+b\int_{\mathbb R} f'(\hat v(x))(v(t,x)-\hat v(x))^2\,dx \\
+&+\langle R_f(x),v(t,\cdot)-\hat v\rangle \\
+&+C'(t)\langle \hat v_x,\hat v-v(t,\cdot)\rangle_{L^2(\mathbb R)}.
+\end{aligned}
+\]
+\end{lemma}
+
+\begin{proof}
+Write
+\[
+u(t,\cdot)=v(t,\cdot)-\hat v.
+\]
+Then
+\[
+\frac12\frac{d}{dt}\|v(t,\cdot)-\hat v\|_{L^2(\mathbb R)}^2
+=
+\frac12\frac{d}{dt}\|u(t,\cdot)\|_{L^2(\mathbb R)}^2
+=
+\langle \partial_t u(t,\cdot),u(t,\cdot)\rangle_{L^2(\mathbb R)}.
+\]
+Because $\hat v=\hat v(\cdot+ct+C(t))$, the chain rule gives
+\[
+\partial_t \hat v=(c+C'(t))\hat v_x.
+\]
+Hence
+\[
+\partial_t u=\partial_t v-(c+C'(t))\hat v_x.
+\]
+Using the traveling-wave equation for $\hat v$ and the Taylor expansion from Section 6.8, one obtains the perturbation equation in the moving frame
+\[
+\partial_t u
+=
+\nu\partial_{xx}u+b f'(\hat v)u+R_f(x)-C'(t)\hat v_x.
+\]
+Substituting this into the energy identity yields
+\[
+\frac12\frac{d}{dt}\|u(t,\cdot)\|_{L^2(\mathbb R)}^2
+=
+\langle \nu\partial_{xx}u+b f'(\hat v)u,u\rangle
++\langle R_f(x),u\rangle
+-C'(t)\langle \hat v_x,u\rangle_{L^2(\mathbb R)}.
+\]
+Integrating by parts in the diffusion term gives
+\[
+\langle \nu\partial_{xx}u,u\rangle
+=
+-\nu\int_{\mathbb R}(\partial_x u(x))^2\,dx.
+\]
+Also,
+\[
+\langle b f'(\hat v)u,u\rangle
+=
+b\int_{\mathbb R} f'(\hat v(x))u^2(x)\,dx,
+\]
+and
+\[
+-C'(t)\langle \hat v_x,u\rangle_{L^2(\mathbb R)}
+=
+C'(t)\langle \hat v_x,\hat v-v(t,\cdot)\rangle_{L^2(\mathbb R)}.
+\]
+Combining these identities and recalling $u=v-\hat v$ gives the stated inequality.
 \end{proof}
 
 \end{document}
