@@ -24,7 +24,9 @@
 
 This lecture develops Gaussian measures on Hilbert spaces, establishes the trace and spectral properties of the covariance operator, and introduces the canonical construction of the \(Q\)-Wiener process.
 
-\section*{1. Foundation: Gaussian Measures on Hilbert Spaces}
+\section*{1. Gaussian Measures on Hilbert Spaces}
+
+\subsection*{1.1. Foundation: Gaussian Measures on Hilbert Spaces}
 We begin by fixing a real, separable Hilbert space, denoted by $H$, equipped with an inner product $\langle \cdot,\cdot\rangle$.
 
 We define a probability measure $\mu$ on the Borel $\sigma$-algebra $(H,\mathcal B(H))$ to be a Gaussian measure if and only if, for every $h\in H$, the one-dimensional projection
@@ -37,7 +39,7 @@ has characteristic function
 \qquad \text{for all } t\in\mathbb R.
 \]
 
-\section*{2. Theorem 1.6: Characterization of the Measure}
+\subsection*{1.2. Theorem 1.6: Characterization of the Measure}
 Having fixed the setting, we now state the abstract characterization of Gaussian measures on $H$.
 
 \begin{theorem}[Theorem 1.6]
@@ -61,7 +63,7 @@ For this to hold, the covariance operator $Q$ must satisfy strict conditions: it
 \]
 If the trace is finite for one CONS, it is finite for all such systems.
 
-\section*{3. Application: The Brownian Bridge and the Inverse Dirichlet Laplacian}
+\subsection*{1.3. Application: The Brownian Bridge and the Inverse Dirichlet Laplacian}
 With the general characterization in place, consider a first example given by the Brownian bridge on the time interval $[0,T]$.
 The Brownian bridge process may be viewed as Brownian motion conditioned to return to the prescribed terminal point at time $T$. Equivalently, the law of the Brownian bridge is the distribution of Brownian motion under this conditioning. In the present case, the process is pinned at $0$ at the initial time and again at $0$ at time $T$, although one could also choose arbitrary initial and terminal positions.
 
@@ -71,7 +73,7 @@ We consider the inverse Dirichlet Laplacian operator, denoted $(-\Delta_D)^{-1}$
 \]
 The kernel of this integral, \(\left(s\wedge t-\frac{st}{T}\right)\), is the fundamental solution. By evaluating this fundamental solution at the boundaries $t=0$ and $t=T$, one sees that it trivially equals $0$, satisfying the required Dirichlet boundary conditions.
 
-\section*{4. Sketch of the Proof for Theorem 1.6}
+\subsection*{1.4. Sketch of the Proof for Theorem 1.6}
 After this example, return to the forward implication \(\Rightarrow\) in Theorem 1.6.
 What one has is that for every \(h\in H\), the projection \(\ell_h(u)=\langle h,u\rangle\) is a one-dimensional Gaussian random variable under \(\mu\). The goal is to point out that there exist a mean vector \(m\in H\) and a covariance operator \(Q\) such that these scalar Gaussian projections admit the Hilbert-space representation \(\mu=\mathcal N(m,Q)\).
 
@@ -105,7 +107,9 @@ The Baire Category Theorem then yields an interior point argument that gives the
 
 We now make this boundedness argument rigorous and then construct the covariance operator.
 
-\section*{5. Fatou's Lemma and the Closedness of $H_n$}
+\section*{2. Constructing the Mean and Covariance}
+
+\subsection*{2.1. Fatou's Lemma and the Closedness of $H_n$}
 To begin the proof, first show that the sets $H_n$ are closed. Let $(h_n)_{n\ge 1}$ be a sequence in $H_n$ such that
 \[
 h_n\to h
@@ -138,7 +142,7 @@ h\in H_n.
 \]
 So every limit of a convergent sequence from $H_n$ stays in $H_n$. This is exactly the definition of closedness.
 
-\section*{6. Applying the Baire Category Theorem}
+\subsection*{2.2. Applying the Baire Category Theorem}
 Once the closed sets $H_n$ are available, apply the Baire Category Theorem. Since the entire Hilbert space is the countable union of these closed subsets,
 \[
 H=\bigcup_{n\ge 1} H_n,
@@ -149,7 +153,7 @@ H^\circ_{n_0}\neq\varnothing.
 \]
 Therefore, there exists a strictly positive radius $\varepsilon>0$ and a center point $h_0\in H$ such that the open ball $B_\varepsilon(h_0)$ is completely contained within $H_{n_0}$.
 
-\section*{7. Bounding the Mean Functional $m(h)$}
+\subsection*{2.3. Bounding the Mean Functional $m(h)$}
 Having found a set with non-empty interior, use this information to bound the map $h\mapsto m(h)$ on the unit ball. This shows that $h\mapsto m(h)$ is a continuous linear functional on $H$, and therefore, by the Riesz representation theorem, there exists a unique vector in $H$ representing it. To prove this boundedness, evaluate $h\in H$ subject to $\|h\|\le 1$. Use an algebraic manipulation to scale and shift $h$ directly into the defined ball $B_\varepsilon(h_0)$:
 \[
 h=\frac{2}{\varepsilon}\left(\frac{\varepsilon}{2}h+h_0-h_0\right).
@@ -195,7 +199,7 @@ m(h)=\langle m,h\rangle
 \qquad \text{for all } h\in H.
 \]
 
-\section*{8. Construction of the Covariance Operator $Q$}
+\subsection*{2.4. Construction of the Covariance Operator $Q$}
 Once the mean vector has been identified, construct the covariance operator $Q$. For each \(h\in H\), one defines the linear functional \(g\mapsto \langle Qh,g\rangle\) through the centered second moments. Define this mapping explicitly by
 \[
 \langle Qh,g\rangle
@@ -219,7 +223,9 @@ This establishes the existence and representation of the covariance operator $Q$
 
 The next step is to prove that the covariance operator $Q$ is trace class, that is, that \(\tr(Q)<\infty\).
 
-\section*{9. The Trace Bound Lemma}
+\section*{3. The Trace Bound Argument}
+
+\subsection*{3.1. The Trace Bound Lemma}
 After the existence of the covariance operator has been established, the remaining structural point is the finite trace condition.
 
 \begin{lemma}[Trace bound lemma]
@@ -241,7 +247,7 @@ and therefore
 \]
 \end{lemma}
 
-\section*{10. Side Remark: The Deterministic-Drift Case of Girsanov's Theorem}
+\subsection*{3.2. Side Remark: The Deterministic-Drift Case of Girsanov's Theorem}
 Before returning to the trace estimate, record the deterministic-shift case of Girsanov's theorem.
 
 \begin{theorem}[Deterministic-drift case of Girsanov's theorem]
@@ -257,7 +263,7 @@ The finiteness of this quantity is exactly the condition under which the corresp
 In finite dimensions, a full-support density may be shifted in any direction and remain absolutely continuous. In the Wiener-space setting, by contrast, this property holds only along Cameron-Martin directions. Thus the deterministic shifts that preserve absolute continuity form only a very small subset of the whole path space. In fact, the Cameron-Martin space itself has Wiener measure zero. The admissible shift directions are therefore exceptional directions along which one may still compare the shifted law with the original Wiener measure.
 \end{theorem}
 
-\section*{11. Proof of the Trace Bound Lemma (Finite-Dimensional Case)}
+\subsection*{3.3. Proof of the Trace Bound Lemma (Finite-Dimensional Case)}
 \begin{proof}
 Return now to the trace bound proof and begin with the finite-dimensional setting:
 \[
@@ -333,7 +339,9 @@ Therefore,
 
 Having established the finite-dimensional estimate, pass next to the infinite-dimensional limit.
 
-\section*{12. Completing the Trace Bound Proof: The Infinite Limit}
+\section*{4. Spectral Structure of the Covariance Operator}
+
+\subsection*{4.1. Completing the Trace Bound Proof: The Infinite Limit}
 \begin{proof}
 From our finite-dimensional projection, we established the fundamental inequality:
 \[
@@ -385,7 +393,7 @@ Because this integral is strictly positive, its inverse square is finite, rigoro
 This has a direct support interpretation: if the variances were not summable, then the limiting Gaussian measure would no longer be supported on the Hilbert space \(H\), but only on a larger space with a weaker norm.
 \end{proof}
 
-\section*{13. Spectral Properties of the Covariance Operator}
+\subsection*{4.2. Spectral Properties of the Covariance Operator}
 Once \(\tr(Q)<\infty\) has been established, the finite trace property yields the spectral decomposition of the covariance operator. Formalize the properties of $Q$ via the following proposition.
 
 \begin{proposition}
@@ -403,13 +411,15 @@ A critical topological consequence of this structure is that \(0\) is the only a
 \]
 \end{proposition}
 
-\section*{14. The Abstract Fourier Series Foundation}
+\subsection*{4.3. The Abstract Fourier Series Foundation}
 With the spectral data now available, recall the deterministic framework of the abstract Fourier series. Given the CONS \((e_k)_k\) in $H$, any arbitrary element \(x\in H\) can be uniquely represented by the expansion
 \[
 x=\sum_{k=1}^\infty \langle x,e_k\rangle e_k.
 \]
 
-\section*{15. Canonical Representation of a Gaussian Measure}
+\section*{5. Canonical Representations and the \(Q\)-Wiener Process}
+
+\subsection*{5.1. Canonical Representation of a Gaussian Measure}
 These ingredients now combine into the canonical representation, often referred to as the Karhunen--Lo\`eve expansion.
 
 \begin{proposition}
@@ -432,7 +442,7 @@ This representation also gives a practical way to simulate an infinite-dimension
 
 Before passing to time-dependent processes, we first examine the one-dimensional projections of the Gaussian random variable in the eigenbasis of \(Q\).
 
-\section*{16. The One-Dimensional Projections of the Gaussian Variable}
+\subsection*{5.2. The One-Dimensional Projections of the Gaussian Variable}
 To prepare for the process case, project the Gaussian random variable \(X\stackrel{\hat{\ }}{=}\mathcal N(m,Q)\) onto the Complete Orthonormal System \((e_k)\). The inner product \(\langle X,e_k\rangle\) yields a one-dimensional Gaussian distribution:
 \[
 \langle X,e_k\rangle\stackrel{\hat{\ }}{=}\mathcal N(\langle m,e_k\rangle,\langle Qe_k,e_k\rangle).
@@ -452,7 +462,7 @@ X\stackrel{\hat{\ }}{=}\sum_{k=1}^\infty \sqrt{\lambda_k}\,\mathcal N(0,1)e_k+\s
 
 This pointwise decomposition is the static model for the next step, where the scalar Gaussian coefficients are replaced by one-dimensional Brownian motions.
 
-\section*{17. Definition of the \(Q\)-Wiener Process}
+\subsection*{5.3. Definition of the \(Q\)-Wiener Process}
 Having understood the static decomposition, replace the scalar Gaussian coefficients by time-dependent Brownian motions and define the corresponding process. Let \(H\) and \(U\) be separable Hilbert spaces. Define a \(U\)-valued stochastic process \((W_t)_{t\in[0,T]}\) on a standard probability space \((\Omega,\mathcal F,\mathbb P)\). This process is formally called a standard \(Q\)-Wiener process if and only if it satisfies three strict axioms:
 The notation is now switched from \(H\) to \(U\) in order to separate the state space of the Wiener process from the state space that will later be used for stochastic differential equations or stochastic partial differential equations. Once this state space is fixed, one cannot take the identity as covariance operator in infinite dimensions, because that would have infinite trace. For this reason the covariance is given by a trace-class operator \(Q\).
 
@@ -478,7 +488,7 @@ W_{t_i}-W_{t_{i-1}}\sim N(0,(t_i-t_{i-1})Q).
 \]
 If one works with a given filtration \((\mathcal F_t)_{t\in[0,T]}\), the corresponding filtered definition requires in addition that the process be adapted and that these increments are independent of the past \(\sigma\)-algebra \(\mathcal F_{t_{i-1}}\).
 
-\section*{18. Canonical Representation of the Wiener Process}
+\subsection*{5.4. Canonical Representation of the Wiener Process}
 Once the \(Q\)-Wiener process has been defined, construct its canonical series representation parallel to the static case. The canonical representation of \(W_t\) is
 \[
 W_t=\sum_{k=1}^\infty \sqrt{\lambda_k}\,\beta_k(t)e_k.
@@ -494,7 +504,7 @@ This means that the partial sums converge not only pathwise, but also in the sen
 \]
 See Appendix A.14 for a brief explanation of this mode of convergence.
 
-\section*{19. Martingale Convergence and Doob's Inequality}
+\subsection*{5.5. Martingale Convergence and Doob's Inequality}
 To justify the convergence asserted in the previous section, analyze the partial sums of this canonical series as a sequence of martingales, denoted \((M_t^n)_n\), where
 \[
 M_t^n:=\sum_{k=1}^n \sqrt{\lambda_k}\,\beta_k(t)e_k.
